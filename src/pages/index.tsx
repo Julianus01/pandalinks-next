@@ -1,4 +1,4 @@
-import LinksApi from '@/api/LinksApi'
+import LinksApi, { Link } from '@/api/LinksApi'
 import AuthLayout from '@/components/AuthLayout'
 import { withAuth } from '@/firebase/withAuth'
 
@@ -8,9 +8,8 @@ export async function getServerSideProps() {
   return { props: { links: response } }
 }
 
-// TODO: Types
 interface Props {
-  links: any
+  links: Link
 }
 
 function HomePage(props: Props) {
@@ -26,13 +25,13 @@ function HomePage(props: Props) {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="w-6 h-6 text-gray-400 absolute left-3 inset-y-0 my-auto"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
               />
             </svg>
@@ -49,11 +48,11 @@ function HomePage(props: Props) {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="w-4 h-4"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             add link
           </button>

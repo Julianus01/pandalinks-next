@@ -1,22 +1,24 @@
-import { useContext, useEffect } from 'react'
+/* eslint-disable react/display-name */
+import { ComponentType, useContext, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AuthContext } from '@/context/AuthContext'
 import LoadingPage from '@/components/LoadingPage'
 
-// eslint-disable-next-line react/display-name
-export const withAuth = (Component: React.FC) => (props: any) => {
-  const { user } = useContext(AuthContext)
-  const router = useRouter()
+export const withAuth =
+  <P extends {}>(Component: ComponentType<P>): ComponentType<P> =>
+  (props) => {
+    const { user } = useContext(AuthContext)
+    const router = useRouter()
 
-  useEffect(() => {
+    useEffect(() => {
+      if (!user) {
+        router.push('/login')
+      }
+    }, [router, user])
+
     if (!user) {
-      router.push('/login')
+      return <LoadingPage />
     }
-  }, [router, user])
 
-  if (!user) {
-    return <LoadingPage />
+    return <Component {...props} />
   }
-
-  return <Component {...props} />
-}
