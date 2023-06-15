@@ -10,7 +10,7 @@ export interface AuthContextState {
   loading: boolean
 }
 
-export const AuthContext = React.createContext<AuthContextState>({ user: null })
+export const AuthContext = React.createContext<AuthContextState>({ user: null, loading: true })
 
 export const useAuthContext = () => React.useContext(AuthContext)
 
