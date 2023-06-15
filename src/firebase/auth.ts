@@ -1,5 +1,5 @@
 import firebase_app from './firebaseConfig'
-import { AuthError, GoogleAuthProvider, getAuth, signInWithPopup, signOut } from 'firebase/auth'
+import { AuthError, GoogleAuthProvider, getAuth, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth'
 
 const auth = getAuth(firebase_app)
 
@@ -33,7 +33,7 @@ export async function loginWithGoogleCredential() {
   try {
     const provider = new GoogleAuthProvider()
 
-    const userCredential = await signInWithPopup(auth, provider)
+    const userCredential = await signInWithRedirect(auth, provider)
     return userCredential
   } catch (err) {
     const error: AuthError = err as AuthError

@@ -1,6 +1,8 @@
+import LoadingPage from '@/components/LoadingPage'
+import { AuthContext } from '@/context/AuthContext'
 import { loginWithGoogleCredential } from '@/firebase/auth'
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useContext } from 'react'
 
 const features = [
   {
@@ -43,16 +45,25 @@ const features = [
 
 function LoginPage() {
   const router = useRouter()
+  const authData = useContext(AuthContext)
 
   async function login() {
     await loginWithGoogleCredential()
+  }
+
+  if (authData.loading) {
+    return <LoadingPage />
+  }
+
+  if (authData.user) {
     router.push('/')
+    return <LoadingPage />
   }
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-28 gap-12 text-gray-600 md:px-8 xl:flex">
-      <div className="space-y-5 max-w-2xl mx-auto text-center xl:text-left">
-        <div className="flex flex-wrap items-center justify-center gap-6 xl:justify-start">
+      <div className="space-y-5 max-w-2xl mx-auto text-center">
+        <div className="flex flex-wrap items-center justify-center gap-6">
           {features.map((item, idx) => (
             <div key={idx} className="flex items-center gap-x-2 text-gray-500 text-sm">
               {item.icon}
@@ -73,7 +84,7 @@ function LoginPage() {
           eaque ipsa quae.
         </p>
 
-        <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0 xl:justify-start">
+        <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0">
           <button
             onClick={login}
             className="flex items-center justify-center gap-x-2 py-2 px-4 text-white font-medium bg-gray-800 duration-150 hover:bg-gray-700 active:bg-gray-900 rounded-lg md:inline-flex"

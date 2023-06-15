@@ -7,6 +7,7 @@ const auth = getAuth(firebase_app)
 
 export interface AuthContextState {
   user: User | null
+  loading: boolean
 }
 
 export const AuthContext = React.createContext<AuthContextState>({ user: null })
@@ -35,5 +36,5 @@ export const AuthContextProvider = ({ children }: AuthContextProps) => {
     return () => unsubscribe()
   }, [])
 
-  return <AuthContext.Provider value={{ user }}>{loading ? <LoadingPage /> : children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading }}>{loading ? <LoadingPage /> : children}</AuthContext.Provider>
 }
