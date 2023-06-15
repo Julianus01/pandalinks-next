@@ -1,6 +1,7 @@
 import { AuthContextProvider } from '@/context/AuthContext'
 import './globals.css'
 import { Inter } from 'next/font/google'
+import classNames from 'classnames'
 
 const inter = Inter({ display: 'swap', subsets: ['latin'] })
 
@@ -12,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={classNames({ [inter.className]: true, 'bg-gray-50': true })}>
         <AuthContextProvider>{children}</AuthContextProvider>
       </body>
     </html>
