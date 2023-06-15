@@ -70,7 +70,8 @@ function LoginPage() {
         </h1>
 
         <p className="max-w-xl mx-auto xl:mx-0">
-          Experience simplicity and beautiful UI in your daily use. Manager, organize and use them by joining in
+          Sed ut perspiciatis unde omnis iste natus voluptatem accusantium doloremque laudantium, totam rem aperiam,
+          eaque ipsa quae.
         </p>
 
         <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0 xl:justify-start">
