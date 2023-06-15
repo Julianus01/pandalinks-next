@@ -1,4 +1,3 @@
-'use client'
 import { loginWithGoogleCredential } from '@/firebase/auth'
 import { useRouter } from 'next/navigation'
 import React from 'react'

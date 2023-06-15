@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import { onAuthStateChanged, getAuth, User } from 'firebase/auth'
 import firebase_app from '@/firebase/firebaseConfig'

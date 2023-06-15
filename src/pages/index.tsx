@@ -1,8 +1,22 @@
-'use client'
+import LinksApi from '@/api/LinksApi'
 import AuthLayout from '@/components/AuthLayout'
 import { withAuth } from '@/firebase/withAuth'
 
-function HomePage() {
+export async function getServerSideProps() {
+  const response = await LinksApi.getLinks()
+
+  return { props: { links: response } }
+}
+
+// TODO: Types
+interface Props {
+  links: any
+}
+
+function HomePage(props: Props) {
+  console.log('Home Props')
+  console.log(props)
+
   return (
     <AuthLayout>
       <div className="w-full max-w-3xl h-16 px-5 mx-auto pt-20">
