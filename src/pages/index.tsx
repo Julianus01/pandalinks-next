@@ -1,25 +1,32 @@
-import LinksApi, { Link } from '@/api/LinksApi'
+import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
+import { LinksApi } from '@/api/LinksApi'
+import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/AuthLayout'
 import { withAuth } from '@/firebase/withAuth'
+import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 
 export async function getServerSideProps() {
-  const response = await LinksApi.getLinks()
+  const response = await AdminLinksApi.getLinks()
 
   return { props: { links: response } }
 }
 
 interface Props {
-  links: Link
+  links: Link[]
 }
 
 function HomePage(props: Props) {
-  console.log('Home Props')
-  console.log(props)
+  const linksQuery = useQuery({
+    queryKey: [ReactQueryKey.getLinks],
+    queryFn: LinksApi.getLinks,
+    initialData: props.links,
+  })
 
   return (
     <AuthLayout>
       <div className="w-full max-w-3xl h-16 px-5 mx-auto pt-20">
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 mb-6">
           <div className="relative flex-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -56,6 +63,28 @@ function HomePage(props: Props) {
             </svg>
             add link
           </button>
+        </div>
+
+        <div className="flex-y-2">
+          {linksQuery.data.map((link: Link) => (
+            <a
+              rel="noopener noreferrer"
+              target="_blank"
+              href={`//${link.src}`}
+              key={link.id}
+              className="px-4 py-2 hover:bg-gray-100 rounded cursor-pointer -mx-1 flex items-center"
+            >
+              <Image
+                className="mr-2"
+                alt="test"
+                width={18}
+                height={18}
+                src={`https://www.google.com/s2/favicons?domain=${link.src}&sz=256`}
+              />
+
+              <p>{link.src}</p>
+            </a>
+          ))}
         </div>
       </div>
     </AuthLayout>

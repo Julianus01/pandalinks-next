@@ -1,22 +1,18 @@
-import db from '@/utils/db'
+import { Link } from './AdminLinksApi'
+import { DocumentData, QueryDocumentSnapshot, collection, getDocs, getFirestore, query } from 'firebase/firestore'
+import { FirestoreCollection } from './FirestoreCollection'
 
-export interface Link {
-  id: string
-  src: string
+async function getLinks(): Promise<Link[]> {
+  const querySnapshot = await getDocs(query(collection(getFirestore(), FirestoreCollection.links)))
+
+  const links = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Link[]
+
+  return links
 }
 
-async function getLinks() {
-  const links = await db.collection('links').get()
-  const linksData = links.docs.map((link) => ({
-    id: link.id,
-    ...link.data(),
-  }))
-
-  return linksData
+export const LinksApi = {
+  getLinks
 }
-
-const LinksApi = {
-  getLinks,
-}
-
-export default LinksApi
