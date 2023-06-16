@@ -141,19 +141,24 @@ function HomePage(props: Props) {
         </div>
 
         <div ref={linksContainerRef} className="space-y-1">
-          {filteredLinks.map((link: Link) => (
-            <LinkRow
-              onUpdate={onUpdateLink}
-              onExitEditMode={() => setIsEditMode(false)}
-              isEditMode={isEditMode && selected === link.id}
-              onContextMenu={(event) => handleContextMenu(event, link)}
-              link={link}
-              key={link.id}
-              onClick={() => setSelected(link.id)}
-              onDoubleClick={() => navigateToLink(link)}
-              isSelected={selected === link.id}
-            />
-          ))}
+          {filteredLinks.map((link: Link) => {
+            const isSelected = selected === link.id
+
+            return (
+              <LinkRow
+                isUpdating={updateLinkMutation.isPending && isSelected}
+                onUpdate={onUpdateLink}
+                onExitEditMode={() => setIsEditMode(false)}
+                isEditMode={isEditMode && isSelected}
+                onContextMenu={(event) => handleContextMenu(event, link)}
+                link={link}
+                key={link.id}
+                onClick={() => setSelected(link.id)}
+                onDoubleClick={() => navigateToLink(link)}
+                isSelected={isSelected}
+              />
+            )
+          })}
         </div>
       </div>
 
