@@ -49,6 +49,7 @@ function LoginPage() {
 
   async function login() {
     await loginWithGoogleCredential()
+    router.push('/login')
   }
 
   if (authData.loading) {

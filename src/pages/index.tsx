@@ -50,7 +50,7 @@ function HomePage() {
   useClickAway(contextMenuRef, resetContextMenu)
 
   useKey('Escape', () => {
-    setShowContextMenu(false)
+    resetContextMenu()
     setSelected(null)
     setEditLink(null)
   })
