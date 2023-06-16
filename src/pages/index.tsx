@@ -52,6 +52,7 @@ function HomePage() {
   useKey('Escape', () => {
     setShowContextMenu(false)
     setSelected(null)
+    setEditLink(null)
   })
 
   useKey(
