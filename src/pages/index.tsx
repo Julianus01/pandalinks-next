@@ -1,13 +1,13 @@
 import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
-import { LinksApi } from '@/api/LinksApi'
+import { LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/AuthLayout'
 import LinkRow from '@/components/Links/LinkRow'
 import SearchLinks from '@/components/Links/SearchLinks'
 import { withAuth } from '@/firebase/withAuth'
-import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useClickAway, useKey } from 'react-use'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo, useRef, useState } from 'react'
+import { useClickAway, useEvent, useKey } from 'react-use'
 
 export async function getServerSideProps() {
   const response = await AdminLinksApi.getLinks()
@@ -20,30 +20,62 @@ interface Props {
 }
 
 function HomePage(props: Props) {
+  const queryClient = useQueryClient()
   const [searchQ, setSearchQ] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
-  const ref = useRef(null)
+  const [isEditMode, setIsEditMode] = useState<boolean>(false)
+  const linksContainerRef = useRef(null)
 
-  const contextmenuRef = useRef<HTMLDivElement>(null)
-  const contextmenuHandler = useRef<HTMLDivElement>(null)
+  const contextMenuRef = useRef<HTMLDivElement>(null)
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
+
+  // Close context menu when clicking away
+  useClickAway(contextMenuRef, resetContextMenu)
 
   useKey('Escape', () => {
     setShowContextMenu(false)
     setSelected(null)
   })
 
-  useClickAway(ref, () => {
+  useKey(
+    'Enter',
+    () => {
+      if (selected && !isEditMode) {
+        setIsEditMode(true)
+      }
+    },
+    {},
+    [selected, isEditMode]
+  )
+
+  useClickAway(linksContainerRef, () => {
     setSelected(null)
   })
 
-  useEffect(() => {
-    document.addEventListener('click', () => resetContextMenu())
-    document.addEventListener('contextmenu', (e) => {
-      if (contextmenuHandler.current && !contextmenuHandler?.current?.contains(e.target as any)) resetContextMenu()
+  const updateLinkMutation = useMutation({
+    mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
+  })
+
+  function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
+    updateLinkMutation.mutate(updatedLink, {
+      onSuccess: () => {
+        queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+          const oldLinks = data as Link[]
+
+          const updatedLinks = oldLinks.map((oldLink) => {
+            if (oldLink.id === updatedLink.id) {
+              return { ...oldLink, ...updatedLink }
+            }
+
+            return oldLink
+          })
+
+          return updatedLinks
+        })
+      },
     })
-  }, [])
+  }
 
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks],
@@ -65,12 +97,12 @@ function HomePage(props: Props) {
     const { pageX, pageY } = e
     setShowContextMenu(true)
     setTimeout(() => {
-      if (contextmenuRef?.current) {
-        const rect = contextmenuRef.current.getBoundingClientRect()
+      if (contextMenuRef?.current) {
+        const rect = contextMenuRef.current.getBoundingClientRect()
         const x = pageX + rect.width > window.innerWidth ? window.innerWidth - rect.width : pageX + 2
         const y = pageY + rect.height > window.innerHeight ? window.innerHeight - rect.height : pageY + 2
         setPosition({ x, y })
-        contextmenuRef?.current?.classList.remove('opacity-0')
+        contextMenuRef?.current?.classList.remove('opacity-0')
         document.documentElement.classList.add('overflow-hidden')
       }
     }, 100)
@@ -108,10 +140,12 @@ function HomePage(props: Props) {
           </button>
         </div>
 
-        <div ref={ref} className="space-y-1">
+        <div ref={linksContainerRef} className="space-y-1">
           {filteredLinks.map((link: Link) => (
             <LinkRow
-              ref={contextmenuHandler}
+              onUpdate={onUpdateLink}
+              onExitEditMode={() => setIsEditMode(false)}
+              isEditMode={isEditMode && selected === link.id}
               onContextMenu={(event) => handleContextMenu(event, link)}
               link={link}
               key={link.id}
@@ -125,7 +159,7 @@ function HomePage(props: Props) {
 
       {showContextMenu && (
         <div
-          ref={contextmenuRef}
+          ref={contextMenuRef}
           className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
           style={{ top: `${position.y}px`, left: `${position.x}px` }}
         >
