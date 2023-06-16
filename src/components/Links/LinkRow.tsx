@@ -3,25 +3,9 @@ import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { UrlUtils } from '@/utils/urlUtils'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
-
-const useOutsideClick = (ref, callback, deps = []) => {
-  useEffect(() => {
-    const handleClick = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        callback()
-      }
-    }
-
-    document.addEventListener('click', handleClick, true)
-
-    return () => {
-      document.removeEventListener('click', handleClick, true)
-    }
-  }, [ref, callback, ...deps])
-}
 
 interface Props {
   link: Link
@@ -31,8 +15,8 @@ interface Props {
   onDoubleClick: () => void
   onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void
   onExitEditMode: () => void
-  onUnselect: () => void
   onUpdate: (updatedLink: UpdateLinkRequestParams) => void
+  onUnselect: () => void
 }
 
 function LinkRow(props: Props) {
@@ -43,6 +27,13 @@ function LinkRow(props: Props) {
     'Enter',
     () => {
       const trimmedValue = value.trim()
+
+      if (!trimmedValue?.length) {
+        setValue(props.link.src)
+        props.onExitEditMode()
+
+        return
+      }
 
       if (props.isEditMode && trimmedValue !== props.link.src) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
@@ -56,13 +47,20 @@ function LinkRow(props: Props) {
       }
     },
     {},
-    [props.isEditMode, value]
+    [props.isEditMode, value, props.link.src]
   )
 
   useClickAway(ref, () => {
     const trimmedValue = value.trim()
 
     if (props.isEditMode) {
+      if (!trimmedValue?.length) {
+        setValue(props.link.src)
+        props.onExitEditMode()
+
+        return
+      }
+
       if (trimmedValue !== props.link.src) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
           setValue(props.link.src)
@@ -77,7 +75,6 @@ function LinkRow(props: Props) {
       }
 
       props.onExitEditMode()
-      props.onUnselect()
     }
   })
 

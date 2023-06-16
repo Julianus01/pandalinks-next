@@ -10,13 +10,14 @@ import { useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LinkRowAdd from '@/components/Links/LinkRowAdd'
+import LoadingPage from '@/components/shared/LoadingPage'
 
 function HomePage() {
   const queryClient = useQueryClient()
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
-  const [isEditMode, setIsEditMode] = useState<boolean>(false)
+  const [inEdit, setInEdit] = useState<string | null>(null)
   const linksContainerRef = useRef(null)
 
   const contextMenuRef = useRef<HTMLDivElement>(null)
@@ -26,8 +27,11 @@ function HomePage() {
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks],
     queryFn: LinksApi.getLinks,
-    initialData: [],
   })
+
+  const links = useMemo(() => {
+    return linksQuery.data || []
+  }, [linksQuery.data])
 
   const updateLinkMutation = useMutation({
     mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
@@ -52,12 +56,12 @@ function HomePage() {
   useKey(
     'Enter',
     () => {
-      if (selected && !isEditMode) {
-        setIsEditMode(true)
+      if (selected && !inEdit) {
+        setInEdit(selected)
       }
     },
     {},
-    [selected, isEditMode]
+    [selected, inEdit]
   )
 
   // Delete Key
@@ -69,9 +73,12 @@ function HomePage() {
       if (selected) {
         queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
           const oldLinks = data as Link[]
+
           return oldLinks.filter((oldLink) => oldLink.id !== selected)
         })
+
         const deletePromise = deleteLinkMutation.mutateAsync(selected)
+
         toast.promise(deletePromise, {
           loading: 'Removing link...',
           success: () => {
@@ -146,11 +153,11 @@ function HomePage() {
 
   const filteredLinks = useMemo(() => {
     if (!searchQ) {
-      return linksQuery.data
+      return links
     }
 
-    return linksQuery.data.filter((link) => link.src.toLowerCase().includes(searchQ.toLowerCase()))
-  }, [linksQuery.data, searchQ])
+    return links.filter((link) => link.src.toLowerCase().includes(searchQ.toLowerCase()))
+  }, [links, searchQ])
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
     setSelected(link.id)
@@ -181,7 +188,9 @@ function HomePage() {
     return window.open(link.src, '_blank')
   }
 
-  console.log({ selected, isEditMode })
+  if (linksQuery.isLoading) {
+    return <LoadingPage />
+  }
 
   return (
     <AuthLayout>
@@ -219,15 +228,13 @@ function HomePage() {
             return (
               <LinkRow
                 onUpdate={onUpdateLink}
-                onExitEditMode={() => setIsEditMode(false)}
-                onUnselect={() => setSelected(null)}
-                isEditMode={isEditMode && isSelected}
+                onExitEditMode={() => setInEdit(null)}
+                isEditMode={inEdit === link.id}
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
                 onClick={() => {
                   setSelected(link.id)
-                  setIsEditMode(false)
                 }}
                 onDoubleClick={() => navigateToLink(link)}
                 isSelected={isSelected}
@@ -266,6 +273,7 @@ function HomePage() {
                     className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
                     role="menuitem"
                   >
+                    {' '}
                     {item.name}
                     <span className="text-gray-500">{item.command}</span>
                   </button>

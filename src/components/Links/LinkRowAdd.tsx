@@ -18,6 +18,12 @@ function LinkRowAdd(props: Props) {
     () => {
       const trimmedValue = value.trim()
 
+      if (!trimmedValue?.length) {
+        props.onClose()
+
+        return
+      }
+
       if (!UrlUtils.isValidUrl(trimmedValue)) {
         toast.error('Link is invalid URL')
 
@@ -32,6 +38,12 @@ function LinkRowAdd(props: Props) {
 
   useClickAway(ref, () => {
     const trimmedValue = value.trim()
+
+    if (!trimmedValue?.length) {
+      props.onClose()
+
+      return
+    }
 
     if (!UrlUtils.isValidUrl(trimmedValue)) {
       toast.error('Link is invalid URL')
