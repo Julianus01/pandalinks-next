@@ -12,7 +12,7 @@ const queryClient = new QueryClient()
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <main className={inter.className}>
-      <Toaster />
+      <Toaster position="bottom-center" />
 
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>

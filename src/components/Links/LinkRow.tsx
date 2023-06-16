@@ -1,5 +1,6 @@
 import { Link } from '@/api/AdminLinksApi'
 import { UpdateLinkRequestParams } from '@/api/LinksApi'
+import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
 import { UrlUtils } from '@/utils/urlUtils'
 import classNames from 'classnames'
 import Image from 'next/image'
@@ -21,6 +22,20 @@ interface Props {
 function LinkRow(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const [value, setValue] = useState<string>(props.link.src)
+  const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
+
+  // CMD + C
+  useKey(
+    (event) => {
+      return (event.ctrlKey || event.metaKey) && event.key === 'c'
+    },
+    () => {
+      if (props.isSelected) {
+        navigator.clipboard.writeText(value)
+        showCopiedMessage()
+      }
+    }
+  )
 
   useKey(
     'Escape',
@@ -47,7 +62,7 @@ function LinkRow(props: Props) {
 
       if (props.isEditMode && trimmedValue !== props.link.src) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
-          toast('Link is invalid URL')
+          toast('Invalid Link')
 
           return
         }
@@ -74,7 +89,7 @@ function LinkRow(props: Props) {
       if (trimmedValue !== props.link.src) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
           setValue(props.link.src)
-          toast('Link is invalid URL')
+          toast('Invalid Link')
           props.onExitEditMode()
 
           return
@@ -96,7 +111,7 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'pl-4 hover:bg-gray-100 rounded-lg cursor-pointer -mx-1.5 flex items-center border border-solid group': true,
+        'px-4 hover:bg-gray-100 rounded-lg cursor-pointer -mx-1.5 flex items-center border border-solid group': true,
         'border-gray-50': !props.isSelected,
         'hover:border-gray-200 bg-gray-100 border border-solid border-gray-200': props.isSelected,
         'cursor-default': props.isEditMode,
@@ -137,17 +152,34 @@ function LinkRow(props: Props) {
         </svg>
       </div>
 
-      {!props.isEditMode && <p className="py-2 pr-4">{value}</p>}
+      {!showCopied && !props.isEditMode && (
+        <p className="py-2">
+          {value}
+          {/* {showCopied && <> - Copied</>} */}
+        </p>
+      )}
+
+      {showCopied && <div className="py-2 font-semibold">Copied</div>}
 
       {props.isEditMode && (
         <input
           onChange={(event) => setValue(event.target.value)}
           value={value}
           autoFocus
+          onFocus={(e) => e.target.select()}
           type="text"
           placeholder="Nike.com"
-          className="w-full py-2 pr-4 focus:outline-none bg-transparent"
+          className="flex-1 py-2 focus:outline-none bg-transparent"
         />
+      )}
+
+      {props.isSelected && !props.isEditMode && (
+        <p className="inline ml-auto text-xs">
+          <kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+            Enter
+          </kbd>{' '}
+          to rename
+        </p>
       )}
     </div>
   )

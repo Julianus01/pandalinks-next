@@ -25,7 +25,7 @@ function LinkRowAdd(props: Props) {
       }
 
       if (!UrlUtils.isValidUrl(trimmedValue)) {
-        toast('Link is invalid URL')
+        toast('Invalid Link')
 
         return
       }
@@ -46,7 +46,7 @@ function LinkRowAdd(props: Props) {
     }
 
     if (!UrlUtils.isValidUrl(trimmedValue)) {
-      toast('Link is invalid URL')
+      toast('Invalid Link')
       props.onClose()
 
       return

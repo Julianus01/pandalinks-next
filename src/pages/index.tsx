@@ -11,13 +11,14 @@ import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LinkRowAdd from '@/components/Links/LinkRowAdd'
 import LoadingPage from '@/components/shared/LoadingPage'
+import Navbar from '@/components/shared/Navbar'
 
 function HomePage() {
   const queryClient = useQueryClient()
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
-  const [inEdit, setInEdit] = useState<string | null>(null)
+  const [editLink, setEditLink] = useState<string | null>(null)
   const linksContainerRef = useRef(null)
 
   const contextMenuRef = useRef<HTMLDivElement>(null)
@@ -56,12 +57,12 @@ function HomePage() {
   useKey(
     'Enter',
     () => {
-      if (selected && !inEdit) {
-        setInEdit(selected)
+      if (selected && !editLink) {
+        setEditLink(selected)
       }
     },
     {},
-    [selected, inEdit]
+    [selected, editLink]
   )
 
   // Delete Key
@@ -77,7 +78,12 @@ function HomePage() {
           return oldLinks.filter((oldLink) => oldLink.id !== selected)
         })
 
-        const deletePromise = deleteLinkMutation.mutateAsync(selected)
+        const deletePromise = deleteLinkMutation.mutateAsync(selected, {
+          onSuccess: () => {
+            setSelected(null)
+            setEditLink(null)
+          },
+        })
 
         toast.promise(deletePromise, {
           loading: 'Removing link...',
@@ -193,10 +199,12 @@ function HomePage() {
   }
 
   return (
-    <AuthLayout>
-      <div className="w-full max-w-2xl px-5 mx-auto py-20">
-        <div className='fixed left-0 top-20 right-0 z-10'>
-          <div className="flex space-x-2 w-full max-w-2xl px-5 mx-auto pt-20 bg-gray-50">
+    <AuthLayout
+      header={
+        <div className="fixed left-0 top-0 right-0 backdrop-blur-sm z-10">
+          <Navbar />
+
+          <div className="flex space-x-2 w-full max-w-2xl px-5 mx-auto pt-20">
             <SearchLinksInput
               onCreate={onCreateLink}
               value={searchQ}
@@ -216,14 +224,24 @@ function HomePage() {
                 className="w-4 h-4"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
+              </svg>
             </button>
           </div>
-
-          <div className='h-20 bg-gradient-to-b from-gray-50 via-transparent to-transparent' />
         </div>
-
+      }
+    >
+      <div className="w-full max-w-2xl px-5 mx-auto py-20">
         <div ref={linksContainerRef} className="space-y-1 pt-36">
+          {searchQ && !filteredLinks.length && (
+            <div className="inline">
+              Press{' '}
+              <kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+                Enter
+              </kbd>{' '}
+              to add the link
+            </div>
+          )}
+
           {showAddRow && <LinkRowAdd onClose={() => setShowAddRow(false)} onCreate={onCreateLink} />}
 
           {filteredLinks.map((link: Link) => {
@@ -232,8 +250,8 @@ function HomePage() {
             return (
               <LinkRow
                 onUpdate={onUpdateLink}
-                onExitEditMode={() => setInEdit(null)}
-                isEditMode={inEdit === link.id}
+                onExitEditMode={() => setEditLink(null)}
+                isEditMode={editLink === link.id}
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
@@ -285,14 +303,14 @@ const menuItems = {
       command: 'Cmd + C',
     },
     {
-      name: 'Edit',
+      name: 'Rename',
       command: 'Enter',
     },
   ],
   group_2: [
     {
       name: 'Delete',
-      command: 'Cmd + D',
+      command: 'Cmd + Delete',
     },
   ],
 }
