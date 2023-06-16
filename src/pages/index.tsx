@@ -173,8 +173,11 @@ function HomePage() {
     setTimeout(() => {
       if (contextMenuRef?.current) {
         const rect = contextMenuRef.current.getBoundingClientRect()
-        const x = pageX + rect.width > window.innerWidth ? window.innerWidth - rect.width : pageX + 2
-        const y = pageY + rect.height > window.innerHeight ? window.innerHeight - rect.height : pageY + 2
+        const x =
+          pageX - scrollX + rect.width > window.innerWidth ? window.innerWidth - rect.width : pageX - scrollX + 2
+
+        const y =
+          pageY - scrollY + rect.height > window.innerHeight ? window.innerHeight - rect.height : pageY - scrollY + 2
         setPosition({ x, y })
         contextMenuRef?.current?.classList.remove('opacity-0')
         document.documentElement.classList.add('overflow-hidden')
@@ -303,7 +306,7 @@ const menuItems = {
       command: 'Cmd + C',
     },
     {
-      name: 'Rename',
+      name: 'Edit',
       command: 'Enter',
     },
   ],
