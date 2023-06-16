@@ -9,6 +9,7 @@ import {
   doc,
   getDocs,
   getFirestore,
+  orderBy,
   query,
   setDoc,
   where,
@@ -20,7 +21,11 @@ const auth = getAuth()
 
 async function getLinks(): Promise<Link[]> {
   const querySnapshot = await getDocs(
-    query(collection(getFirestore(), FirestoreCollection.links), where('userId', '==', auth.currentUser?.uid))
+    query(
+      collection(getFirestore(), FirestoreCollection.links),
+      where('userId', '==', auth.currentUser?.uid),
+      orderBy('createdAt', 'desc')
+    )
   )
 
   const links = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
@@ -51,8 +56,8 @@ async function createLink(params: CreateLinkRequestParams) {
   const newLink: Partial<Link> = {
     src: params.src,
     userId: auth.currentUser?.uid,
-    // createdAt,
-    // updatedAt,
+    createdAt,
+    updatedAt,
   }
 
   const newEnvironmentDoc = await addDoc(collection(getFirestore(), FirestoreCollection.links), newLink)
