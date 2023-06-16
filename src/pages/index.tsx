@@ -6,7 +6,7 @@ import LinkRow from '@/components/Links/LinkRow'
 import SearchLinks from '@/components/Links/SearchLinks'
 import { withAuth } from '@/firebase/withAuth'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 
 export async function getServerSideProps() {
@@ -20,6 +20,7 @@ interface Props {
 }
 
 function HomePage(props: Props) {
+  const [searchQ, setSearchQ] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
   const ref = useRef(null)
 
@@ -33,7 +34,32 @@ function HomePage(props: Props) {
     setSelected(null)
   })
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>, link: Link) => {
+  useClickAway(ref, () => {
+    setSelected(null)
+  })
+
+  useEffect(() => {
+    document.addEventListener('click', () => resetContextMenu())
+    document.addEventListener('contextmenu', (e) => {
+      if (contextmenuHandler.current && !contextmenuHandler?.current?.contains(e.target as any)) resetContextMenu()
+    })
+  }, [])
+
+  const linksQuery = useQuery({
+    queryKey: [ReactQueryKey.getLinks],
+    queryFn: LinksApi.getLinks,
+    initialData: props.links,
+  })
+
+  const filteredLinks = useMemo(() => {
+    if (!searchQ) {
+      return linksQuery.data
+    }
+
+    return linksQuery.data.filter((link) => link.src.toLowerCase().includes(searchQ.toLowerCase()))
+  }, [linksQuery.data, searchQ])
+
+  function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
     setSelected(link.id)
     e.preventDefault()
     const { pageX, pageY } = e
@@ -50,27 +76,10 @@ function HomePage(props: Props) {
     }, 100)
   }
 
-  const resetToDefault = () => {
+  function resetContextMenu() {
     setShowContextMenu(false)
     document.documentElement.classList.remove('overflow-hidden')
   }
-
-  useEffect(() => {
-    document.addEventListener('click', () => resetToDefault())
-    document.addEventListener('contextmenu', (e) => {
-      if (contextmenuHandler.current && !contextmenuHandler?.current?.contains(e.target as any)) resetToDefault()
-    })
-  }, [])
-
-  useClickAway(ref, () => {
-    setSelected(null)
-  })
-
-  const linksQuery = useQuery({
-    queryKey: [ReactQueryKey.getLinks],
-    queryFn: LinksApi.getLinks,
-    initialData: props.links,
-  })
 
   function navigateToLink(link: Link) {
     if (!link.src.match(/^https?:\/\//i)) {
@@ -83,7 +92,7 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-3xl h-16 px-5 mx-auto pt-20">
         <div className="flex space-x-2 mb-6">
-          <SearchLinks />
+          <SearchLinks value={searchQ} onChange={(event) => setSearchQ(event.target.value)} />
 
           <button className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100">
             <svg
@@ -100,7 +109,7 @@ function HomePage(props: Props) {
         </div>
 
         <div ref={ref} className="space-y-1">
-          {linksQuery.data.map((link: Link) => (
+          {filteredLinks.map((link: Link) => (
             <LinkRow
               ref={contextmenuHandler}
               onContextMenu={(event) => handleContextMenu(event, link)}
@@ -124,12 +133,12 @@ function HomePage(props: Props) {
             {menuItems.group_1.map((item, idx) => (
               <li key={idx}>
                 <button
-                  className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5 hover:text-white hover:bg-blue-600 active:bg-blue-500 rounded-lg duration-150 group cursor-default"
+                  className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
                   role="menuitem"
                 >
                   {item.name}
 
-                  <span {...props} className="text-gray-500 group-hover:text-white duration-150">
+                  <span {...props} className="text-gray-500">
                     {item.command}
                   </span>
                 </button>
@@ -142,12 +151,12 @@ function HomePage(props: Props) {
               {group.map((item, idx) => (
                 <li key={idx}>
                   <button
-                    className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5 hover:text-white hover:bg-blue-600 active:bg-blue-500 rounded-lg duration-150 group cursor-default"
+                    className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
                     role="menuitem"
                   >
                     {' '}
                     {item.name}
-                    <span {...props} className="text-gray-500 group-hover:text-white duration-150">
+                    <span {...props} className="text-gray-500">
                       {item.command}
                     </span>
                   </button>

@@ -1,4 +1,9 @@
-function SearchLinks() {
+interface Props {
+  value: string
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function SearchLinks(props: Props) {
   return (
     <div className="relative flex-1">
       <svg
@@ -17,6 +22,8 @@ function SearchLinks() {
       </svg>
 
       <input
+        value={props.value}
+        onChange={props.onChange}
         type="text"
         placeholder="Search your links..."
         className="w-full pl-12 pr-3 py-2 text-gray-700 bg-white outline-none border focus:border-gray-400 shadow-sm rounded-lg"
