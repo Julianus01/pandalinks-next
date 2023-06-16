@@ -70,6 +70,7 @@ function LinkRow(props: Props) {
         }
 
         props.onUpdate({ id: props.link.id, src: trimmedValue })
+        props.onExitEditMode()
         return
       }
 
@@ -93,20 +94,22 @@ function LinkRow(props: Props) {
     >
       <div className="relative">
         <div className="absolute top-0 right-0 bottom-0 left-0">
-          <Image
-            className={classNames({
-              'bg-gray-50 group-hover:bg-gray-100': true,
-              'bg-white group-hover:bg-white': props.isEditMode,
-            })}
-            alt="test"
-            width={17}
-            height={17}
-            src={`https://www.google.com/s2/favicons?domain=${value}&sz=256`}
-            onError={({ currentTarget }) => {
-              currentTarget.onerror = null // prevents looping
-              currentTarget.style.display = 'none'
-            }}
-          />
+          {UrlUtils.isValidUrl(value) && (
+            <Image
+              className={classNames({
+                'bg-gray-50 group-hover:bg-gray-100': true,
+                'bg-white group-hover:bg-white': props.isEditMode,
+              })}
+              alt="test"
+              width={17}
+              height={17}
+              src={`https://www.google.com/s2/favicons?domain=${value}&sz=256`}
+              onError={({ currentTarget }) => {
+                currentTarget.onerror = null // prevents looping
+                currentTarget.style.display = 'none'
+              }}
+            />
+          )}
         </div>
 
         <svg
