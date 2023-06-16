@@ -16,12 +16,14 @@ function SearchLinksInput(props: Props) {
     'Enter',
     () => {
       if (ref.current === document.activeElement) {
-        console.log('Focused')
-        
         const trimmedValue = props.value.trim()
 
+        if (!trimmedValue) {
+          return
+        }
+
         if (!UrlUtils.isValidUrl(trimmedValue)) {
-          toast.error('Link is invalid URL')
+          toast('Link is invalid URL')
 
           return
         }

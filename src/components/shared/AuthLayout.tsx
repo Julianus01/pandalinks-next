@@ -8,7 +8,10 @@ interface Props {
 function AuthLayout(props: Props) {
   return (
     <>
-      <Navbar />
+      <div className='fixed left-0 top-0 right-0 bg-gray-50 z-10'>
+        <Navbar />
+      </div>
+
       {props.children}
     </>
   )

@@ -47,7 +47,7 @@ function LinkRow(props: Props) {
 
       if (props.isEditMode && trimmedValue !== props.link.src) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
-          toast.error('Link is invalid URL')
+          toast('Link is invalid URL')
 
           return
         }
@@ -74,7 +74,7 @@ function LinkRow(props: Props) {
       if (trimmedValue !== props.link.src) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
           setValue(props.link.src)
-          toast.error('Link is invalid URL')
+          toast('Link is invalid URL')
           props.onExitEditMode()
 
           return
@@ -96,7 +96,7 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'pl-4 hover:bg-gray-100 rounded-lg cursor-pointer -mx-1 flex items-center border border-solid group': true,
+        'pl-4 hover:bg-gray-100 rounded-lg cursor-pointer -mx-1.5 flex items-center border border-solid group': true,
         'border-gray-50': !props.isSelected,
         'hover:border-gray-200 bg-gray-100 border border-solid border-gray-200': props.isSelected,
         'cursor-default': props.isEditMode,
@@ -104,7 +104,7 @@ function LinkRow(props: Props) {
       })}
     >
       <div className="relative">
-        <div className="absolute top-0 right-0 bottom-0 left-0">
+        <div className="absolute top-0 right-0 bottom-0 left-0 z-1">
           {UrlUtils.isValidUrl(value) && (
             <Image
               className={classNames({
@@ -145,7 +145,7 @@ function LinkRow(props: Props) {
           value={value}
           autoFocus
           type="text"
-          placeholder="Ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          placeholder="Nike.com"
           className="w-full py-2 pr-4 focus:outline-none bg-transparent"
         />
       )}

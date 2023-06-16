@@ -25,7 +25,7 @@ function LinkRowAdd(props: Props) {
       }
 
       if (!UrlUtils.isValidUrl(trimmedValue)) {
-        toast.error('Link is invalid URL')
+        toast('Link is invalid URL')
 
         return
       }
@@ -46,7 +46,7 @@ function LinkRowAdd(props: Props) {
     }
 
     if (!UrlUtils.isValidUrl(trimmedValue)) {
-      toast.error('Link is invalid URL')
+      toast('Link is invalid URL')
       props.onClose()
 
       return
@@ -56,9 +56,9 @@ function LinkRowAdd(props: Props) {
   })
 
   return (
-    <div ref={ref} className="pl-4 rounded-lg -mx-1 flex items-center bg-white border border-solid border-gray-200">
+    <div ref={ref} className="pl-4 rounded-lg -mx-1.5 flex items-center bg-white border border-solid border-gray-200">
       <div className="relative">
-        <div className="absolute top-0 right-0 bottom-0 left-0">
+        <div className="absolute top-0 right-0 bottom-0 left-0 z-1">
           <Image
             className="bg-white group-hover:bg-white"
             alt="test"
@@ -91,7 +91,7 @@ function LinkRowAdd(props: Props) {
         value={value}
         autoFocus
         type="text"
-        placeholder="Ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        placeholder="Nike.com"
         className="w-full py-2 pr-4 focus:outline-none bg-transparent"
       />
     </div>

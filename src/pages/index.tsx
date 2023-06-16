@@ -194,32 +194,36 @@ function HomePage() {
 
   return (
     <AuthLayout>
-      <div className="w-full max-w-3xl h-16 px-5 mx-auto pt-20">
-        <div className="flex space-x-2 mb-6">
-          <SearchLinksInput
-            onCreate={onCreateLink}
-            value={searchQ}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
-          />
+      <div className="w-full max-w-2xl px-5 mx-auto py-20">
+        <div className='fixed left-0 top-20 right-0 z-10'>
+          <div className="flex space-x-2 w-full max-w-2xl px-5 mx-auto pt-20 bg-gray-50">
+            <SearchLinksInput
+              onCreate={onCreateLink}
+              value={searchQ}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
+            />
 
-          <button
-            onClick={() => setShowAddRow(true)}
-            className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-4 h-4"
+            <button
+              onClick={() => setShowAddRow(true)}
+              className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-          </button>
+            </button>
+          </div>
+
+          <div className='h-20 bg-gradient-to-b from-gray-50 via-transparent to-transparent' />
         </div>
 
-        <div ref={linksContainerRef} className="space-y-1">
+        <div ref={linksContainerRef} className="space-y-1 pt-36">
           {showAddRow && <LinkRowAdd onClose={() => setShowAddRow(false)} onCreate={onCreateLink} />}
 
           {filteredLinks.map((link: Link) => {
