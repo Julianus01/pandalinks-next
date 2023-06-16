@@ -250,22 +250,7 @@ function HomePage() {
           className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
           style={{ top: `${position.y}px`, left: `${position.x}px` }}
         >
-          <ul className="px-2 py-1.5" role="menu">
-            {menuItems.group_1.map((item, idx) => (
-              <li key={idx}>
-                <button
-                  className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
-                  role="menuitem"
-                >
-                  {item.name}
-
-                  <span className="text-gray-500">{item.command}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          {[menuItems.group_2, menuItems.group_3, menuItems.group_4].map((group, i) => (
+          {[menuItems.group_1, menuItems.group_2].map((group, i) => (
             <ul className="px-2 py-1.5 border-t" role="menu" key={i}>
               {group.map((item, idx) => (
                 <li key={idx}>
@@ -292,46 +277,18 @@ export default withAuth(HomePage)
 const menuItems = {
   group_1: [
     {
-      name: 'Share',
-      command: '',
+      name: 'Copy link',
+      command: 'Cmd + C',
     },
     {
-      name: 'Get link',
-      command: '',
-    },
-    {
-      name: 'Move to',
-      command: 'Ctrl+M',
+      name: 'Edit',
+      command: 'Enter',
     },
   ],
   group_2: [
     {
-      name: 'Copy link',
-      command: 'Ctrl+C',
-    },
-  ],
-  group_3: [
-    {
-      name: 'Rename',
-      command: '',
-    },
-    {
-      name: 'Duplicate',
-      command: '',
-    },
-  ],
-  group_4: [
-    {
       name: 'Delete',
-      command: 'Ctrl+D',
-    },
-    {
-      name: 'Archieve',
-      command: '',
-    },
-    {
-      name: 'Import files',
-      command: '',
+      command: 'Cmd + D',
     },
   ],
 }

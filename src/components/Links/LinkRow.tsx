@@ -23,6 +23,17 @@ function LinkRow(props: Props) {
   const [value, setValue] = useState<string>(props.link.src)
 
   useKey(
+    'Escape',
+    () => {
+      if (props.isEditMode) {
+        setValue(props.link.src)
+      }
+    },
+    {},
+    [props.isEditMode, props.link.src]
+  )
+
+  useKey(
     'Enter',
     () => {
       const trimmedValue = value.trim()
