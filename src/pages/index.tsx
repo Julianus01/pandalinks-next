@@ -8,6 +8,7 @@ import { withAuth } from '@/firebase/withAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useRef, useState } from 'react'
 import { useClickAway, useEvent, useKey } from 'react-use'
+import { toast } from 'sonner'
 
 export async function getServerSideProps() {
   const response = await AdminLinksApi.getLinks()
@@ -58,7 +59,7 @@ function HomePage(props: Props) {
   })
 
   function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
-    updateLinkMutation.mutate(updatedLink, {
+    const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
       onSuccess: () => {
         queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
           const oldLinks = data as Link[]
@@ -74,6 +75,14 @@ function HomePage(props: Props) {
           return updatedLinks
         })
       },
+    })
+
+    toast.promise(updatePromise, {
+      loading: 'Updating link...',
+      success: () => {
+        return `Link has been updated`
+      },
+      error: 'Something went wrong',
     })
   }
 
@@ -146,7 +155,6 @@ function HomePage(props: Props) {
 
             return (
               <LinkRow
-                isUpdating={updateLinkMutation.isPending && isSelected}
                 onUpdate={onUpdateLink}
                 onExitEditMode={() => setIsEditMode(false)}
                 isEditMode={isEditMode && isSelected}
