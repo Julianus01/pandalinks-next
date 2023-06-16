@@ -11,17 +11,7 @@ import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LinkRowAdd from '@/components/Links/LinkRowAdd'
 
-export async function getServerSideProps() {
-  const response = await AdminLinksApi.getLinks()
-
-  return { props: { links: response } }
-}
-
-interface Props {
-  links: Link[]
-}
-
-function HomePage(props: Props) {
+function HomePage() {
   const queryClient = useQueryClient()
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
@@ -36,7 +26,7 @@ function HomePage(props: Props) {
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks],
     queryFn: LinksApi.getLinks,
-    initialData: props.links,
+    initialData: [],
   })
 
   const updateLinkMutation = useMutation({
@@ -73,18 +63,15 @@ function HomePage(props: Props) {
   // Delete Key
   useKey(
     (event) => {
-      return event.keyCode === 46 || event.key === 'Backspace'
+      return (event.ctrlKey || event.metaKey) && (event.keyCode === 46 || event.key === 'Backspace')
     },
     () => {
       if (selected) {
         queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
           const oldLinks = data as Link[]
-
           return oldLinks.filter((oldLink) => oldLink.id !== selected)
         })
-
         const deletePromise = deleteLinkMutation.mutateAsync(selected)
-
         toast.promise(deletePromise, {
           loading: 'Removing link...',
           success: () => {
@@ -194,6 +181,8 @@ function HomePage(props: Props) {
     return window.open(link.src, '_blank')
   }
 
+  console.log({ selected, isEditMode })
+
   return (
     <AuthLayout>
       <div className="w-full max-w-3xl h-16 px-5 mx-auto pt-20">
@@ -231,11 +220,15 @@ function HomePage(props: Props) {
               <LinkRow
                 onUpdate={onUpdateLink}
                 onExitEditMode={() => setIsEditMode(false)}
+                onUnselect={() => setSelected(null)}
                 isEditMode={isEditMode && isSelected}
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
-                onClick={() => setSelected(link.id)}
+                onClick={() => {
+                  setSelected(link.id)
+                  setIsEditMode(false)
+                }}
                 onDoubleClick={() => navigateToLink(link)}
                 isSelected={isSelected}
               />
@@ -259,9 +252,7 @@ function HomePage(props: Props) {
                 >
                   {item.name}
 
-                  <span {...props} className="text-gray-500">
-                    {item.command}
-                  </span>
+                  <span className="text-gray-500">{item.command}</span>
                 </button>
               </li>
             ))}
@@ -275,11 +266,8 @@ function HomePage(props: Props) {
                     className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
                     role="menuitem"
                   >
-                    {' '}
                     {item.name}
-                    <span {...props} className="text-gray-500">
-                      {item.command}
-                    </span>
+                    <span className="text-gray-500">{item.command}</span>
                   </button>
                 </li>
               ))}

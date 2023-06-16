@@ -11,11 +11,17 @@ import {
   getFirestore,
   query,
   setDoc,
+  where,
 } from 'firebase/firestore'
 import { FirestoreCollection } from './FirestoreCollection'
+import { getAuth } from 'firebase/auth'
+
+const auth = getAuth()
 
 async function getLinks(): Promise<Link[]> {
-  const querySnapshot = await getDocs(query(collection(getFirestore(), FirestoreCollection.links)))
+  const querySnapshot = await getDocs(
+    query(collection(getFirestore(), FirestoreCollection.links), where('userId', '==', auth.currentUser?.uid))
+  )
 
   const links = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
     id: doc.id,
@@ -44,6 +50,7 @@ async function createLink(params: CreateLinkRequestParams) {
 
   const newLink: Partial<Link> = {
     src: params.src,
+    userId: auth.currentUser?.uid,
     // createdAt,
     // updatedAt,
   }

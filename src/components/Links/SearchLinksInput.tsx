@@ -1,4 +1,5 @@
 import { UrlUtils } from '@/utils/urlUtils'
+import { useRef } from 'react'
 import { useKey } from 'react-use'
 import { toast } from 'sonner'
 
@@ -9,18 +10,24 @@ interface Props {
 }
 
 function SearchLinksInput(props: Props) {
+  const ref = useRef<HTMLInputElement>(null)
+
   useKey(
     'Enter',
     () => {
-      const trimmedValue = props.value.trim()
+      if (ref.current === document.activeElement) {
+        console.log('Focused')
+        
+        const trimmedValue = props.value.trim()
 
-      if (!UrlUtils.isValidUrl(trimmedValue)) {
-        toast.error('Link is invalid URL')
+        if (!UrlUtils.isValidUrl(trimmedValue)) {
+          toast.error('Link is invalid URL')
 
-        return
+          return
+        }
+
+        props.onCreate(trimmedValue)
       }
-
-      props.onCreate(trimmedValue)
     },
     {},
     [props.value]
@@ -44,6 +51,7 @@ function SearchLinksInput(props: Props) {
       </svg>
 
       <input
+        ref={ref}
         value={props.value}
         onChange={props.onChange}
         type="text"

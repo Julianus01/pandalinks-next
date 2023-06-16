@@ -3,9 +3,25 @@ import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { UrlUtils } from '@/utils/urlUtils'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
+
+const useOutsideClick = (ref, callback, deps = []) => {
+  useEffect(() => {
+    const handleClick = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback()
+      }
+    }
+
+    document.addEventListener('click', handleClick, true)
+
+    return () => {
+      document.removeEventListener('click', handleClick, true)
+    }
+  }, [ref, callback, ...deps])
+}
 
 interface Props {
   link: Link
@@ -15,6 +31,7 @@ interface Props {
   onDoubleClick: () => void
   onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void
   onExitEditMode: () => void
+  onUnselect: () => void
   onUpdate: (updatedLink: UpdateLinkRequestParams) => void
 }
 
@@ -60,6 +77,7 @@ function LinkRow(props: Props) {
       }
 
       props.onExitEditMode()
+      props.onUnselect()
     }
   })
 
