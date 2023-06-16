@@ -2,6 +2,7 @@ import React from 'react'
 import { onAuthStateChanged, getAuth, User } from 'firebase/auth'
 import firebase_app from '@/firebase/firebaseConfig'
 import LoadingPage from '@/components/LoadingPage'
+import { useRouter } from 'next/router'
 
 const auth = getAuth(firebase_app)
 
@@ -19,6 +20,7 @@ export interface AuthContextProps {
 }
 
 export const AuthContextProvider = ({ children }: AuthContextProps) => {
+  const router = useRouter()
   const [user, setUser] = React.useState<User | null>(null)
   const [loading, setLoading] = React.useState(true)
 
@@ -36,5 +38,11 @@ export const AuthContextProvider = ({ children }: AuthContextProps) => {
     return () => unsubscribe()
   }, [])
 
-  return <AuthContext.Provider value={{ user, loading }}>{loading ? <LoadingPage /> : children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, loading }}>
+      {loading && !router.asPath.includes('/login') && <LoadingPage />}
+
+      {!loading && children}
+    </AuthContext.Provider>
+  )
 }
