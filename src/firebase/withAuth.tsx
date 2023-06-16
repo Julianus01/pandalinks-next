@@ -2,7 +2,7 @@
 import { ComponentType, useContext, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AuthContext } from '@/context/AuthContext'
-import LoadingPage from '@/components/LoadingPage'
+import LoadingPage from '@/components/shared/LoadingPage'
 
 export const withAuth =
   <P extends {}>(Component: ComponentType<P>): ComponentType<P> =>

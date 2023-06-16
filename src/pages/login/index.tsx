@@ -1,4 +1,4 @@
-import LoadingPage from '@/components/LoadingPage'
+import LoadingPage from '@/components/shared/LoadingPage'
 import { AuthContext } from '@/context/AuthContext'
 import { loginWithGoogleCredential } from '@/firebase/auth'
 import { useRouter } from 'next/navigation'

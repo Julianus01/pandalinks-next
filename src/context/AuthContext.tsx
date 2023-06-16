@@ -1,7 +1,7 @@
 import React from 'react'
 import { onAuthStateChanged, getAuth, User } from 'firebase/auth'
 import firebase_app from '@/firebase/firebaseConfig'
-import LoadingPage from '@/components/LoadingPage'
+import LoadingPage from '@/components/shared/LoadingPage'
 import { useRouter } from 'next/router'
 
 const auth = getAuth(firebase_app)

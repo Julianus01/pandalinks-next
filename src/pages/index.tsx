@@ -1,13 +1,13 @@
 import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
 import { LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
-import AuthLayout from '@/components/AuthLayout'
+import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/Links/LinkRow'
 import SearchLinks from '@/components/Links/SearchLinks'
 import { withAuth } from '@/firebase/withAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useRef, useState } from 'react'
-import { useClickAway, useEvent, useKey } from 'react-use'
+import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 
 export async function getServerSideProps() {
