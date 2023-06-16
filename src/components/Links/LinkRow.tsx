@@ -16,7 +16,6 @@ interface Props {
   onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void
   onExitEditMode: () => void
   onUpdate: (updatedLink: UpdateLinkRequestParams) => void
-  onUnselect: () => void
 }
 
 function LinkRow(props: Props) {
