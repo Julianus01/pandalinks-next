@@ -1,5 +1,5 @@
 import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
-import { LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
+import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/Links/LinkRow'
@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
+import LinkRowAdd from '@/components/Links/LinkRowAdd'
 
 export async function getServerSideProps() {
   const response = await AdminLinksApi.getLinks()
@@ -22,6 +23,7 @@ interface Props {
 
 function HomePage(props: Props) {
   const queryClient = useQueryClient()
+  const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
   const [isEditMode, setIsEditMode] = useState<boolean>(false)
@@ -58,6 +60,10 @@ function HomePage(props: Props) {
     mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
   })
 
+  const createLinkMutation = useMutation({
+    mutationFn: (newLink: CreateLinkRequestParams) => LinksApi.createLink(newLink),
+  })
+
   function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
     const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
       onSuccess: () => {
@@ -81,6 +87,31 @@ function HomePage(props: Props) {
       loading: 'Updating link...',
       success: () => {
         return `Link has been updated`
+      },
+      error: 'Something went wrong',
+    })
+  }
+
+  function onCreateLink(src: string) {
+    const createPromise = createLinkMutation.mutateAsync(
+      { src },
+      {
+        onSuccess: (newLink) => {
+          queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+            const oldLinks = data as Link[]
+
+            return [newLink, ...oldLinks]
+          })
+          
+          setShowAddRow(false)
+        },
+      }
+    )
+
+    toast.promise(createPromise, {
+      loading: 'Creating link...',
+      success: () => {
+        return `Link has been created`
       },
       error: 'Something went wrong',
     })
@@ -135,7 +166,10 @@ function HomePage(props: Props) {
         <div className="flex space-x-2 mb-6">
           <SearchLinks value={searchQ} onChange={(event) => setSearchQ(event.target.value)} />
 
-          <button className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100">
+          <button
+            onClick={() => setShowAddRow(true)}
+            className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -150,6 +184,8 @@ function HomePage(props: Props) {
         </div>
 
         <div ref={linksContainerRef} className="space-y-1">
+          {showAddRow && <LinkRowAdd onCreate={onCreateLink} />}
+
           {filteredLinks.map((link: Link) => {
             const isSelected = selected === link.id
 

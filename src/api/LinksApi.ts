@@ -2,6 +2,8 @@ import { Link } from './AdminLinksApi'
 import {
   DocumentData,
   QueryDocumentSnapshot,
+  Timestamp,
+  addDoc,
   collection,
   doc,
   getDocs,
@@ -30,7 +32,28 @@ async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<
   return setDoc(doc(getFirestore(), FirestoreCollection.links, id), updates, { merge: true })
 }
 
+export interface CreateLinkRequestParams {
+  src: string
+}
+
+async function createLink(params: CreateLinkRequestParams) {
+  // TODO: Fix this
+  const createdAt = Timestamp.now()
+  const updatedAt = Timestamp.now()
+
+  const newLink: Partial<Link> = {
+    src: params.src,
+    // createdAt,
+    // updatedAt,
+  }
+
+  const newEnvironmentDoc = await addDoc(collection(getFirestore(), FirestoreCollection.links), newLink)
+
+  return { ...newLink, id: newEnvironmentDoc.id }
+}
+
 export const LinksApi = {
   getLinks,
   updateLink,
+  createLink
 }

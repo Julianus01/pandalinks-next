@@ -83,7 +83,7 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer -mx-1 flex items-center border border-solid': true,
+        'pl-4 hover:bg-gray-100 rounded-lg cursor-pointer -mx-1 flex items-center border border-solid': true,
         'border-gray-50': !props.isSelected,
         'hover:border-gray-200 bg-gray-100 border border-solid border-gray-200': props.isSelected,
         'cursor-default': props.isEditMode,
@@ -98,7 +98,7 @@ function LinkRow(props: Props) {
         src={`https://www.google.com/s2/favicons?domain=${value}&sz=256`}
       />
 
-      {!props.isEditMode && <p>{value}</p>}
+      {!props.isEditMode && <p className='py-2 pr-4'>{value}</p>}
 
       {props.isEditMode && (
         <input
@@ -107,7 +107,7 @@ function LinkRow(props: Props) {
           autoFocus
           type="text"
           placeholder="Edit man"
-          className="w-full focus:outline-none bg-transparent"
+          className="w-full py-2 pr-4 focus:outline-none bg-transparent"
         />
       )}
     </div>
