@@ -72,26 +72,7 @@ function HomePage() {
     },
     () => {
       if (selected) {
-        queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
-          const oldLinks = data as Link[]
-
-          return oldLinks.filter((oldLink) => oldLink.id !== selected)
-        })
-
-        const deletePromise = deleteLinkMutation.mutateAsync(selected, {
-          onSuccess: () => {
-            setSelected(null)
-            setEditLink(null)
-          },
-        })
-
-        toast.promise(deletePromise, {
-          loading: 'Removing link...',
-          success: () => {
-            return `Link has been removed`
-          },
-          error: 'Something went wrong',
-        })
+        onDeleteLink(selected)
       }
     },
     {},
@@ -101,6 +82,29 @@ function HomePage() {
   useClickAway(linksContainerRef, () => {
     setSelected(null)
   })
+
+  function onDeleteLink(linkId: string) {
+    queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+      const oldLinks = data as Link[]
+
+      return oldLinks.filter((oldLink) => oldLink.id !== selected)
+    })
+
+    const deletePromise = deleteLinkMutation.mutateAsync(linkId, {
+      onSuccess: () => {
+        setSelected(null)
+        setEditLink(null)
+      },
+    })
+
+    toast.promise(deletePromise, {
+      loading: 'Removing link...',
+      success: () => {
+        return `Link has been removed`
+      },
+      error: 'Something went wrong',
+    })
+  }
 
   function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
     const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
@@ -185,6 +189,52 @@ function HomePage() {
     }, 100)
   }
 
+  function onContextMenuRowClick(contextMenuRow: ContextMenuRow) {
+    const link = filteredLinks.find((link) => link.id === selected)
+
+    if (!link) {
+      resetContextMenu()
+      return
+    }
+
+    switch (contextMenuRow.action) {
+      case ContextMenuAction.copyLink:
+        navigator.clipboard.writeText(link.src)
+        toast(
+          <>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"
+              />
+            </svg>
+            Copied to clipboard{' '}
+          </>
+        )
+        break
+
+      case ContextMenuAction.edit:
+        setEditLink(selected)
+        break
+
+      case ContextMenuAction.delete:
+        if (selected) {
+          onDeleteLink(selected)
+        }
+        break
+    }
+
+    resetContextMenu()
+  }
+
   function resetContextMenu() {
     setShowContextMenu(false)
     document.documentElement.classList.remove('overflow-hidden')
@@ -266,54 +316,69 @@ function HomePage() {
               />
             )
           })}
+
+          {showContextMenu && (
+            <div
+              ref={contextMenuRef}
+              className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
+              style={{ top: `${position.y}px`, left: `${position.x}px` }}
+            >
+              {[CONTEXT_MENU_GROUP_ONE, CONTEXT_MENU_GROUP_TWO].map((group, i) => (
+                <ul className="px-2 py-1.5 border-t" role="menu" key={i}>
+                  {group.map((contextMenuRow, idx) => (
+                    <li key={idx}>
+                      <button
+                        onClick={() => onContextMenuRowClick(contextMenuRow)}
+                        className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
+                        role="menuitem"
+                      >
+                        {' '}
+                        {contextMenuRow.name}
+                        <span className="text-gray-500">{contextMenuRow.command}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {showContextMenu && (
-        <div
-          ref={contextMenuRef}
-          className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
-          style={{ top: `${position.y}px`, left: `${position.x}px` }}
-        >
-          {[menuItems.group_1, menuItems.group_2].map((group, i) => (
-            <ul className="px-2 py-1.5 border-t" role="menu" key={i}>
-              {group.map((item, idx) => (
-                <li key={idx}>
-                  <button
-                    className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
-                    role="menuitem"
-                  >
-                    {' '}
-                    {item.name}
-                    <span className="text-gray-500">{item.command}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      )}
     </AuthLayout>
   )
 }
 
 export default withAuth(HomePage)
 
-const menuItems = {
-  group_1: [
-    {
-      name: 'Copy link',
-      command: 'Cmd + C',
-    },
-    {
-      name: 'Edit',
-      command: 'Enter',
-    },
-  ],
-  group_2: [
-    {
-      name: 'Delete',
-      command: 'Cmd + Delete',
-    },
-  ],
+enum ContextMenuAction {
+  copyLink = 'copyLink',
+  edit = 'edit',
+  delete = 'delete',
 }
+
+interface ContextMenuRow {
+  action: ContextMenuAction
+  name: string
+  command: string
+}
+
+const CONTEXT_MENU_GROUP_ONE: ContextMenuRow[] = [
+  {
+    action: ContextMenuAction.copyLink,
+    name: 'Copy link',
+    command: 'Cmd + C',
+  },
+  {
+    action: ContextMenuAction.edit,
+    name: 'Edit',
+    command: 'Enter',
+  },
+]
+
+const CONTEXT_MENU_GROUP_TWO: ContextMenuRow[] = [
+  {
+    action: ContextMenuAction.delete,
+    name: 'Delete',
+    command: 'Cmd + Delete',
+  },
+]
