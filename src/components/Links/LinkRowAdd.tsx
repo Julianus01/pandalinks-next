@@ -1,36 +1,24 @@
+import { UrlUtils } from '@/utils/urlUtils'
 import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 
-function isValidUrl(urlString: string) {
-  var urlPattern = new RegExp(
-    '^(https?:\\/\\/)?' + // validate protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // validate OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // validate port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
-      '(\\#[-a-z\\d_]*)?$',
-    'i'
-  ) // validate fragment locator
-
-  return !!urlPattern.test(urlString)
-}
-
 interface Props {
   onCreate: (src: string) => void
+  onClose: () => void
 }
 
 function LinkRowAdd(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const [value, setValue] = useState<string>('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+  const [value, setValue] = useState<string>('')
 
   useKey(
     'Enter',
     () => {
       const trimmedValue = value.trim()
 
-      if (!isValidUrl(trimmedValue)) {
+      if (!UrlUtils.isValidUrl(trimmedValue)) {
         toast.error('Link is invalid URL')
 
         return
@@ -45,32 +33,53 @@ function LinkRowAdd(props: Props) {
   useClickAway(ref, () => {
     const trimmedValue = value.trim()
 
-    if (!isValidUrl(trimmedValue)) {
+    if (!UrlUtils.isValidUrl(trimmedValue)) {
       toast.error('Link is invalid URL')
+      props.onClose()
 
       return
     }
 
     props.onCreate(trimmedValue)
-    return
   })
 
   return (
     <div ref={ref} className="pl-4 rounded-lg -mx-1 flex items-center bg-white border border-solid border-gray-200">
-      <Image
-        className="mr-2"
-        alt="test"
-        width={17}
-        height={17}
-        src={`https://www.google.com/s2/favicons?domain=${value}&sz=256`}
-      />
+      <div className="relative">
+        <div className="absolute top-0 right-0 bottom-0 left-0">
+          <Image
+            className="bg-white group-hover:bg-white"
+            alt="test"
+            width={17}
+            height={17}
+            src={`https://www.google.com/s2/favicons?domain=${value}&sz=256`}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null // prevents looping
+              currentTarget.style.display = 'none'
+            }}
+          />
+        </div>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-4 h-4 mr-2 text-rose-500"
+        >
+          <path
+            fillRule="evenodd"
+            d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
 
       <input
         onChange={(event) => setValue(event.target.value)}
         value={value}
         autoFocus
         type="text"
-        placeholder="Edit man"
+        placeholder="Ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         className="w-full py-2 pr-4 focus:outline-none bg-transparent"
       />
     </div>

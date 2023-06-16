@@ -1,9 +1,31 @@
+import { UrlUtils } from '@/utils/urlUtils'
+import { useKey } from 'react-use'
+import { toast } from 'sonner'
+
 interface Props {
   value: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onCreate: (src: string) => void
 }
 
-function SearchLinks(props: Props) {
+function SearchLinksInput(props: Props) {
+  useKey(
+    'Enter',
+    () => {
+      const trimmedValue = props.value.trim()
+
+      if (!UrlUtils.isValidUrl(trimmedValue)) {
+        toast.error('Link is invalid URL')
+
+        return
+      }
+
+      props.onCreate(trimmedValue)
+    },
+    {},
+    [props.value]
+  )
+
   return (
     <div className="relative flex-1">
       <svg
@@ -32,4 +54,4 @@ function SearchLinks(props: Props) {
   )
 }
 
-export default SearchLinks
+export default SearchLinksInput

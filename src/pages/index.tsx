@@ -3,7 +3,7 @@ import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/ap
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/Links/LinkRow'
-import SearchLinks from '@/components/Links/SearchLinks'
+import SearchLinksInput from '@/components/Links/SearchLinksInput'
 import { withAuth } from '@/firebase/withAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useRef, useState } from 'react'
@@ -93,6 +93,8 @@ function HomePage(props: Props) {
   }
 
   function onCreateLink(src: string) {
+    setSearchQ('')
+
     const createPromise = createLinkMutation.mutateAsync(
       { src },
       {
@@ -102,7 +104,7 @@ function HomePage(props: Props) {
 
             return [newLink, ...oldLinks]
           })
-          
+
           setShowAddRow(false)
         },
       }
@@ -164,7 +166,11 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-3xl h-16 px-5 mx-auto pt-20">
         <div className="flex space-x-2 mb-6">
-          <SearchLinks value={searchQ} onChange={(event) => setSearchQ(event.target.value)} />
+          <SearchLinksInput
+            onCreate={onCreateLink}
+            value={searchQ}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
+          />
 
           <button
             onClick={() => setShowAddRow(true)}
@@ -184,7 +190,7 @@ function HomePage(props: Props) {
         </div>
 
         <div ref={linksContainerRef} className="space-y-1">
-          {showAddRow && <LinkRowAdd onCreate={onCreateLink} />}
+          {showAddRow && <LinkRowAdd onClose={() => setShowAddRow(false)} onCreate={onCreateLink} />}
 
           {filteredLinks.map((link: Link) => {
             const isSelected = selected === link.id
