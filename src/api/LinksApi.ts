@@ -5,6 +5,7 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   getFirestore,
@@ -52,8 +53,14 @@ async function createLink(params: CreateLinkRequestParams) {
   return { ...newLink, id: newEnvironmentDoc.id }
 }
 
+// Delete Project Environments
+async function deleteLink(linkId: string) {
+  return deleteDoc(doc(getFirestore(), FirestoreCollection.links, linkId))
+}
+
 export const LinksApi = {
   getLinks,
   updateLink,
-  createLink
+  createLink,
+  deleteLink,
 }

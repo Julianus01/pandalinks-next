@@ -33,6 +33,24 @@ function HomePage(props: Props) {
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
+  const linksQuery = useQuery({
+    queryKey: [ReactQueryKey.getLinks],
+    queryFn: LinksApi.getLinks,
+    initialData: props.links,
+  })
+
+  const updateLinkMutation = useMutation({
+    mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
+  })
+
+  const createLinkMutation = useMutation({
+    mutationFn: (newLink: CreateLinkRequestParams) => LinksApi.createLink(newLink),
+  })
+
+  const deleteLinkMutation = useMutation({
+    mutationFn: (linkId: string) => LinksApi.deleteLink(linkId),
+  })
+
   // Close context menu when clicking away
   useClickAway(contextMenuRef, resetContextMenu)
 
@@ -52,16 +70,36 @@ function HomePage(props: Props) {
     [selected, isEditMode]
   )
 
+  // Delete Key
+  useKey(
+    (event) => {
+      return event.keyCode === 46 || event.key === 'Backspace'
+    },
+    () => {
+      if (selected) {
+        queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+          const oldLinks = data as Link[]
+
+          return oldLinks.filter((oldLink) => oldLink.id !== selected)
+        })
+
+        const deletePromise = deleteLinkMutation.mutateAsync(selected)
+
+        toast.promise(deletePromise, {
+          loading: 'Removing link...',
+          success: () => {
+            return `Link has been removed`
+          },
+          error: 'Something went wrong',
+        })
+      }
+    },
+    {},
+    [selected]
+  )
+
   useClickAway(linksContainerRef, () => {
     setSelected(null)
-  })
-
-  const updateLinkMutation = useMutation({
-    mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
-  })
-
-  const createLinkMutation = useMutation({
-    mutationFn: (newLink: CreateLinkRequestParams) => LinksApi.createLink(newLink),
   })
 
   function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
@@ -118,12 +156,6 @@ function HomePage(props: Props) {
       error: 'Something went wrong',
     })
   }
-
-  const linksQuery = useQuery({
-    queryKey: [ReactQueryKey.getLinks],
-    queryFn: LinksApi.getLinks,
-    initialData: props.links,
-  })
 
   const filteredLinks = useMemo(() => {
     if (!searchQ) {
