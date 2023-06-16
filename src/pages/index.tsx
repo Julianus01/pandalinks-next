@@ -2,13 +2,12 @@ import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
 import { LinksApi } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/AuthLayout'
+import LinkRow from '@/components/Links/LinkRow'
 import SearchLinks from '@/components/Links/SearchLinks'
 import { withAuth } from '@/firebase/withAuth'
 import { useQuery } from '@tanstack/react-query'
-import classNames from 'classnames'
-import Image from 'next/image'
-import { useRef, useState } from 'react'
-import { useClickAway } from 'react-use'
+import { useEffect, useRef, useState } from 'react'
+import { useClickAway, useKey } from 'react-use'
 
 export async function getServerSideProps() {
   const response = await AdminLinksApi.getLinks()
@@ -24,6 +23,45 @@ function HomePage(props: Props) {
   const [selected, setSelected] = useState<string | null>(null)
   const ref = useRef(null)
 
+  const contextmenuRef = useRef<HTMLDivElement>(null)
+  const contextmenuHandler = useRef<HTMLDivElement>(null)
+  const [showContextMenu, setShowContextMenu] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+
+  useKey('Escape', () => {
+    setShowContextMenu(false)
+    setSelected(null)
+  })
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>, link: Link) => {
+    setSelected(link.id)
+    e.preventDefault()
+    const { pageX, pageY } = e
+    setShowContextMenu(true)
+    setTimeout(() => {
+      if (contextmenuRef?.current) {
+        const rect = contextmenuRef.current.getBoundingClientRect()
+        const x = pageX + rect.width > window.innerWidth ? window.innerWidth - rect.width : pageX + 2
+        const y = pageY + rect.height > window.innerHeight ? window.innerHeight - rect.height : pageY + 2
+        setPosition({ x, y })
+        contextmenuRef?.current?.classList.remove('opacity-0')
+        document.documentElement.classList.add('overflow-hidden')
+      }
+    }, 100)
+  }
+
+  const resetToDefault = () => {
+    setShowContextMenu(false)
+    document.documentElement.classList.remove('overflow-hidden')
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', () => resetToDefault())
+    document.addEventListener('contextmenu', (e) => {
+      if (contextmenuHandler.current && !contextmenuHandler?.current?.contains(e.target as any)) resetToDefault()
+    })
+  }, [])
+
   useClickAway(ref, () => {
     setSelected(null)
   })
@@ -34,14 +72,11 @@ function HomePage(props: Props) {
     initialData: props.links,
   })
 
-  function onClickLink(link: Link) {
-    if (selected === link.id) {
-      window.open(`//${link.src}`, '_blank')
-
-      return
+  function navigateToLink(link: Link) {
+    if (!link.src.match(/^https?:\/\//i)) {
+      return window.open(`http://${link.src}`, '_blank')
     }
-
-    setSelected(link.id)
+    return window.open(link.src, '_blank')
   }
 
   return (
@@ -66,33 +101,111 @@ function HomePage(props: Props) {
 
         <div ref={ref} className="space-y-1">
           {linksQuery.data.map((link: Link) => (
-            <div
-              onClick={() => onClickLink(link)}
-              // rel="noopener noreferrer"
-              // target="_blank"
-              // href={`//${link.src}`}
+            <LinkRow
+              ref={contextmenuHandler}
+              onContextMenu={(event) => handleContextMenu(event, link)}
+              link={link}
               key={link.id}
-              className={classNames({
-                'px-4 py-2 hover:bg-gray-100 rounded cursor-pointer -mx-1 flex items-center': true,
-                // 'bg-blue-50 hover:bg-blue-50': selected === link.id,
-                'bg-gray-100 outline-1': selected === link.id,
-              })}
-            >
-              <Image
-                className="mr-2"
-                alt="test"
-                width={18}
-                height={18}
-                src={`https://www.google.com/s2/favicons?domain=${link.src}&sz=256`}
-              />
-
-              <p>{link.src}</p>
-            </div>
+              onClick={() => setSelected(link.id)}
+              onDoubleClick={() => navigateToLink(link)}
+              isSelected={selected === link.id}
+            />
           ))}
         </div>
       </div>
+
+      {showContextMenu && (
+        <div
+          ref={contextmenuRef}
+          className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
+          style={{ top: `${position.y}px`, left: `${position.x}px` }}
+        >
+          <ul className="px-2 py-1.5" role="menu">
+            {menuItems.group_1.map((item, idx) => (
+              <li key={idx}>
+                <button
+                  className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5 hover:text-white hover:bg-blue-600 active:bg-blue-500 rounded-lg duration-150 group cursor-default"
+                  role="menuitem"
+                >
+                  {item.name}
+
+                  <span {...props} className="text-gray-500 group-hover:text-white duration-150">
+                    {item.command}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {[menuItems.group_2, menuItems.group_3, menuItems.group_4].map((group, i) => (
+            <ul className="px-2 py-1.5 border-t" role="menu" key={i}>
+              {group.map((item, idx) => (
+                <li key={idx}>
+                  <button
+                    className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5 hover:text-white hover:bg-blue-600 active:bg-blue-500 rounded-lg duration-150 group cursor-default"
+                    role="menuitem"
+                  >
+                    {' '}
+                    {item.name}
+                    <span {...props} className="text-gray-500 group-hover:text-white duration-150">
+                      {item.command}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      )}
     </AuthLayout>
   )
 }
 
 export default withAuth(HomePage)
+
+const menuItems = {
+  group_1: [
+    {
+      name: 'Share',
+      command: '',
+    },
+    {
+      name: 'Get link',
+      command: '',
+    },
+    {
+      name: 'Move to',
+      command: 'Ctrl+M',
+    },
+  ],
+  group_2: [
+    {
+      name: 'Copy link',
+      command: 'Ctrl+C',
+    },
+  ],
+  group_3: [
+    {
+      name: 'Rename',
+      command: '',
+    },
+    {
+      name: 'Duplicate',
+      command: '',
+    },
+  ],
+  group_4: [
+    {
+      name: 'Delete',
+      command: 'Ctrl+D',
+    },
+    {
+      name: 'Archieve',
+      command: '',
+    },
+    {
+      name: 'Import files',
+      command: '',
+    },
+  ],
+}
