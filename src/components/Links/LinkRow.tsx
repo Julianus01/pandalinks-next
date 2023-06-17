@@ -152,14 +152,9 @@ function LinkRow(props: Props) {
         </svg>
       </div>
 
-      {!showCopied && !props.isEditMode && (
-        <p className="py-2">
-          {value}
-          {/* {showCopied && <> - Copied</>} */}
-        </p>
-      )}
+      {!showCopied && !props.isEditMode && <p className="py-2">{value}</p>}
 
-      {showCopied && <div className="py-2 font-semibold">Copied</div>}
+      {showCopied && <div className="py-2 flex items-center">Copied to clipboard</div>}
 
       {props.isEditMode && (
         <input

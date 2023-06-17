@@ -9,7 +9,7 @@ interface Props {
   onCreate: (src: string) => void
 }
 
-function SearchLinksInput(props: Props) {
+function SearchAndCreateLinksInput(props: Props) {
   const ref = useRef<HTMLInputElement>(null)
 
   useKey(
@@ -64,4 +64,4 @@ function SearchLinksInput(props: Props) {
   )
 }
 
-export default SearchLinksInput
+export default SearchAndCreateLinksInput

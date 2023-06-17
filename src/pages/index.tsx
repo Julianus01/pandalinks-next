@@ -3,7 +3,7 @@ import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/ap
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/Links/LinkRow'
-import SearchLinksInput from '@/components/Links/SearchLinksInput'
+import SearchAndCreateLinksInput from '@/components/Links/SearchAndCreateLinksInput'
 import { withAuth } from '@/firebase/withAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useRef, useState } from 'react'
@@ -91,12 +91,22 @@ function HomePage() {
       return oldLinks.filter((oldLink) => oldLink.id !== selected)
     })
 
-    const deletePromise = deleteLinkMutation.mutateAsync(linkId, {
-      onSuccess: () => {
-        setSelected(null)
+    if (selected) {
+      const index = filteredLinks.map((link) => link.id).indexOf(selected)
+
+      if (filteredLinks[index + 1]) {
+        setSelected(filteredLinks[index + 1].id)
         setEditLink(null)
-      },
-    })
+      } else if (filteredLinks[index - 1]) {
+        setSelected(filteredLinks[index - 1].id)
+        setEditLink(null)
+      }
+    } else {
+      setSelected(null)
+      setEditLink(null)
+    }
+
+    const deletePromise = deleteLinkMutation.mutateAsync(linkId)
 
     toast.promise(deletePromise, {
       loading: 'Removing link...',
@@ -259,7 +269,7 @@ function HomePage() {
           <Navbar />
 
           <div className="flex space-x-2 w-full max-w-2xl px-5 mx-auto pt-20">
-            <SearchLinksInput
+            <SearchAndCreateLinksInput
               onCreate={onCreateLink}
               value={searchQ}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
