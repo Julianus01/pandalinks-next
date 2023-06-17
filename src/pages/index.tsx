@@ -270,33 +270,36 @@ function HomePage() {
 
           <div className="flex space-x-2 w-full max-w-2xl px-5 mx-auto pt-20">
             <SearchAndCreateLinksInput
+              isCreateMode={!linksQuery.isLoading && !filteredLinks?.length}
               onCreate={onCreateLink}
               value={searchQ}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
             />
 
-            <button
-              onClick={() => setShowAddRow(true)}
-              className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-4 h-4"
+            {!linksQuery.isLoading && !!filteredLinks?.length && (
+              <button
+                onClick={() => setShowAddRow(true)}
+                className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       }
     >
       <div className="w-full max-w-2xl px-5 mx-auto py-20">
         <div ref={linksContainerRef} className="space-y-1 pt-36">
-          {searchQ && !filteredLinks.length && (
+          {!linksQuery.isLoading && !filteredLinks.length && (
             <div className="inline">
               Press{' '}
               <kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
