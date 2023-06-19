@@ -17,6 +17,7 @@ import {
 import { FirestoreCollection } from './FirestoreCollection'
 import { getAuth } from 'firebase/auth'
 import { LinkUtils } from '@/utils/link-utils'
+import fp from 'lodash/fp'
 
 const auth = getAuth()
 
@@ -29,14 +30,20 @@ async function getLinks(): Promise<Link[]> {
     )
   )
 
-  const links = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Link[]
+  const links = fp.compose(
+    LinkUtils.splitByPinned,
 
-  const byPinned = LinkUtils.splitByPinned(links)
+    fp.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data()
 
-  return byPinned
+      return {
+        id: doc.id,
+        ...data,
+      }
+    })
+  )(querySnapshot.docs)
+
+  return links
 }
 
 export interface UpdateLinkRequestParams extends Partial<Link> {

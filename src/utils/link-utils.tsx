@@ -1,12 +1,12 @@
 import { Link } from '@/api/AdminLinksApi'
 import { DateUtils } from './date-utils'
-import { CommonUtils } from './common-utils'
+import fp from 'lodash/fp'
 
 function splitByPinned(links: Link[]) {
-  const [pinnedLinks, unpinnedLinks] = CommonUtils.partition(links, (link: Link) => {
+  const [pinnedLinks, unpinnedLinks] = fp.partition((link: Link) => {
     const isPinned = link.tags.includes('pinned')
     return isPinned
-  })
+  })(links)
 
   return [...pinnedLinks, ...unpinnedLinks] as Link[]
 }

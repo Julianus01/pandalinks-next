@@ -1,7 +1,8 @@
 import { FirestoreCollection } from './FirestoreCollection'
-import { Timestamp } from 'firebase/firestore'
+import { DocumentData, QueryDocumentSnapshot, Timestamp } from 'firebase/firestore'
 import firebaseAdmin from '@/utils/firebaseAdmin'
 import { LinkUtils } from '@/utils/link-utils'
+import fp from 'lodash/fp'
 
 const db = firebaseAdmin.firestore()
 
@@ -16,28 +17,30 @@ export interface Link {
 }
 
 async function getLinks(userId: string): Promise<Link[]> {
-  const links = await db
+  const querySnapshot = await db
     .collection(FirestoreCollection.links)
     .where('userId', '==', userId)
     .orderBy('visitedAt', 'desc')
     .get()
 
-  const linksData = links.docs.map((doc) => {
-    const data = doc.data()
+  const links = fp.compose(
+    // Need to stringify and then parse because date object
+    // is not json format and it breaks Next
+    (links) => JSON.parse(JSON.stringify(links)),
 
-    return {
-      id: doc.id,
-      ...data,
-    }
-  }) as Link[]
+    LinkUtils.splitByPinned,
 
-  const splitByPinnedLinks = LinkUtils.splitByPinned(linksData)
+    fp.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data()
 
-  // Need to stringify and then parse because date object
-  // is not json format and it breaks Next
-  const linksResponse = JSON.parse(JSON.stringify(splitByPinnedLinks))
+      return {
+        id: doc.id,
+        ...data,
+      }
+    })
+  )(querySnapshot.docs)
 
-  return linksResponse || []
+  return links || []
 }
 
 export const AdminLinksApi = {
