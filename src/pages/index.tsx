@@ -544,7 +544,7 @@ function HomePage(props: Props) {
             )
           })}
 
-          {showContextMenu && (
+          {showContextMenu && selectedLink && (
             <div
               ref={contextMenuRef}
               className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
