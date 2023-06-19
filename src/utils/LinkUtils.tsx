@@ -1,18 +1,19 @@
 import { Link } from '@/api/AdminLinksApi'
 import { DateUtils } from './DateUtils'
-import _ from 'lodash/fp'
+
+const partitionArr = (arr: any, condn: any) =>
+  arr.reduce((acc: any, i: any) => (acc[condn(i) ? 0 : 1].push(i), acc), [[], []])
 
 function splitByPinned(links: Link[]) {
-  const [pinnedLinks, unpinnedLinks] = _.partition((link: Link) => {
+  const [pinnedLinks, unpinnedLinks] = partitionArr(links, (link: Link) => {
     const isPinned = link.tags.includes('pinned')
     return isPinned
-  })(links)
+  })
 
   return [...pinnedLinks, ...unpinnedLinks]
 }
 
 function sortByVisitedAt(links: Link[]) {
-
   return links.sort((first: Link, second: Link) => {
     return (
       DateUtils.dateFromFBTimestamp(first.visitedAt).valueOf() -

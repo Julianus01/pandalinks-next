@@ -1,4 +1,4 @@
-import { UrlUtils } from '@/utils/urlUtils'
+import { UrlUtils } from '@/utils/UrlUtils'
 import { useRef } from 'react'
 import { useKey } from 'react-use'
 import { toast } from 'sonner'
