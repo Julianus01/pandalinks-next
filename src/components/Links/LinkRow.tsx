@@ -173,7 +173,7 @@ function LinkRow(props: Props) {
       )}
 
       {!props.isEditMode && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 ml-auto">
           {props.link.tags?.[0] && (
             <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
               #{props.link.tags[0]}
