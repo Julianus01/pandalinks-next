@@ -14,8 +14,8 @@ function splitByPinned(links: Link[]) {
 function sortByVisitedAt(links: Link[]) {
   return links.sort((first: Link, second: Link) => {
     return (
-      DateUtils.dateFromFBTimestamp(first.visitedAt).valueOf() -
-      DateUtils.dateFromFBTimestamp(second.visitedAt).valueOf()
+      DateUtils.dateFromFBTimestamp(second.visitedAt).valueOf() -
+      DateUtils.dateFromFBTimestamp(first.visitedAt).valueOf()
     )
   })
 }
