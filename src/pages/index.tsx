@@ -16,6 +16,7 @@ import { AuthContext } from '@/context/AuthContext'
 import nookies from 'nookies'
 import { GetServerSidePropsContext } from 'next'
 import firebaseAdmin from '@/utils/firebaseAdmin'
+import { Timestamp } from 'firebase/firestore'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   try {
@@ -158,15 +159,13 @@ function HomePage(props: Props) {
         queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
           const oldLinks = data as Link[]
 
-          const updatedLinks = oldLinks.map((oldLink) => {
+          return oldLinks.map((oldLink) => {
             if (oldLink.id === updatedLink.id) {
               return { ...oldLink, ...updatedLink }
             }
 
             return oldLink
           })
-
-          return updatedLinks
         })
       },
     })
@@ -287,9 +286,25 @@ function HomePage(props: Props) {
   }
 
   function navigateToLink(link: Link) {
+    const updatedLink: Link = { ...link, visitedAt: Timestamp.now() }
+    updateLinkMutation.mutate(updatedLink)
+
+    queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+      const oldLinks = data as Link[]
+
+      return oldLinks.map((oldLink) => {
+        if (oldLink.id === updatedLink.id) {
+          return { ...oldLink, ...updatedLink }
+        }
+
+        return oldLink
+      })
+    })
+
     if (!link.src.match(/^https?:\/\//i)) {
       return window.open(`http://${link.src}`, '_blank')
     }
+
     return window.open(link.src, '_blank')
   }
 
