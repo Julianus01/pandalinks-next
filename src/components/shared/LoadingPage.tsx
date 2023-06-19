@@ -12,7 +12,7 @@ export default function LoadingPage() {
 
         <div className="w-full mx-auto py-6 space-y-4">
           <div className="flex items-end">
-            <div className="h-4 bg-gray-200 rounded w-48" />
+            <div className="h-4 bg-gray-200 rounded w-20" />
 
             <div className="h-4 bg-gray-200 rounded w-16 ml-auto" />
           </div>

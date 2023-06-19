@@ -315,7 +315,7 @@ function HomePage() {
             <div className="px-2 pb-2 flex items-center border-b">
               <p className="text-sm text-gray-500">Destination</p>
 
-              <p className="ml-auto text-sm text-gray-500">Visited At</p>
+              <p className="ml-auto text-sm text-gray-500">last visited</p>
             </div>
           )}
 
