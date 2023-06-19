@@ -16,6 +16,7 @@ import {
 } from 'firebase/firestore'
 import { FirestoreCollection } from './FirestoreCollection'
 import { getAuth } from 'firebase/auth'
+import { LinkUtils } from '@/utils/LinkUtils'
 
 const auth = getAuth()
 
@@ -33,7 +34,9 @@ async function getLinks(): Promise<Link[]> {
     ...doc.data(),
   })) as Link[]
 
-  return links
+  const byPinned = LinkUtils.splitByPinned(links)
+
+  return byPinned
 }
 
 export interface UpdateLinkRequestParams extends Partial<Link> {

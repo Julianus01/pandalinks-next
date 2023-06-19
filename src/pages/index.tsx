@@ -395,6 +395,8 @@ function HomePage(props: Props) {
   function pinLink(linkId: string) {
     const linkToPin = filteredLinks.find((link) => link.id === linkId)
 
+    toast('Pinned')
+
     if (linkToPin) {
       updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
 
@@ -419,6 +421,8 @@ function HomePage(props: Props) {
 
   function unpinLink(linkId: string) {
     const linkToUnpin = filteredLinks.find((link) => link.id === linkId)
+
+    toast('Unpinned')
 
     if (linkToUnpin) {
       const newTags = linkToUnpin.tags.filter((tag) => tag !== 'pinned')
