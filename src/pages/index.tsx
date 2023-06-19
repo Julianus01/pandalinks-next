@@ -18,7 +18,6 @@ import { LinkUtils } from '@/utils/link-utils'
 function HomePage() {
   const queryClient = useQueryClient()
   const { user } = useContext(AuthContext)
-  const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editLinkId, setEditLinkId] = useState<string | null>(null)
@@ -217,8 +216,6 @@ function HomePage() {
 
             return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
           })
-
-          setShowAddRow(false)
         },
       }
     )
