@@ -79,6 +79,8 @@ function HomePage(props: Props) {
     return links.filter((link) => link.url.toLowerCase().includes(searchQ.toLowerCase()))
   }, [links, searchQ])
 
+  console.log(filteredLinks)
+
   const selectedLink = useMemo(() => {
     return filteredLinks.find((link) => link.id === selectedId)
   }, [filteredLinks, selectedId])

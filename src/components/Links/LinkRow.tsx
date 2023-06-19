@@ -26,12 +26,7 @@ function LinkRow(props: Props) {
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
   const lastVisitedText = useMemo(() => {
-    // TODO: Check why for first render this is undefined? 🤔
-    if (!props.link.visitedAt.seconds) {
-      return ''
-    }
-
-    return DateUtils.timeSince(DateUtils.dateFromFBTimestamp(props.link.visitedAt))
+    return DateUtils.timeSince(new Date(props.link.visitedAt))
   }, [props.link.visitedAt])
 
   // CMD + C
