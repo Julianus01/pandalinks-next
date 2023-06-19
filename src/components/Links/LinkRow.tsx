@@ -172,7 +172,7 @@ function LinkRow(props: Props) {
         />
       )}
 
-      {!props.isSelected && (
+      {!props.isEditMode && (
         <div className="flex items-center space-x-2">
           {props.link.tags?.[0] && (
             <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
@@ -184,14 +184,14 @@ function LinkRow(props: Props) {
         </div>
       )}
 
-      {props.isSelected && !props.isEditMode && (
+      {/* {props.isSelected && !props.isEditMode && (
         <p className="inline ml-auto text-xs">
           <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
             Enter
           </kbd>{' '}
           to edit
         </p>
-      )}
+      )} */}
     </div>
   )
 }

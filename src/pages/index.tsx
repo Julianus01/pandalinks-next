@@ -142,12 +142,18 @@ function HomePage(props: Props) {
       return false
     },
     () => {
-      if (selectedId) {
-        pinLink(selectedId)
+      if (selectedLink) {
+        const isPinned = selectedLink?.tags?.includes('pinned')
+
+        if (!isPinned) {
+          pinLink(selectedLink.id)
+        } else {
+          unpinLink(selectedLink.id)
+        }
       }
     },
     {},
-    [selectedId]
+    [selectedLink]
   )
 
   useKey(
@@ -577,11 +583,13 @@ const getContextMenuGroupOne = (link: Link): ContextMenuRow[] => {
       action: ContextMenuAction.pin,
       name: 'Pin',
       hide: isPinned,
+      command: 'Cmd + P',
     },
     {
       action: ContextMenuAction.unpin,
       name: 'Unpin',
       hide: !isPinned,
+      command: 'Cmd + P',
     },
     {
       action: ContextMenuAction.edit,
