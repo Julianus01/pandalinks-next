@@ -17,7 +17,7 @@ import nookies from 'nookies'
 import { GetServerSidePropsContext } from 'next'
 import firebaseAdmin from '@/utils/firebaseAdmin'
 import { Timestamp } from 'firebase/firestore'
-import { LinkUtils } from '@/utils/LinkUtils'
+import { LinkUtils } from '@/utils/link-utils'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   try {

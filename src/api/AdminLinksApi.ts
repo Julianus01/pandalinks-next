@@ -1,7 +1,7 @@
 import { FirestoreCollection } from './FirestoreCollection'
 import { Timestamp } from 'firebase/firestore'
 import firebaseAdmin from '@/utils/firebaseAdmin'
-import { LinkUtils } from '@/utils/LinkUtils'
+import { LinkUtils } from '@/utils/link-utils'
 
 const db = firebaseAdmin.firestore()
 

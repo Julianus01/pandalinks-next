@@ -16,7 +16,7 @@ import {
 } from 'firebase/firestore'
 import { FirestoreCollection } from './FirestoreCollection'
 import { getAuth } from 'firebase/auth'
-import { LinkUtils } from '@/utils/LinkUtils'
+import { LinkUtils } from '@/utils/link-utils'
 
 const auth = getAuth()
 

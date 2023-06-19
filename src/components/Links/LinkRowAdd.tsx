@@ -1,4 +1,4 @@
-import { UrlUtils } from '@/utils/urlUtils'
+import { UrlUtils } from '@/utils/url-utils'
 import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'

@@ -1,16 +1,14 @@
 import { Link } from '@/api/AdminLinksApi'
-import { DateUtils } from './DateUtils'
-
-const partitionArr = (arr: any, condn: any) =>
-  arr.reduce((acc: any, i: any) => (acc[condn(i) ? 0 : 1].push(i), acc), [[], []])
+import { DateUtils } from './date-utils'
+import { CommonUtils } from './common-utils'
 
 function splitByPinned(links: Link[]) {
-  const [pinnedLinks, unpinnedLinks] = partitionArr(links, (link: Link) => {
+  const [pinnedLinks, unpinnedLinks] = CommonUtils.partition(links, (link: Link) => {
     const isPinned = link.tags.includes('pinned')
     return isPinned
   })
 
-  return [...pinnedLinks, ...unpinnedLinks]
+  return [...pinnedLinks, ...unpinnedLinks] as Link[]
 }
 
 function sortByVisitedAt(links: Link[]) {
