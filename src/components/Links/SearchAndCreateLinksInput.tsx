@@ -36,6 +36,21 @@ function SearchAndCreateLinksInput(props: Props) {
     [props.value]
   )
 
+  useKey(
+    (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault()
+
+        return true
+      }
+
+      return false
+    },
+    () => {
+      ref.current?.focus()
+    }
+  )
+
   return (
     <div className="relative flex-1">
       {props.isCreateMode && (
@@ -74,8 +89,18 @@ function SearchAndCreateLinksInput(props: Props) {
         onChange={props.onChange}
         type="text"
         placeholder={props.isCreateMode ? 'Instagram.com...' : 'Search your links...'}
-        className="w-full pl-12 pr-3 py-2 text-gray-700 bg-white outline-none border focus:border-gray-300 shadow-sm rounded-lg"
+        className="w-full pl-12 pr-3 py-2 text-gray-700 bg-white outline-none border focus:border-slate-300 shadow-sm rounded-lg"
       />
+
+      <div className="absolute flex items-center space-x-1 right-3 inset-y-0 my-auto">
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+          ⌘
+        </kbd>
+
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+          F
+        </kbd>
+      </div>
     </div>
   )
 }

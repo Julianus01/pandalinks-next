@@ -9,6 +9,7 @@ export interface Link {
   userId: string
   createdAt: Timestamp
   updatedAt: Timestamp
+  visitedAt: Timestamp
 }
 
 async function getLinks(): Promise<Link[]> {

@@ -41,7 +41,11 @@ export interface UpdateLinkRequestParams extends Partial<Link> {
 }
 
 async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<void> {
-  return setDoc(doc(getFirestore(), FirestoreCollection.links, id), updates, { merge: true })
+  const updatedAt = Timestamp.now()
+
+  const updatedLink: Partial<Link> = { ...updates, updatedAt }
+
+  return setDoc(doc(getFirestore(), FirestoreCollection.links, id), updatedLink, { merge: true })
 }
 
 export interface CreateLinkRequestParams {
@@ -52,12 +56,14 @@ async function createLink(params: CreateLinkRequestParams) {
   // TODO: Fix this
   const createdAt = Timestamp.now()
   const updatedAt = Timestamp.now()
+  const visitedAt = Timestamp.now()
 
   const newLink: Partial<Link> = {
     src: params.src,
     userId: auth.currentUser?.uid,
     createdAt,
     updatedAt,
+    visitedAt,
   }
 
   const newEnvironmentDoc = await addDoc(collection(getFirestore(), FirestoreCollection.links), newLink)
