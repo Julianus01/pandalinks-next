@@ -30,9 +30,6 @@ async function getLinks(userId: string): Promise<Link[]> {
 
     LinkUtils.splitByPinned,
 
-    // From Timestamp to js Date
-    fp.map(LinkUtils.mapTimestampPropertiesToDateString),
-
     fp.map((doc: QueryDocumentSnapshot<DocumentData>) => {
       const data = doc.data()
 
