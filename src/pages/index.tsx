@@ -9,7 +9,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
-import LinkRowAdd from '@/components/Links/LinkRowAdd'
 import LoadingPage from '@/components/shared/LoadingPage'
 import Navbar from '@/components/shared/Navbar'
 import { AuthContext } from '@/context/AuthContext'
@@ -433,24 +432,6 @@ function HomePage() {
                 value={searchQ}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
               />
-
-              {!linksQuery.isLoading && !!filteredLinks?.length && (
-                <button
-                  onClick={() => setShowAddRow(true)}
-                  className="px-3 flex gap-1 items-center py-1.5 bg-white text-sm text-gray-700 duration-100 border rounded-lg hover:bg-gray-50 active:bg-gray-100"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -488,8 +469,6 @@ function HomePage() {
               </div>
             </div>
           )}
-
-          {showAddRow && <LinkRowAdd onClose={() => setShowAddRow(false)} onCreate={onCreateLink} />}
 
           {filteredLinks.map((link: Link) => {
             const isSelected = selectedId === link.id

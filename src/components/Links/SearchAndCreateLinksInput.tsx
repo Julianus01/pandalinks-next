@@ -51,6 +51,10 @@ function SearchAndCreateLinksInput(props: Props) {
     }
   )
 
+  useKey('Escape', () => {
+    ref.current?.blur()
+  })
+
   return (
     <div className="relative flex-1">
       {props.isCreateMode && (
