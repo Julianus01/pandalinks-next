@@ -1,7 +1,8 @@
-import db from '@/utils/db'
 import { FirestoreCollection } from './FirestoreCollection'
-import { getAuth } from 'firebase/auth'
 import { Timestamp } from 'firebase/firestore'
+import firebaseAdmin from '@/utils/firebaseAdmin'
+
+const db = firebaseAdmin.firestore()
 
 export interface Link {
   id: string
@@ -12,12 +13,10 @@ export interface Link {
   visitedAt: Timestamp
 }
 
-async function getLinks(): Promise<Link[]> {
-  const auth = getAuth()
-
+async function getLinks(userId: string): Promise<Link[]> {
   const links = await db
     .collection(FirestoreCollection.links)
-    .where('userId', '==', auth.currentUser?.uid)
+    .where('userId', '==', userId)
     .orderBy('createdAt', 'desc')
     .get()
 
@@ -26,7 +25,11 @@ async function getLinks(): Promise<Link[]> {
     ...doc.data(),
   })) as Link[]
 
-  return linksData || []
+  // Need to stringify and then parse because date object
+  // is not json format and it breaks Next
+  const linksResponse = JSON.parse(JSON.stringify(linksData))
+
+  return linksResponse || []
 }
 
 export const AdminLinksApi = {

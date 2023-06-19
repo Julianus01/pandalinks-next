@@ -13,8 +13,40 @@ import LinkRowAdd from '@/components/Links/LinkRowAdd'
 import LoadingPage from '@/components/shared/LoadingPage'
 import Navbar from '@/components/shared/Navbar'
 import { AuthContext } from '@/context/AuthContext'
+import nookies from 'nookies'
+import { GetServerSidePropsContext } from 'next'
+import firebaseAdmin from '@/utils/firebaseAdmin'
 
-function HomePage() {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  try {
+    const cookies = nookies.get(ctx)
+    const token = await firebaseAdmin.auth().verifyIdToken(cookies.token)
+
+    const links = await AdminLinksApi.getLinks(token.uid)
+
+    return {
+      props: { links },
+    }
+  } catch (err) {
+    // either the `token` cookie didn't exist
+    // or token verification failed
+    // either way: redirect to the login page
+    ctx.res.writeHead(302, { Location: '/login' })
+    ctx.res.end()
+
+    // `as never` prevents inference issues
+    // with InferGetServerSidePropsType.
+    // The props returned here don't matter because we've
+    // already redirected the user.
+    return { props: { links: [] } as never }
+  }
+}
+
+interface Props {
+  links: Link[]
+}
+
+function HomePage(props: Props) {
   const queryClient = useQueryClient()
   const { user } = useContext(AuthContext)
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
@@ -30,6 +62,7 @@ function HomePage() {
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks, user?.uid],
     queryFn: LinksApi.getLinks,
+    initialData: props.links,
   })
 
   const links = useMemo(() => {
