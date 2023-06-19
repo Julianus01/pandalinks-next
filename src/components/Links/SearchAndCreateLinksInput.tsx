@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 interface Props {
   value: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-  onCreate: (src: string) => void
+  onCreate: (url: string) => void
   isCreateMode: boolean
 }
 

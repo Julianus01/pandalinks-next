@@ -22,7 +22,7 @@ interface Props {
 
 function LinkRow(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const [value, setValue] = useState<string>(props.link.src)
+  const [value, setValue] = useState<string>(props.link.url)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
   const lastVisitedText = useMemo(() => {
@@ -46,11 +46,11 @@ function LinkRow(props: Props) {
     'Escape',
     () => {
       if (props.isEditMode) {
-        setValue(props.link.src)
+        setValue(props.link.url)
       }
     },
     {},
-    [props.isEditMode, props.link.src]
+    [props.isEditMode, props.link.url]
   )
 
   useKey(
@@ -59,25 +59,25 @@ function LinkRow(props: Props) {
       const trimmedValue = value.trim()
 
       if (!trimmedValue?.length) {
-        setValue(props.link.src)
+        setValue(props.link.url)
         props.onExitEditMode()
 
         return
       }
 
-      if (props.isEditMode && trimmedValue !== props.link.src) {
+      if (props.isEditMode && trimmedValue !== props.link.url) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
           toast('Invalid Link')
 
           return
         }
 
-        props.onUpdate({ id: props.link.id, src: trimmedValue })
+        props.onUpdate({ id: props.link.id, url: trimmedValue })
         props.onExitEditMode()
       }
     },
     {},
-    [props.isEditMode, value, props.link.src]
+    [props.isEditMode, value, props.link.url]
   )
 
   useClickAway(ref, () => {
@@ -85,22 +85,22 @@ function LinkRow(props: Props) {
 
     if (props.isEditMode) {
       if (!trimmedValue?.length) {
-        setValue(props.link.src)
+        setValue(props.link.url)
         props.onExitEditMode()
 
         return
       }
 
-      if (trimmedValue !== props.link.src) {
+      if (trimmedValue !== props.link.url) {
         if (!UrlUtils.isValidUrl(trimmedValue)) {
-          setValue(props.link.src)
+          setValue(props.link.url)
           toast('Invalid Link')
           props.onExitEditMode()
 
           return
         }
 
-        props.onUpdate({ id: props.link.id, src: trimmedValue })
+        props.onUpdate({ id: props.link.id, url: trimmedValue })
         props.onExitEditMode()
         return
       }

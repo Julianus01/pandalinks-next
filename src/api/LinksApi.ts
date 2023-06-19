@@ -49,7 +49,7 @@ async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<
 }
 
 export interface CreateLinkRequestParams {
-  src: string
+  url: string
 }
 
 async function createLink(params: CreateLinkRequestParams) {
@@ -59,7 +59,7 @@ async function createLink(params: CreateLinkRequestParams) {
   const visitedAt = Timestamp.now()
 
   const newLink: Partial<Link> = {
-    src: params.src,
+    url: params.url,
     userId: auth.currentUser?.uid,
     createdAt,
     updatedAt,

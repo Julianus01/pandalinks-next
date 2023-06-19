@@ -179,11 +179,11 @@ function HomePage(props: Props) {
     })
   }
 
-  function onCreateLink(src: string) {
+  function onCreateLink(url: string) {
     setSearchQ('')
 
     const createPromise = createLinkMutation.mutateAsync(
-      { src },
+      { url },
       {
         onSuccess: (newLink) => {
           queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
@@ -211,7 +211,7 @@ function HomePage(props: Props) {
       return links
     }
 
-    return links.filter((link) => link.src.toLowerCase().includes(searchQ.toLowerCase()))
+    return links.filter((link) => link.url.toLowerCase().includes(searchQ.toLowerCase()))
   }, [links, searchQ])
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
@@ -244,7 +244,7 @@ function HomePage(props: Props) {
 
     switch (contextMenuRow.action) {
       case ContextMenuAction.copyLink:
-        navigator.clipboard.writeText(link.src)
+        navigator.clipboard.writeText(link.url)
         toast(
           <>
             <svg
@@ -301,11 +301,11 @@ function HomePage(props: Props) {
       })
     })
 
-    if (!link.src.match(/^https?:\/\//i)) {
-      return window.open(`http://${link.src}`, '_blank')
+    if (!link.url.match(/^https?:\/\//i)) {
+      return window.open(`http://${link.url}`, '_blank')
     }
 
-    return window.open(link.src, '_blank')
+    return window.open(link.url, '_blank')
   }
 
   if (linksQuery.isLoading) {

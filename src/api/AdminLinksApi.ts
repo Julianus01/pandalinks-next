@@ -6,7 +6,7 @@ const db = firebaseAdmin.firestore()
 
 export interface Link {
   id: string
-  src: string
+  url: string
   userId: string
   createdAt: Timestamp
   updatedAt: Timestamp
