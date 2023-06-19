@@ -56,7 +56,7 @@ function LinkRowAdd(props: Props) {
   })
 
   return (
-    <div ref={ref} className="pl-4 rounded-lg -mx-1.5 flex items-center bg-white border border-solid border-gray-200">
+    <div ref={ref} className="pl-4 rounded-lg -mx-1.5 flex items-center bg-white border border-solid border-gray-200 shadow-sm">
       <div className="relative">
         <div className="absolute top-0 right-0 bottom-0 left-0 z-1">
           <Image
