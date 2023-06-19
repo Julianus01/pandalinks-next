@@ -1,7 +1,7 @@
 import { Link } from '@/api/AdminLinksApi'
 import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
-import { DateUtils } from '@/utils/dateUtils'
+import { DateUtils } from '@/utils/DateUtils'
 import { UrlUtils } from '@/utils/urlUtils'
 import classNames from 'classnames'
 import Image from 'next/image'
@@ -26,7 +26,12 @@ function LinkRow(props: Props) {
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
   const lastVisitedText = useMemo(() => {
-    return DateUtils.timeSince(new Date(props.link.visitedAt.seconds * 1000))
+    // TODO: Check why for first render this is undefined? 🤔
+    if (!props.link.visitedAt.seconds) {
+      return ''
+    }
+
+    return DateUtils.timeSince(DateUtils.dateFromFBTimestamp(props.link.visitedAt))
   }, [props.link.visitedAt])
 
   // CMD + C

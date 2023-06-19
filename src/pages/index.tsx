@@ -17,6 +17,7 @@ import nookies from 'nookies'
 import { GetServerSidePropsContext } from 'next'
 import firebaseAdmin from '@/utils/firebaseAdmin'
 import { Timestamp } from 'firebase/firestore'
+import { LinkUtils } from '@/utils/LinkUtils'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   try {
@@ -177,7 +178,9 @@ function HomePage(props: Props) {
     queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
       const oldLinks = data as Link[]
 
-      return oldLinks.filter((oldLink) => oldLink.id !== selectedId)
+      const updatedLinks = oldLinks.filter((oldLink) => oldLink.id !== selectedId)
+
+      return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
     })
 
     if (selectedId) {
@@ -212,13 +215,15 @@ function HomePage(props: Props) {
         queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
           const oldLinks = data as Link[]
 
-          return oldLinks.map((oldLink) => {
+          const updatedLinks = oldLinks.map((oldLink) => {
             if (oldLink.id === updatedLink.id) {
               return { ...oldLink, ...updatedLink }
             }
 
             return oldLink
           })
+
+          return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
         })
       },
     })
@@ -242,7 +247,9 @@ function HomePage(props: Props) {
           queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
             const oldLinks = data as Link[]
 
-            return [newLink, ...oldLinks]
+            const updatedLinks: Link[] = [newLink, ...oldLinks] as Link[]
+
+            return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
           })
 
           setShowAddRow(false)
@@ -367,13 +374,15 @@ function HomePage(props: Props) {
     queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
       const oldLinks = data as Link[]
 
-      return oldLinks.map((oldLink) => {
+      const updatedLinks = oldLinks.map((oldLink) => {
         if (oldLink.id === updatedLink.id) {
           return { ...oldLink, ...updatedLink }
         }
 
         return oldLink
       })
+
+      return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
     })
 
     if (!link.url.match(/^https?:\/\//i)) {
@@ -392,7 +401,7 @@ function HomePage(props: Props) {
       queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
         const oldLinks = data as Link[]
 
-        return oldLinks.map((link) => {
+        const updatedLinks = oldLinks.map((link) => {
           if (link.id === linkId) {
             return {
               ...link,
@@ -402,6 +411,8 @@ function HomePage(props: Props) {
 
           return link
         })
+
+        return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
       })
     }
   }
@@ -417,7 +428,7 @@ function HomePage(props: Props) {
       queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
         const oldLinks = data as Link[]
 
-        return oldLinks.map((link) => {
+        const updatedLinks = oldLinks.map((link) => {
           if (link.id === linkId) {
             return {
               ...link,
@@ -427,6 +438,8 @@ function HomePage(props: Props) {
 
           return link
         })
+
+        return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
       })
     }
   }
@@ -434,8 +447,6 @@ function HomePage(props: Props) {
   if (linksQuery.isLoading) {
     return <LoadingPage />
   }
-
-  console.log(filteredLinks)
 
   return (
     <AuthLayout
@@ -490,7 +501,20 @@ function HomePage(props: Props) {
             <div className="px-2 pb-2 flex items-center border-b">
               <p className="text-sm text-gray-500">{filteredLinks?.length} Results - Destination</p>
 
-              <p className="ml-auto text-sm text-gray-500">last visited</p>
+              <div className="ml-auto flex items-center space-x-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4 text-gray-500"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                </svg>
+
+                <p className="text-sm text-gray-500">last visited</p>
+              </div>
             </div>
           )}
 

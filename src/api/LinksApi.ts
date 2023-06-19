@@ -24,7 +24,7 @@ async function getLinks(): Promise<Link[]> {
     query(
       collection(getFirestore(), FirestoreCollection.links),
       where('userId', '==', auth.currentUser?.uid),
-      orderBy('createdAt', 'desc')
+      orderBy('visitedAt', 'desc')
     )
   )
 
@@ -53,7 +53,6 @@ export interface CreateLinkRequestParams {
 }
 
 async function createLink(params: CreateLinkRequestParams) {
-  // TODO: Fix this
   const createdAt = Timestamp.now()
   const updatedAt = Timestamp.now()
   const visitedAt = Timestamp.now()
@@ -67,12 +66,11 @@ async function createLink(params: CreateLinkRequestParams) {
     visitedAt,
   }
 
-  const newEnvironmentDoc = await addDoc(collection(getFirestore(), FirestoreCollection.links), newLink)
+  const newLinkDoc = await addDoc(collection(getFirestore(), FirestoreCollection.links), newLink)
 
-  return { ...newLink, id: newEnvironmentDoc.id }
+  return { ...newLink, id: newLinkDoc.id }
 }
 
-// Delete Project Environments
 async function deleteLink(linkId: string) {
   return deleteDoc(doc(getFirestore(), FirestoreCollection.links, linkId))
 }

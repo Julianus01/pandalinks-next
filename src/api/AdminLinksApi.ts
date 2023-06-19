@@ -1,6 +1,7 @@
 import { FirestoreCollection } from './FirestoreCollection'
 import { Timestamp } from 'firebase/firestore'
 import firebaseAdmin from '@/utils/firebaseAdmin'
+import { LinkUtils } from '@/utils/LinkUtils'
 
 const db = firebaseAdmin.firestore()
 
@@ -18,17 +19,23 @@ async function getLinks(userId: string): Promise<Link[]> {
   const links = await db
     .collection(FirestoreCollection.links)
     .where('userId', '==', userId)
-    .orderBy('createdAt', 'desc')
+    .orderBy('visitedAt', 'desc')
     .get()
 
-  const linksData = links.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Link[]
+  const linksData = links.docs.map((doc) => {
+    const data = doc.data()
+
+    return {
+      id: doc.id,
+      ...data,
+    }
+  }) as Link[]
+
+  const splitByPinnedLinks = LinkUtils.splitByPinned(linksData)
 
   // Need to stringify and then parse because date object
   // is not json format and it breaks Next
-  const linksResponse = JSON.parse(JSON.stringify(linksData))
+  const linksResponse = JSON.parse(JSON.stringify(splitByPinnedLinks))
 
   return linksResponse || []
 }

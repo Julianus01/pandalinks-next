@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore'
+
 function timeSince(date: any) {
   var seconds = Math.floor(((new Date() as any) - date) / 1000)
 
@@ -38,6 +40,11 @@ function timeSince(date: any) {
   return 'less than a minute ago'
 }
 
+function dateFromFBTimestamp(timestamp: Timestamp) {
+  return new Date(timestamp.seconds * 1000)
+}
+
 export const DateUtils = {
   timeSince,
+  dateFromFBTimestamp,
 }
