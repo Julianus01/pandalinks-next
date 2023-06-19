@@ -6,15 +6,17 @@ import LinkRow from '@/components/Links/LinkRow'
 import SearchAndCreateLinksInput from '@/components/Links/SearchAndCreateLinksInput'
 import { withAuth } from '@/firebase/withAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useRef, useState } from 'react'
+import { useContext, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LinkRowAdd from '@/components/Links/LinkRowAdd'
 import LoadingPage from '@/components/shared/LoadingPage'
 import Navbar from '@/components/shared/Navbar'
+import { AuthContext } from '@/context/AuthContext'
 
 function HomePage() {
   const queryClient = useQueryClient()
+  const { user } = useContext(AuthContext)
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
   const [selected, setSelected] = useState<string | null>(null)
@@ -26,7 +28,7 @@ function HomePage() {
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
   const linksQuery = useQuery({
-    queryKey: [ReactQueryKey.getLinks],
+    queryKey: [ReactQueryKey.getLinks, user?.uid],
     queryFn: LinksApi.getLinks,
   })
 
@@ -85,7 +87,7 @@ function HomePage() {
   })
 
   function onDeleteLink(linkId: string) {
-    queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+    queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
       const oldLinks = data as Link[]
 
       return oldLinks.filter((oldLink) => oldLink.id !== selected)
@@ -120,7 +122,7 @@ function HomePage() {
   function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
     const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
       onSuccess: () => {
-        queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+        queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
           const oldLinks = data as Link[]
 
           const updatedLinks = oldLinks.map((oldLink) => {
@@ -152,7 +154,7 @@ function HomePage() {
       { src },
       {
         onSuccess: (newLink) => {
-          queryClient.setQueryData([ReactQueryKey.getLinks], (data) => {
+          queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
             const oldLinks = data as Link[]
 
             return [newLink, ...oldLinks]

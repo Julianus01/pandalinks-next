@@ -13,8 +13,6 @@ export interface AuthContextState {
 
 export const AuthContext = React.createContext<AuthContextState>({ user: null, loading: true })
 
-export const useAuthContext = () => React.useContext(AuthContext)
-
 export interface AuthContextProps {
   children: React.ReactNode
 }

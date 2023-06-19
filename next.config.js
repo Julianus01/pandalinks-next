@@ -9,6 +9,7 @@ const nextConfig = {
         pathname: '/s2/favicons',
       },
     ],
+    domains: ['lh3.googleusercontent.com'],
   },
 }
 
