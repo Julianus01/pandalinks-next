@@ -1,5 +1,6 @@
-import { Link, LinkDb } from '@/api/AdminLinksApi'
+import { Link } from '@/api/AdminLinksApi'
 import fp from 'lodash/fp'
+import { DateUtils } from './date-utils'
 
 function splitByPinned(links: Link[]) {
   const [pinnedLinks, unpinnedLinks] = fp.partition((link: Link) => {
@@ -12,7 +13,7 @@ function splitByPinned(links: Link[]) {
 
 function sortByVisitedAt(links: Link[]) {
   return links.sort((first: Link, second: Link) => {
-    return second.visitedAt.valueOf() - first.visitedAt.valueOf()
+    return second.visitedAt.toDate().valueOf() - first.visitedAt.toDate().valueOf()
   })
 }
 
@@ -23,18 +24,8 @@ function applyPinAndSortByVisitedAt(links: Link[]) {
   return sortedAndSplitByPinned
 }
 
-function mapTimestampPropertiesToDateString(link: LinkDb) {
-  return {
-    ...link,
-    createdAt: link.createdAt.toDate().toString(),
-    updatedAt: link.updatedAt.toDate().toString(),
-    visitedAt: link.visitedAt.toDate().toString(),
-  }
-}
-
 export const LinkUtils = {
   splitByPinned,
   sortByVisitedAt,
   applyPinAndSortByVisitedAt,
-  mapTimestampPropertiesToDateString,
 }

@@ -6,7 +6,7 @@ import fp from 'lodash/fp'
 
 const db = firebaseAdmin.firestore()
 
-export interface LinkDb {
+export interface Link {
   id: string
   url: string
   userId: string
@@ -14,16 +14,6 @@ export interface LinkDb {
   createdAt: Timestamp
   updatedAt: Timestamp
   visitedAt: Timestamp
-}
-
-export interface Link {
-  id: string
-  url: string
-  userId: string
-  tags: string[]
-  createdAt: Date
-  updatedAt: Date
-  visitedAt: Date
 }
 
 async function getLinks(userId: string): Promise<Link[]> {

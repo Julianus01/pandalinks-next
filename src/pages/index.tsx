@@ -1,4 +1,4 @@
-import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
+import { Link } from '@/api/AdminLinksApi'
 import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
@@ -13,42 +13,10 @@ import LinkRowAdd from '@/components/Links/LinkRowAdd'
 import LoadingPage from '@/components/shared/LoadingPage'
 import Navbar from '@/components/shared/Navbar'
 import { AuthContext } from '@/context/AuthContext'
-import nookies from 'nookies'
-import { GetServerSidePropsContext } from 'next'
-import firebaseAdmin from '@/utils/firebaseAdmin'
 import { Timestamp } from 'firebase/firestore'
 import { LinkUtils } from '@/utils/link-utils'
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  try {
-    const cookies = nookies.get(ctx)
-    const token = await firebaseAdmin.auth().verifyIdToken(cookies.token)
-
-    const links = await AdminLinksApi.getLinks(token.uid)
-
-    return {
-      props: { links },
-    }
-  } catch (err) {
-    // either the `token` cookie didn't exist
-    // or token verification failed
-    // either way: redirect to the login page
-    ctx.res.writeHead(302, { Location: '/login' })
-    ctx.res.end()
-
-    // `as never` prevents inference issues
-    // with InferGetServerSidePropsType.
-    // The props returned here don't matter because we've
-    // already redirected the user.
-    return { props: { links: [] } as never }
-  }
-}
-
-interface Props {
-  links: Link[]
-}
-
-function HomePage(props: Props) {
+function HomePage() {
   const queryClient = useQueryClient()
   const { user } = useContext(AuthContext)
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
@@ -64,7 +32,6 @@ function HomePage(props: Props) {
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks, user?.uid],
     queryFn: LinksApi.getLinks,
-    initialData: props.links,
   })
 
   const links = useMemo(() => {
@@ -78,8 +45,6 @@ function HomePage(props: Props) {
 
     return links.filter((link) => link.url.toLowerCase().includes(searchQ.toLowerCase()))
   }, [links, searchQ])
-
-  console.log(filteredLinks)
 
   const selectedLink = useMemo(() => {
     return filteredLinks.find((link) => link.id === selectedId)
