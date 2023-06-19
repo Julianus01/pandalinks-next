@@ -52,8 +52,8 @@ function HomePage(props: Props) {
   const { user } = useContext(AuthContext)
   const [showAddRow, setShowAddRow] = useState<boolean>(false)
   const [searchQ, setSearchQ] = useState<string>('')
-  const [selected, setSelected] = useState<string | null>(null)
-  const [editLink, setEditLink] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [editLinkId, setEditLinkId] = useState<string | null>(null)
   const linksContainerRef = useRef(null)
 
   const contextMenuRef = useRef<HTMLDivElement>(null)
@@ -69,6 +69,18 @@ function HomePage(props: Props) {
   const links = useMemo(() => {
     return linksQuery.data || []
   }, [linksQuery.data])
+
+  const filteredLinks = useMemo(() => {
+    if (!searchQ) {
+      return links
+    }
+
+    return links.filter((link) => link.url.toLowerCase().includes(searchQ.toLowerCase()))
+  }, [links, searchQ])
+
+  const selectedLink = useMemo(() => {
+    return filteredLinks.find((link) => link.id === selectedId)
+  }, [filteredLinks, selectedId])
 
   const updateLinkMutation = useMutation({
     mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
@@ -87,59 +99,94 @@ function HomePage(props: Props) {
 
   useKey('Escape', () => {
     resetContextMenu()
-    setSelected(null)
-    setEditLink(null)
+    setSelectedId(null)
+    setEditLinkId(null)
   })
 
   useKey(
     'Enter',
     () => {
-      if (selected && !editLink) {
-        setEditLink(selected)
+      if (selectedId && !editLinkId) {
+        setEditLinkId(selectedId)
       }
     },
     {},
-    [selected, editLink]
+    [selectedId, editLinkId]
   )
 
-  // Delete Key
+  useKey(
+    (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'o') {
+        event.preventDefault()
+        return true
+      }
+
+      return false
+    },
+    () => {
+      if (selectedLink) {
+        navigateToLink(selectedLink)
+      }
+    },
+    {},
+    [selectedId]
+  )
+
+  useKey(
+    (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+        event.preventDefault()
+        return true
+      }
+
+      return false
+    },
+    () => {
+      if (selectedId) {
+        pinLink(selectedId)
+      }
+    },
+    {},
+    [selectedId]
+  )
+
   useKey(
     (event) => {
       return (event.ctrlKey || event.metaKey) && (event.keyCode === 46 || event.key === 'Backspace')
     },
     () => {
-      if (selected) {
-        onDeleteLink(selected)
+      if (selectedId) {
+        onDeleteLink(selectedId)
       }
     },
     {},
-    [selected]
+    [selectedId]
   )
 
   useClickAway(linksContainerRef, () => {
-    setSelected(null)
+    setSelectedId(null)
   })
 
   function onDeleteLink(linkId: string) {
     queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
       const oldLinks = data as Link[]
 
-      return oldLinks.filter((oldLink) => oldLink.id !== selected)
+      return oldLinks.filter((oldLink) => oldLink.id !== selectedId)
     })
 
-    if (selected) {
-      const index = filteredLinks.map((link) => link.id).indexOf(selected)
+    if (selectedId) {
+      const index = filteredLinks.map((link) => link.id).indexOf(selectedId)
 
       if (filteredLinks[index + 1]) {
-        setSelected(filteredLinks[index + 1].id)
-        setEditLink(null)
+        setSelectedId(filteredLinks[index + 1].id)
+        setEditLinkId(null)
       } else if (filteredLinks[index - 1]) {
-        setSelected(filteredLinks[index - 1].id)
-        setEditLink(null)
+        setSelectedId(filteredLinks[index - 1].id)
+        setEditLinkId(null)
       }
     } else {
-      setSelected(null)
-      setEditLink(null)
+      setSelectedId(null)
+      setEditLinkId(null)
     }
 
     const deletePromise = deleteLinkMutation.mutateAsync(linkId)
@@ -206,16 +253,8 @@ function HomePage(props: Props) {
     })
   }
 
-  const filteredLinks = useMemo(() => {
-    if (!searchQ) {
-      return links
-    }
-
-    return links.filter((link) => link.url.toLowerCase().includes(searchQ.toLowerCase()))
-  }, [links, searchQ])
-
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
-    setSelected(link.id)
+    setSelectedId(link.id)
     e.preventDefault()
     const { pageX, pageY } = e
     setShowContextMenu(true)
@@ -235,7 +274,7 @@ function HomePage(props: Props) {
   }
 
   function onContextMenuRowClick(contextMenuRow: ContextMenuRow) {
-    const link = filteredLinks.find((link) => link.id === selected)
+    const link = filteredLinks.find((link) => link.id === selectedId)
 
     if (!link) {
       resetContextMenu()
@@ -243,7 +282,15 @@ function HomePage(props: Props) {
     }
 
     switch (contextMenuRow.action) {
-      case ContextMenuAction.copyLink:
+      case ContextMenuAction.visit: {
+        if (selectedLink) {
+          navigateToLink(selectedLink)
+        }
+
+        break
+      }
+
+      case ContextMenuAction.copyLink: {
         navigator.clipboard.writeText(link.url)
         toast(
           <>
@@ -264,17 +311,39 @@ function HomePage(props: Props) {
             Copied to clipboard{' '}
           </>
         )
-        break
 
-      case ContextMenuAction.edit:
-        setEditLink(selected)
         break
+      }
 
-      case ContextMenuAction.delete:
-        if (selected) {
-          onDeleteLink(selected)
+      case ContextMenuAction.pin: {
+        if (selectedId) {
+          pinLink(selectedId)
         }
+
         break
+      }
+
+      case ContextMenuAction.unpin: {
+        if (selectedId) {
+          unpinLink(selectedId)
+        }
+
+        break
+      }
+
+      case ContextMenuAction.edit: {
+        setEditLinkId(selectedId)
+
+        break
+      }
+
+      case ContextMenuAction.delete: {
+        if (selectedId) {
+          onDeleteLink(selectedId)
+        }
+
+        break
+      }
     }
 
     resetContextMenu()
@@ -308,9 +377,59 @@ function HomePage(props: Props) {
     return window.open(link.url, '_blank')
   }
 
+  function pinLink(linkId: string) {
+    const linkToPin = filteredLinks.find((link) => link.id === linkId)
+
+    if (linkToPin) {
+      updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
+
+      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+        const oldLinks = data as Link[]
+
+        return oldLinks.map((link) => {
+          if (link.id === linkId) {
+            return {
+              ...link,
+              tags: [...new Set(linkToPin.tags), 'pinned'],
+            }
+          }
+
+          return link
+        })
+      })
+    }
+  }
+
+  function unpinLink(linkId: string) {
+    const linkToUnpin = filteredLinks.find((link) => link.id === linkId)
+
+    if (linkToUnpin) {
+      const newTags = linkToUnpin.tags.filter((tag) => tag !== 'pinned')
+
+      updateLinkMutation.mutate({ ...linkToUnpin, tags: newTags })
+
+      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+        const oldLinks = data as Link[]
+
+        return oldLinks.map((link) => {
+          if (link.id === linkId) {
+            return {
+              ...link,
+              tags: newTags,
+            }
+          }
+
+          return link
+        })
+      })
+    }
+  }
+
   if (linksQuery.isLoading) {
     return <LoadingPage />
   }
+
+  console.log(filteredLinks)
 
   return (
     <AuthLayout
@@ -363,7 +482,7 @@ function HomePage(props: Props) {
 
           {!!filteredLinks.length && (
             <div className="px-2 pb-2 flex items-center border-b">
-              <p className="text-sm text-gray-500">Destination</p>
+              <p className="text-sm text-gray-500">{filteredLinks?.length} Results - Destination</p>
 
               <p className="ml-auto text-sm text-gray-500">last visited</p>
             </div>
@@ -372,18 +491,18 @@ function HomePage(props: Props) {
           {showAddRow && <LinkRowAdd onClose={() => setShowAddRow(false)} onCreate={onCreateLink} />}
 
           {filteredLinks.map((link: Link) => {
-            const isSelected = selected === link.id
+            const isSelected = selectedId === link.id
 
             return (
               <LinkRow
                 onUpdate={onUpdateLink}
-                onExitEditMode={() => setEditLink(null)}
-                isEditMode={editLink === link.id}
+                onExitEditMode={() => setEditLinkId(null)}
+                isEditMode={editLinkId === link.id}
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
                 onClick={() => {
-                  setSelected(link.id)
+                  setSelectedId(link.id)
                 }}
                 onDoubleClick={() => navigateToLink(link)}
                 isSelected={isSelected}
@@ -397,7 +516,7 @@ function HomePage(props: Props) {
               className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
               style={{ top: `${position.y}px`, left: `${position.x}px` }}
             >
-              {[CONTEXT_MENU_GROUP_ONE, CONTEXT_MENU_GROUP_TWO].map((group, i) => (
+              {[getContextMenuGroupOne(selectedLink), getContextMenuGroupTwo()].map((group, i) => (
                 <ul className="px-2 py-1.5 border-t" role="menu" key={i}>
                   {group.map((contextMenuRow, idx) => (
                     <li key={idx}>
@@ -425,6 +544,9 @@ function HomePage(props: Props) {
 export default withAuth(HomePage)
 
 enum ContextMenuAction {
+  visit = 'visit',
+  pin = 'pin',
+  unpin = 'unpin',
   copyLink = 'copyLink',
   edit = 'edit',
   delete = 'delete',
@@ -433,23 +555,45 @@ enum ContextMenuAction {
 interface ContextMenuRow {
   action: ContextMenuAction
   name: string
-  command: string
+  command?: string
+  hide?: boolean
 }
 
-const CONTEXT_MENU_GROUP_ONE: ContextMenuRow[] = [
-  {
-    action: ContextMenuAction.copyLink,
-    name: 'Copy link',
-    command: 'Cmd + C',
-  },
-  {
-    action: ContextMenuAction.edit,
-    name: 'Edit',
-    command: 'Enter',
-  },
-]
+const getContextMenuGroupOne = (link: Link): ContextMenuRow[] => {
+  const isPinned = link.tags.includes('pinned')
 
-const CONTEXT_MENU_GROUP_TWO: ContextMenuRow[] = [
+  const groupOne: ContextMenuRow[] = [
+    {
+      action: ContextMenuAction.visit,
+      name: 'Visit',
+      command: 'Cmd + O',
+    },
+    {
+      action: ContextMenuAction.copyLink,
+      name: 'Copy link',
+      command: 'Cmd + C',
+    },
+    {
+      action: ContextMenuAction.pin,
+      name: 'Pin',
+      hide: isPinned,
+    },
+    {
+      action: ContextMenuAction.unpin,
+      name: 'Unpin',
+      hide: !isPinned,
+    },
+    {
+      action: ContextMenuAction.edit,
+      name: 'Edit',
+      command: 'Enter',
+    },
+  ]
+
+  return groupOne.filter((item) => !item.hide)
+}
+
+const getContextMenuGroupTwo = (): ContextMenuRow[] => [
   {
     action: ContextMenuAction.delete,
     name: 'Delete',

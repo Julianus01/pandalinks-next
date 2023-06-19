@@ -62,7 +62,7 @@ function SearchAndCreateLinksInput(props: Props) {
           stroke="currentColor"
           className="w-6 h-6 text-gray-400 absolute left-3 inset-y-0 my-auto"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       )}
 

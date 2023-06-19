@@ -8,6 +8,7 @@ export interface Link {
   id: string
   url: string
   userId: string
+  tags: string[]
   createdAt: Timestamp
   updatedAt: Timestamp
   visitedAt: Timestamp

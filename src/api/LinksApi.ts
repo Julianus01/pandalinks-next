@@ -61,6 +61,7 @@ async function createLink(params: CreateLinkRequestParams) {
   const newLink: Partial<Link> = {
     url: params.url,
     userId: auth.currentUser?.uid,
+    tags: [],
     createdAt,
     updatedAt,
     visitedAt,
