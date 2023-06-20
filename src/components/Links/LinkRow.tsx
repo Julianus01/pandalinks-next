@@ -3,9 +3,10 @@ import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
 import { DateUtils } from '@/utils/date-utils'
 import { UrlUtils } from '@/utils/url-utils'
+import axios from 'axios'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 
@@ -32,6 +33,26 @@ function LinkRow(props: Props) {
   const isPinned = useMemo(() => {
     return props.link.tags.includes('pinned')
   }, [props.link.tags])
+
+  // TODO: Make this work
+  // useEffect(() => {
+  //   let url = props.link.url
+
+  //   if (!url.match(/^https?:\/\//i)) {
+  //     url = `https://${url}`
+  //   }
+
+  //   axios
+  //     .get('/api/url-metadata', { params: { url: url } })
+  //     .then((response) => {
+  //       console.log('Response')
+  //       console.log(response.data)
+  //     })
+  //     .catch((error) => {
+  //       console.log('Error here')
+  //       console.log(error)
+  //     })
+  // }, [props.link.url])
 
   // CMD + C
   useKey(

@@ -41,7 +41,14 @@ function HomePage() {
       return links
     }
 
-    return links.filter((link) => link.url.toLowerCase().includes(searchQ.toLowerCase()))
+    return links.filter((link) => {
+      const query = searchQ.toLowerCase()
+
+      const isUrlMatch = link.url.toLowerCase().includes(query)
+      const hasTagMatch = !!link.tags.filter((tag) => tag.includes(query))?.length
+
+      return isUrlMatch || hasTagMatch
+    })
   }, [links, searchQ])
 
   const selectedLink = useMemo(() => {
@@ -416,26 +423,16 @@ function HomePage() {
   }
 
   return (
-    <AuthLayout
-      header={
-        <div className="fixed left-0 top-0 right-0 backdrop-blur-sm z-10">
-          <Navbar />
+    <AuthLayout>
+      <div className="w-full max-w-2xl mx-auto pt-20 space-y-6 px-5 pb-40">
+        <SearchAndCreateLinksInput
+          isCreateMode={!linksQuery.isLoading && !filteredLinks?.length}
+          onCreate={onCreateLink}
+          value={searchQ}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
+        />
 
-          <div className="w-full max-w-2xl px-5 mx-auto pt-20 space-y-4">
-            <div className="flex space-x-2">
-              <SearchAndCreateLinksInput
-                isCreateMode={!linksQuery.isLoading && !filteredLinks?.length}
-                onCreate={onCreateLink}
-                value={searchQ}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-      }
-    >
-      <div className="w-full max-w-2xl px-5 mx-auto py-20">
-        <div ref={linksContainerRef} className="space-y-2 pt-36">
+        <div ref={linksContainerRef} className="space-y-2">
           {!linksQuery.isLoading && !filteredLinks.length && (
             <div className="inline mt-2">
               Press{' '}

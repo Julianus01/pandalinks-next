@@ -9,11 +9,7 @@ interface Props {
 function AuthLayout(props: Props) {
   return (
     <>
-      {!props.header && (
-        <div className="fixed left-0 top-0 right-0 backdrop-blur-sm z-10">
-          <Navbar />
-        </div>
-      )}
+      {!props.header && <Navbar />}
 
       {props.header && props.header}
 
