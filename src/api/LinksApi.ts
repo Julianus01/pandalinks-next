@@ -2,7 +2,6 @@ import { Link } from './AdminLinksApi'
 import {
   DocumentData,
   QueryDocumentSnapshot,
-  Timestamp,
   addDoc,
   collection,
   deleteDoc,
@@ -51,7 +50,7 @@ export interface UpdateLinkRequestParams extends Partial<Link> {
 }
 
 async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<void> {
-  const updatedAt = Timestamp.now()
+  const updatedAt = Date.now()
 
   const updatedLink: Partial<Link> = { ...updates, updatedAt }
 
@@ -63,9 +62,9 @@ export interface CreateLinkRequestParams {
 }
 
 async function createLink(params: CreateLinkRequestParams) {
-  const createdAt = Timestamp.now()
-  const updatedAt = Timestamp.now()
-  const visitedAt = Timestamp.now()
+  const createdAt = Date.now()
+  const updatedAt = Date.now()
+  const visitedAt = Date.now()
 
   const newLink: Partial<Link> = {
     url: params.url,

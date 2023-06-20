@@ -1,5 +1,5 @@
 import { FirestoreCollection } from './FirestoreCollection'
-import { DocumentData, QueryDocumentSnapshot, Timestamp } from 'firebase/firestore'
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore'
 import firebaseAdmin from '@/utils/firebaseAdmin'
 import { LinkUtils } from '@/utils/link-utils'
 import fp from 'lodash/fp'
@@ -11,9 +11,9 @@ export interface Link {
   url: string
   userId: string
   tags: string[]
-  createdAt: Timestamp
-  updatedAt: Timestamp
-  visitedAt: Timestamp
+  createdAt: number
+  updatedAt: number
+  visitedAt: number
 }
 
 async function getLinks(userId: string): Promise<Link[]> {
@@ -24,10 +24,6 @@ async function getLinks(userId: string): Promise<Link[]> {
     .get()
 
   const links = fp.compose(
-    // Need to stringify and then parse because date object
-    // is not json format and it breaks Next
-    (links) => JSON.parse(JSON.stringify(links)),
-
     LinkUtils.splitByPinned,
 
     fp.map((doc: QueryDocumentSnapshot<DocumentData>) => {

@@ -27,7 +27,7 @@ function LinkRow(props: Props) {
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
   const lastVisitedText = useMemo(() => {
-    return DateUtils.timeSince(props.link.visitedAt.toDate())
+    return DateUtils.timeSince(new Date(props.link.visitedAt))
   }, [props.link.visitedAt])
 
   const isPinned = useMemo(() => {

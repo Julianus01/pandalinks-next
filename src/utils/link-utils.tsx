@@ -1,6 +1,5 @@
 import { Link } from '@/api/AdminLinksApi'
 import fp from 'lodash/fp'
-import { DateUtils } from './date-utils'
 
 function splitByPinned(links: Link[]) {
   const [pinnedLinks, unpinnedLinks] = fp.partition((link: Link) => {
@@ -13,7 +12,7 @@ function splitByPinned(links: Link[]) {
 
 function sortByVisitedAt(links: Link[]) {
   return links.sort((first: Link, second: Link) => {
-    return second.visitedAt.toDate().valueOf() - first.visitedAt.toDate().valueOf()
+    return new Date(second.visitedAt).valueOf() - new Date(first.visitedAt).valueOf()
   })
 }
 
