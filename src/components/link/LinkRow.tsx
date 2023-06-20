@@ -3,10 +3,10 @@ import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
 import { DateUtils } from '@/utils/date-utils'
 import { UrlUtils } from '@/utils/url-utils'
-import axios from 'axios'
 import classNames from 'classnames'
 import fp from 'lodash/fp'
 import Image from 'next/image'
+import React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
@@ -153,22 +153,7 @@ function LinkRow(props: Props) {
     >
       <div className="relative">
         <div className="absolute top-0 right-0 bottom-0 left-0 z-1">
-          {UrlUtils.isValidUrl(value) && (
-            <Image
-              className={classNames({
-                'bg-gray-50 group-hover:bg-gray-100': true,
-                'bg-white group-hover:bg-white': props.isEditMode,
-              })}
-              alt="test"
-              width={17}
-              height={17}
-              src={`https://www.google.com/s2/favicons?domain=${value}&sz=256`}
-              onError={({ currentTarget }) => {
-                currentTarget.onerror = null // prevents looping
-                currentTarget.style.display = 'none'
-              }}
-            />
-          )}
+          {UrlUtils.isValidUrl(value) && <MemoLinkRowImage url={value} isEditMode={props.isEditMode} />}
         </div>
 
         <svg
@@ -236,6 +221,32 @@ function LinkRow(props: Props) {
 }
 
 export default LinkRow
+
+interface LinkRowImageProps {
+  isEditMode: boolean
+  url: string
+}
+
+function LinkRowImage(props: LinkRowImageProps) {
+  return (
+    <Image
+      className={classNames({
+        'bg-gray-50 group-hover:bg-gray-100': true,
+        'bg-white group-hover:bg-white': props.isEditMode,
+      })}
+      alt="test"
+      width={17}
+      height={17}
+      src={`https://www.google.com/s2/favicons?domain=${props.url}&sz=256`}
+      onError={({ currentTarget }) => {
+        currentTarget.onerror = null // prevents looping
+        currentTarget.style.display = 'none'
+      }}
+    />
+  )
+}
+
+const MemoLinkRowImage = React.memo(LinkRowImage)
 
 const COLORS = [
   'bg-slate-50 text-slate-800 ring-slate-600/20',
