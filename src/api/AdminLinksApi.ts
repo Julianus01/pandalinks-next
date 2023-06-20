@@ -19,6 +19,7 @@ export interface Link {
 
 export interface Bookmark {
   type: string
+  tags: string[]
   addDate: number
   title: string
   icon: string

@@ -26,7 +26,20 @@ function applyPinAndSortByVisitedAt(links: Link[]) {
 function getBookmarksFromImportedJson(json: HTMLBookmark[]): Bookmark[] {
   const result: Bookmark[] = json?.flatMap((item: any) => {
     if (item.type === 'folder') {
-      return getBookmarksFromImportedJson(item?.children || [])
+      const currentTag = item.title.replace(/\s+/g, '-').toLowerCase()
+
+      if (currentTag === 'bookmarks-bar') {
+        return getBookmarksFromImportedJson(item?.children || [])
+      }
+
+      const childItems = getBookmarksFromImportedJson(item?.children || [])
+
+      const withExtraTag = childItems.map((item) => ({
+        ...item,
+        tags: [...new Set([...(item?.tags || []), currentTag])],
+      }))
+
+      return withExtraTag
     }
 
     if (item.type === 'link') {

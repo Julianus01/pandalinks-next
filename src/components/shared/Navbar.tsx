@@ -2,6 +2,7 @@ import React, { ChangeEvent, useContext, useRef } from 'react'
 import Image from 'next/image'
 import { logout } from '@/firebase/auth'
 import { AuthContext } from '@/context/AuthContext'
+// @ts-ignore
 import { bookmarksToJSON } from 'bookmarks-to-json'
 import { Bookmark, Link } from '@/api/AdminLinksApi'
 import { LinkUtils } from '@/utils/link-utils'
@@ -40,7 +41,7 @@ function Navbar() {
             id: uuidv4(),
             url: bookmark.url,
             userId: user?.uid,
-            tags: [],
+            tags: bookmark.tags || [],
             createdAt: bookmark.addDate,
             updatedAt: Date.now(),
             visitedAt: Date.now(),
