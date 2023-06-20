@@ -8,12 +8,30 @@ const db = firebaseAdmin.firestore()
 
 export interface Link {
   id: string
+  title: string
   url: string
   userId: string
   tags: string[]
   createdAt: number
   updatedAt: number
   visitedAt: number
+}
+
+export interface Bookmark {
+  type: string
+  addDate: number
+  title: string
+  icon: string
+  url: string
+}
+
+export interface HTMLBookmark {
+  type: string
+  addDate: number
+  title: string
+  icon: string
+  url: string
+  children: HTMLBookmark[]
 }
 
 async function getLinks(userId: string): Promise<Link[]> {

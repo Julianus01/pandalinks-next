@@ -1,4 +1,4 @@
-import { Link } from '@/api/AdminLinksApi'
+import { Bookmark, HTMLBookmark, Link } from '@/api/AdminLinksApi'
 import fp from 'lodash/fp'
 
 function splitByPinned(links: Link[]) {
@@ -23,8 +23,31 @@ function applyPinAndSortByVisitedAt(links: Link[]) {
   return sortedAndSplitByPinned
 }
 
+function getBookmarksFromImportedJson(json: HTMLBookmark[]): Bookmark[] {
+  const result: Bookmark[] = json?.flatMap((item: any) => {
+    if (item.type === 'folder') {
+      return getBookmarksFromImportedJson(item?.children || [])
+    }
+
+    if (item.type === 'link') {
+      const childrenItems = getBookmarksFromImportedJson(item?.children || [])
+
+      if (childrenItems.length) {
+        return [item, childrenItems]
+      }
+
+      return item
+    }
+
+    return []
+  })
+
+  return result
+}
+
 export const LinkUtils = {
   splitByPinned,
   sortByVisitedAt,
   applyPinAndSortByVisitedAt,
+  getBookmarksFromImportedJson,
 }

@@ -5,6 +5,7 @@ import { DateUtils } from '@/utils/date-utils'
 import { UrlUtils } from '@/utils/url-utils'
 import axios from 'axios'
 import classNames from 'classnames'
+import fp from 'lodash/fp'
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
@@ -33,6 +34,20 @@ function LinkRow(props: Props) {
   const isPinned = useMemo(() => {
     return props.link.tags.includes('pinned')
   }, [props.link.tags])
+
+  const displayValue = useMemo(() => {
+    return fp.compose(
+      (value: string) => value.replace('www.', ''),
+      (value: string) => value.replace('https://', ''),
+      (value: string) => value.replace('http://', '')
+    )(value)
+  }, [value])
+
+  useEffect(() => {
+    if (!props.isEditMode && !value.length) {
+      setValue(props.link.url)
+    }
+  }, [props.isEditMode, props.link.url, value])
 
   // TODO: Make this work
   // useEffect(() => {
@@ -65,17 +80,6 @@ function LinkRow(props: Props) {
         showCopiedMessage()
       }
     }
-  )
-
-  useKey(
-    'Escape',
-    () => {
-      if (props.isEditMode) {
-        setValue(props.link.url)
-      }
-    },
-    {},
-    [props.isEditMode, props.link.url]
   )
 
   useKey(
@@ -181,7 +185,7 @@ function LinkRow(props: Props) {
         </svg>
       </div>
 
-      {!showCopied && !props.isEditMode && <p className="py-2 pr-4 truncate flex-1">{value}</p>}
+      {!showCopied && !props.isEditMode && <p className="py-2 pr-4 truncate flex-1">{displayValue}</p>}
 
       {showCopied && <div className="py-2 flex items-center">Copied to clipboard</div>}
 

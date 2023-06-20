@@ -12,6 +12,7 @@ import {
   query,
   setDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore'
 import { FirestoreCollection } from './FirestoreCollection'
 import { getAuth } from 'firebase/auth'
@@ -19,11 +20,12 @@ import { LinkUtils } from '@/utils/link-utils'
 import fp from 'lodash/fp'
 
 const auth = getAuth()
+const firestore = getFirestore()
 
 async function getLinks(): Promise<Link[]> {
   const querySnapshot = await getDocs(
     query(
-      collection(getFirestore(), FirestoreCollection.links),
+      collection(firestore, FirestoreCollection.links),
       where('userId', '==', auth.currentUser?.uid),
       orderBy('visitedAt', 'desc')
     )
@@ -54,7 +56,7 @@ async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<
 
   const updatedLink: Partial<Link> = { ...updates, updatedAt }
 
-  return setDoc(doc(getFirestore(), FirestoreCollection.links, id), updatedLink, { merge: true })
+  return setDoc(doc(firestore, FirestoreCollection.links, id), updatedLink, { merge: true })
 }
 
 export interface CreateLinkRequestParams {
@@ -75,18 +77,31 @@ async function createLink(params: CreateLinkRequestParams) {
     visitedAt,
   }
 
-  const newLinkDoc = await addDoc(collection(getFirestore(), FirestoreCollection.links), newLink)
+  const newLinkDoc = await addDoc(collection(firestore, FirestoreCollection.links), newLink)
 
   return { ...newLink, id: newLinkDoc.id }
 }
 
+async function batchCreateLinks(links: Partial<Link>[]) {
+  const batch = writeBatch(firestore)
+
+  links.forEach((link) => {
+    const docRef = doc(firestore, FirestoreCollection.links, link.id as string)
+
+    batch.set(docRef, link)
+  })
+
+  return batch.commit()
+}
+
 async function deleteLink(linkId: string) {
-  return deleteDoc(doc(getFirestore(), FirestoreCollection.links, linkId))
+  return deleteDoc(doc(firestore, FirestoreCollection.links, linkId))
 }
 
 export const LinksApi = {
   getLinks,
   updateLink,
   createLink,
+  batchCreateLinks,
   deleteLink,
 }
