@@ -2,8 +2,8 @@ import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
 import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
-import LinkRow from '@/components/Links/LinkRow'
-import SearchAndCreateLinksInput from '@/components/Links/SearchAndCreateLinksInput'
+import LinkRow from '@/components/link/LinkRow'
+import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/firebase/withAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext, useMemo, useRef, useState } from 'react'
@@ -372,20 +372,6 @@ function HomePage(props: Props) {
   function navigateToLink(link: Link) {
     const updatedLink: Link = { ...link, visitedAt: Date.now() }
     updateLinkMutation.mutate(updatedLink)
-
-    queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
-      const oldLinks = data as Link[]
-
-      const updatedLinks = oldLinks.map((oldLink) => {
-        if (oldLink.id === updatedLink.id) {
-          return { ...oldLink, ...updatedLink }
-        }
-
-        return oldLink
-      })
-
-      return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
-    })
 
     if (!link.url.match(/^https?:\/\//i)) {
       return window.open(`http://${link.url}`, '_blank')

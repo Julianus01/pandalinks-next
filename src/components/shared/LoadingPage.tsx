@@ -1,4 +1,4 @@
-import NavbarLogoOnly from '../Links/NavbarLogoOnly'
+import NavbarLogoOnly from '../link/NavbarLogoOnly'
 
 export default function LoadingPage() {
   return (

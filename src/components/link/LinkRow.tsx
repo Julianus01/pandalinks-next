@@ -207,30 +207,58 @@ function LinkRow(props: Props) {
             )}
 
             {!isPinned &&
-              props.link.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-md bg-rose-50 px-2 py-1 text-xs font-medium text-rose-800 ring-1 ring-inset ring-rose-600/20"
-                >
-                  #triumph
-                </span>
-              ))}
+              props.link.tags.map((tag) => {
+                const tagColorClasses = getRandomColor(tag)
+
+                return (
+                  <span
+                    key={tag}
+                    className={classNames({
+                      'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
+                      [tagColorClasses]: true,
+                    })}
+                  >
+                    #{tag}
+                  </span>
+                )
+              })}
 
             <p className="ml-auto text-xs">{lastVisitedText}</p>
           </div>
         </>
       )}
-
-      {/* {props.isSelected && !props.isEditMode && (
-        <p className="inline ml-auto text-xs">
-          <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
-            Enter
-          </kbd>{' '}
-          to edit
-        </p>
-      )} */}
     </div>
   )
 }
 
 export default LinkRow
+
+const COLORS = [
+  'bg-slate-50 text-slate-800 ring-slate-600/20',
+  'bg-gray-50 text-gray-800 ring-gray-600/20',
+  'bg-neutral-50 text-neutral-800 ring-neutral-600/20',
+  'bg-stone-50 text-stone-800 ring-stone-600/20',
+  'bg-red-50 text-red-800 ring-red-600/20',
+  'bg-orange-50 text-orange-800 ring-orange-600/20',
+  'bg-amber-50 text-amber-800 ring-amber-600/20',
+  'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
+  'bg-lime-50 text-lime-800 ring-lime-600/20',
+  'bg-green-50 text-green-800 ring-green-600/20',
+  'bg-emerald-50 text-emerald-800 ring-emerald-600/20',
+  'bg-teal-50 text-teal-800 ring-teal-600/20',
+  'bg-cyan-50 text-cyan-800 ring-cyan-600/20',
+  'bg-sky-50 text-sky-800 ring-sky-600/20',
+  'bg-blue-50 text-blue-800 ring-blue-600/20',
+  'bg-indigo-50 text-indigo-800 ring-indigo-600/20',
+  'bg-violet-50 text-violet-800 ring-violet-600/20',
+  'bg-purple-50 text-purple-800 ring-purple-600/20',
+  'bg-fuchsia-50 text-fuchsia-800 ring-fuchsia-600/20',
+  'bg-pink-50 text-pink-800 ring-pink-600/20',
+  'bg-rose-50 text-rose-800 ring-rose-600/20',
+]
+
+const getRandomColor = (seed: string) => {
+  const rand = parseInt(seed, 36)
+
+  return COLORS[rand ? rand % COLORS.length : 0]
+}
