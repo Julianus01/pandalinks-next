@@ -167,6 +167,62 @@ export function useLinks(params: UseLinksParams) {
     })
   }
 
+  function pinLink(linkId: string) {
+    const linkToPin = links.find((link) => link.id === linkId)
+
+    toast('Pinned')
+
+    if (linkToPin) {
+      updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
+
+      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+        const oldLinks = data as Link[]
+
+        const updatedLinks = oldLinks.map((link) => {
+          if (link.id === linkId) {
+            return {
+              ...link,
+              tags: [...new Set(linkToPin.tags), 'pinned'],
+            }
+          }
+
+          return link
+        })
+
+        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+      })
+    }
+  }
+
+  function unpinLink(linkId: string) {
+    const linkToUnpin = links.find((link) => link.id === linkId)
+
+    toast('Unpinned')
+
+    if (linkToUnpin) {
+      const newTags = linkToUnpin.tags.filter((tag) => tag !== 'pinned')
+
+      updateLinkMutation.mutate({ ...linkToUnpin, tags: newTags })
+
+      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+        const oldLinks = data as Link[]
+
+        const updatedLinks = oldLinks.map((link) => {
+          if (link.id === linkId) {
+            return {
+              ...link,
+              tags: newTags,
+            }
+          }
+
+          return link
+        })
+
+        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+      })
+    }
+  }
+
   return {
     links: filteredLinks,
     isLoading: linksQuery.isLoading,
@@ -184,9 +240,12 @@ export function useLinks(params: UseLinksParams) {
       setSelectedId: setSelectedId,
       setEditLinkId: setEditLinkId,
 
-      createLink,
-      updateLink,
-      deleteLink,
+      createLink: createLink,
+      updateLink: updateLink,
+      deleteLink: deleteLink,
+
+      pinLink: pinLink,
+      unpinLink: unpinLink,
     },
 
     mutations: {

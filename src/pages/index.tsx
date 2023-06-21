@@ -1,16 +1,12 @@
 import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
-import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/firebase/withAuth'
-import { useQueryClient } from '@tanstack/react-query'
-import { useContext, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LoadingPage from '@/components/shared/LoadingPage'
-import { AuthContext } from '@/context/AuthContext'
-import { LinkUtils } from '@/utils/link-utils'
 import { GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
 import firebaseAdmin from '@/utils/firebaseAdmin'
@@ -47,34 +43,88 @@ interface Props {
 }
 
 function HomePage(props: Props) {
-  const queryClient = useQueryClient()
-  const { user } = useContext(AuthContext)
   const linksContainerRef = useRef(null)
 
   const contextMenuRef = useRef<HTMLDivElement>(null)
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
-  const linksHook = useLinks({ initialData: props.links })
+  const useLinksHooks = useLinks({ initialData: props.links })
 
   // Close context menu when clicking away
   useClickAway(contextMenuRef, resetContextMenu)
 
-  useKey('Escape', () => {
-    resetContextMenu()
-    linksHook.actions.setSelectedId(null)
-    linksHook.actions.setEditLinkId(null)
-  })
+  useKey(
+    'Escape',
+    () => {
+      resetContextMenu()
+
+      if (useLinksHooks.editLinkId) {
+        useLinksHooks.actions.setEditLinkId(null)
+        return
+      }
+
+      useLinksHooks.actions.setSelectedId(null)
+    },
+    {},
+    [useLinksHooks.editLinkId]
+  )
+
+  useKey(
+    'ArrowUp',
+    (event) => {
+      event.preventDefault()
+
+      if (useLinksHooks.editLinkId) {
+        return
+      }
+
+      if (!useLinksHooks.selectedId) {
+        useLinksHooks.actions.setSelectedId(useLinksHooks.links[0].id)
+      }
+
+      const currentIndex = useLinksHooks.links.findIndex((link) => link.id === useLinksHooks.selectedId)
+
+      if (useLinksHooks.links[currentIndex - 1]) {
+        useLinksHooks.actions.setSelectedId(useLinksHooks.links[currentIndex - 1].id)
+      }
+    },
+    {},
+    [useLinksHooks.selectedId, useLinksHooks.editLinkId]
+  )
+
+  useKey(
+    'ArrowDown',
+    (event) => {
+      event.preventDefault()
+
+      if (useLinksHooks.editLinkId) {
+        return
+      }
+
+      if (!useLinksHooks.selectedId) {
+        useLinksHooks.actions.setSelectedId(useLinksHooks.links[0].id)
+      }
+
+      const currentIndex = useLinksHooks.links.findIndex((link) => link.id === useLinksHooks.selectedId)
+
+      if (useLinksHooks.links[currentIndex + 1]) {
+        useLinksHooks.actions.setSelectedId(useLinksHooks.links[currentIndex + 1].id)
+      }
+    },
+    {},
+    [useLinksHooks.selectedId, useLinksHooks.editLinkId, useLinksHooks.links]
+  )
 
   useKey(
     'Enter',
     () => {
-      if (linksHook.selectedId && !linksHook.editLinkId) {
-        linksHook.actions.setEditLinkId(linksHook.selectedId)
+      if (useLinksHooks.selectedId && !useLinksHooks.editLinkId) {
+        useLinksHooks.actions.setEditLinkId(useLinksHooks.selectedId)
       }
     },
     {},
-    [linksHook.selectedId, linksHook.editLinkId]
+    [useLinksHooks.selectedId, useLinksHooks.editLinkId]
   )
 
   useKey(
@@ -87,12 +137,12 @@ function HomePage(props: Props) {
       return false
     },
     () => {
-      if (linksHook.selectedLink) {
-        navigateToLink(linksHook.selectedLink)
+      if (useLinksHooks.selectedLink) {
+        navigateToLink(useLinksHooks.selectedLink)
       }
     },
     {},
-    [linksHook.selectedId]
+    [useLinksHooks.selectedId]
   )
 
   useKey(
@@ -105,18 +155,18 @@ function HomePage(props: Props) {
       return false
     },
     () => {
-      if (linksHook.selectedLink) {
-        const isPinned = linksHook.selectedLink?.tags?.includes('pinned')
+      if (useLinksHooks.selectedLink) {
+        const isPinned = useLinksHooks.selectedLink?.tags?.includes('pinned')
 
         if (!isPinned) {
-          pinLink(linksHook.selectedLink.id)
+          useLinksHooks.actions.pinLink(useLinksHooks.selectedLink.id)
         } else {
-          unpinLink(linksHook.selectedLink.id)
+          useLinksHooks.actions.unpinLink(useLinksHooks.selectedLink.id)
         }
       }
     },
     {},
-    [linksHook.selectedLink]
+    [useLinksHooks.selectedLink]
   )
 
   useKey(
@@ -124,20 +174,20 @@ function HomePage(props: Props) {
       return (event.ctrlKey || event.metaKey) && (event.keyCode === 46 || event.key === 'Backspace')
     },
     () => {
-      if (linksHook.selectedId) {
-        linksHook.actions.deleteLink(linksHook.selectedId)
+      if (useLinksHooks.selectedId) {
+        useLinksHooks.actions.deleteLink(useLinksHooks.selectedId)
       }
     },
     {},
-    [linksHook.selectedId]
+    [useLinksHooks.selectedId]
   )
 
   useClickAway(linksContainerRef, () => {
-    linksHook.actions.setSelectedId(null)
+    useLinksHooks.actions.setSelectedId(null)
   })
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
-    linksHook.actions.setSelectedId(link.id)
+    useLinksHooks.actions.setSelectedId(link.id)
     e.preventDefault()
     const { pageX, pageY } = e
     setShowContextMenu(true)
@@ -157,7 +207,7 @@ function HomePage(props: Props) {
   }
 
   function onContextMenuRowClick(contextMenuRow: ContextMenuRow) {
-    const link = linksHook.links.find((link) => link.id === linksHook.selectedId)
+    const link = useLinksHooks.links.find((link) => link.id === useLinksHooks.selectedId)
 
     if (!link) {
       resetContextMenu()
@@ -166,8 +216,8 @@ function HomePage(props: Props) {
 
     switch (contextMenuRow.action) {
       case ContextMenuAction.visit: {
-        if (linksHook.selectedLink) {
-          navigateToLink(linksHook.selectedLink)
+        if (useLinksHooks.selectedLink) {
+          navigateToLink(useLinksHooks.selectedLink)
         }
 
         break
@@ -199,30 +249,30 @@ function HomePage(props: Props) {
       }
 
       case ContextMenuAction.pin: {
-        if (linksHook.selectedId) {
-          pinLink(linksHook.selectedId)
+        if (useLinksHooks.selectedId) {
+          useLinksHooks.actions.pinLink(useLinksHooks.selectedId)
         }
 
         break
       }
 
       case ContextMenuAction.unpin: {
-        if (linksHook.selectedId) {
-          unpinLink(linksHook.selectedId)
+        if (useLinksHooks.selectedId) {
+          useLinksHooks.actions.unpinLink(useLinksHooks.selectedId)
         }
 
         break
       }
 
       case ContextMenuAction.edit: {
-        linksHook.actions.setEditLinkId(linksHook.selectedId)
+        useLinksHooks.actions.setEditLinkId(useLinksHooks.selectedId)
 
         break
       }
 
       case ContextMenuAction.delete: {
-        if (linksHook.selectedId) {
-          linksHook.actions.deleteLink(linksHook.selectedId)
+        if (useLinksHooks.selectedId) {
+          useLinksHooks.actions.deleteLink(useLinksHooks.selectedId)
         }
 
         break
@@ -239,7 +289,7 @@ function HomePage(props: Props) {
 
   function navigateToLink(link: Link) {
     const updatedLink: Link = { ...link, visitedAt: Date.now() }
-    linksHook.mutations.updateLinkMutation.mutate(updatedLink)
+    useLinksHooks.mutations.updateLinkMutation.mutate(updatedLink)
 
     if (!link.url.match(/^https?:\/\//i)) {
       return window.open(`http://${link.url}`, '_blank')
@@ -248,63 +298,7 @@ function HomePage(props: Props) {
     return window.open(link.url, '_blank')
   }
 
-  function pinLink(linkId: string) {
-    const linkToPin = linksHook.links.find((link) => link.id === linkId)
-
-    toast('Pinned')
-
-    if (linkToPin) {
-      linksHook.mutations.updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
-
-      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
-        const oldLinks = data as Link[]
-
-        const updatedLinks = oldLinks.map((link) => {
-          if (link.id === linkId) {
-            return {
-              ...link,
-              tags: [...new Set(linkToPin.tags), 'pinned'],
-            }
-          }
-
-          return link
-        })
-
-        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
-      })
-    }
-  }
-
-  function unpinLink(linkId: string) {
-    const linkToUnpin = linksHook.links.find((link) => link.id === linkId)
-
-    toast('Unpinned')
-
-    if (linkToUnpin) {
-      const newTags = linkToUnpin.tags.filter((tag) => tag !== 'pinned')
-
-      linksHook.mutations.updateLinkMutation.mutate({ ...linkToUnpin, tags: newTags })
-
-      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
-        const oldLinks = data as Link[]
-
-        const updatedLinks = oldLinks.map((link) => {
-          if (link.id === linkId) {
-            return {
-              ...link,
-              tags: newTags,
-            }
-          }
-
-          return link
-        })
-
-        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
-      })
-    }
-  }
-
-  if (linksHook.isLoading) {
+  if (useLinksHooks.isLoading) {
     return <LoadingPage />
   }
 
@@ -312,20 +306,22 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-2xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
-          isCreateMode={!linksHook.isLoading && !linksHook.links?.length}
-          onCreate={linksHook.actions.createLink}
-          value={linksHook.searchQ}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => linksHook.actions.setSearchQ(event.target.value)}
+          isCreateMode={!useLinksHooks.isLoading && !useLinksHooks.links?.length}
+          onCreate={useLinksHooks.actions.createLink}
+          value={useLinksHooks.searchQ}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            useLinksHooks.actions.setSearchQ(event.target.value)
+          }
         />
 
         <GlobalTagsSelector
-          tags={linksHook.allTags}
-          selectedTags={linksHook.selectedTags}
-          onChange={linksHook.actions.setSelectedTags}
+          tags={useLinksHooks.allTags}
+          selectedTags={useLinksHooks.selectedTags}
+          onChange={useLinksHooks.actions.setSelectedTags}
         />
 
         <div ref={linksContainerRef} className="space-y-2">
-          {!linksHook.isLoading && !linksHook.links.length && (
+          {!useLinksHooks.isLoading && !useLinksHooks.links.length && (
             <div className="inline mt-2">
               Press{' '}
               <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
@@ -335,9 +331,9 @@ function HomePage(props: Props) {
             </div>
           )}
 
-          {!!linksHook.links.length && (
+          {!!useLinksHooks.links.length && (
             <div className="px-2 pb-2 flex items-center border-b">
-              <p className="text-sm text-gray-500">{linksHook.links?.length} Results - Destination</p>
+              <p className="text-sm text-gray-500">{useLinksHooks.links?.length} Results - Destination</p>
 
               <div className="ml-auto flex items-center space-x-1">
                 <svg
@@ -356,19 +352,19 @@ function HomePage(props: Props) {
             </div>
           )}
 
-          {linksHook.links.map((link: Link) => {
-            const isSelected = linksHook.selectedId === link.id
+          {useLinksHooks.links.map((link: Link) => {
+            const isSelected = useLinksHooks.selectedId === link.id
 
             return (
               <LinkRow
-                onUpdate={linksHook.actions.updateLink}
-                onExitEditMode={() => linksHook.actions.setEditLinkId(null)}
-                isEditMode={linksHook.editLinkId === link.id}
+                onUpdate={useLinksHooks.actions.updateLink}
+                onExitEditMode={() => useLinksHooks.actions.setEditLinkId(null)}
+                isEditMode={useLinksHooks.editLinkId === link.id}
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
                 onClick={() => {
-                  linksHook.actions.setSelectedId(link.id)
+                  useLinksHooks.actions.setSelectedId(link.id)
                 }}
                 onDoubleClick={() => navigateToLink(link)}
                 isSelected={isSelected}
@@ -376,14 +372,14 @@ function HomePage(props: Props) {
             )
           })}
 
-          {showContextMenu && linksHook.selectedLink && (
+          {showContextMenu && useLinksHooks.selectedLink && (
             <div
               ref={contextMenuRef}
               className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
               style={{ top: `${position.y}px`, left: `${position.x}px` }}
             >
               {[
-                ContentMenuUtils.getContextMenuGroupOne(linksHook.selectedLink),
+                ContentMenuUtils.getContextMenuGroupOne(useLinksHooks.selectedLink),
                 ContentMenuUtils.getContextMenuGroupTwo(),
               ].map((group, i) => (
                 <ul className="px-2 py-1.5 border-t" role="menu" key={i}>

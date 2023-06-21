@@ -99,14 +99,20 @@ function LinkRow(props: Props) {
         return
       }
 
-      if (props.isEditMode && trimmedValue !== props.link.url) {
-        if (!UrlUtils.isValidUrl(trimmedValue)) {
-          toast('Invalid Link')
+      if (props.isEditMode) {
+        if (trimmedValue !== props.link.url) {
+          if (!UrlUtils.isValidUrl(trimmedValue)) {
+            toast('Invalid Link')
+
+            return
+          }
+
+          props.onUpdate({ id: props.link.id, url: trimmedValue })
+          props.onExitEditMode()
 
           return
         }
 
-        props.onUpdate({ id: props.link.id, url: trimmedValue })
         props.onExitEditMode()
       }
     },
@@ -150,7 +156,8 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'px-3 hover:bg-gray-100 rounded-lg cursor-pointer select-none -mx-1.5 flex items-center border border-solid group': true,
+        'px-3 hover:bg-gray-100 rounded-lg cursor-pointer select-none -mx-1.5 flex items-center border border-solid group':
+          true,
         'border-gray-50': !props.isSelected,
         'hover:border-gray-200 bg-gray-100 border border-solid border-gray-200': props.isSelected,
         'cursor-default bg-white hover:bg-white shadow-sm': props.isEditMode,

@@ -51,13 +51,20 @@ function Navbar() {
           (content: string) => JSON.parse(content)
         )(stringContent)
 
+        if (newLinks.length === 0) {
+          toast.error('Invalid Bookmarks html file')
+
+          event.target.value = ''
+          return
+        }
+
         // TODO: Remove slice
-        const createPromise = batchCreateLinksMutation.mutateAsync(newLinks, {
+        const createPromise = batchCreateLinksMutation.mutateAsync(newLinks.slice(0, 12), {
           onSuccess: () => {
             queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
               const oldLinks = data as Link[]
 
-              const updatedLinks: Link[] = [...newLinks, ...oldLinks] as Link[]
+              const updatedLinks: Link[] = [...newLinks.slice(0, 12), ...oldLinks] as Link[]
 
               return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
             })
@@ -96,6 +103,7 @@ function Navbar() {
               className="absolute top-0 right-0 bottom-0 left-0 hidden"
               onChange={onImportBookmarks}
               type="file"
+              accept='.html'
             />
           </div>
 
