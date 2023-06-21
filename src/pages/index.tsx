@@ -64,7 +64,7 @@ function HomePage(props: Props) {
         return
       }
 
-      useLinksHooks.actions.setSelectedId(null)
+      useLinksHooks.actions.setSelectedId(undefined)
     },
     {},
     [useLinksHooks.editLinkId]
@@ -183,7 +183,7 @@ function HomePage(props: Props) {
   )
 
   useClickAway(linksContainerRef, () => {
-    useLinksHooks.actions.setSelectedId(null)
+    useLinksHooks.actions.setSelectedId(undefined)
   })
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
@@ -304,7 +304,7 @@ function HomePage(props: Props) {
 
   return (
     <AuthLayout>
-      <div className="w-full max-w-2xl mx-auto pt-20 space-y-6 px-5 pb-40">
+      <div className="w-full max-w-3xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
           isCreateMode={!useLinksHooks.isLoading && !useLinksHooks.links?.length}
           onCreate={useLinksHooks.actions.createLink}
@@ -382,17 +382,16 @@ function HomePage(props: Props) {
                 ContentMenuUtils.getContextMenuGroupOne(useLinksHooks.selectedLink),
                 ContentMenuUtils.getContextMenuGroupTwo(),
               ].map((group, i) => (
-                <ul className="px-2 py-1.5 border-t" role="menu" key={i}>
+                <ul className="px-2 py-2 border-t" role="menu" key={i}>
                   {group.map((contextMenuRow, idx) => (
                     <li key={idx}>
                       <button
                         onClick={() => onContextMenuRowClick(contextMenuRow)}
-                        className="w-full flex items-center justify-between gap-x-2 px-2 py-1.5  hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-pointer"
+                        className="w-full flex items-center gap-x-2 px-2 py-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-default"
                         role="menuitem"
                       >
-                        {' '}
-                        {contextMenuRow.name}
-                        <span className="text-gray-500">{contextMenuRow.command}</span>
+                        {contextMenuRow.icon && contextMenuRow.icon} {contextMenuRow.name}
+                        <span className="text-gray-500 ml-auto">{contextMenuRow.command}</span>
                       </button>
                     </li>
                   ))}

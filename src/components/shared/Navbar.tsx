@@ -40,6 +40,7 @@ function Navbar() {
             // TODO: Add also title here
             // Generate id to use it for batch write
             id: uuidv4(),
+            title: bookmark.title,
             url: bookmark.url,
             userId: user?.uid,
             tags: bookmark.tags || [],
@@ -86,7 +87,7 @@ function Navbar() {
 
   return (
     <div className="flex justify-center">
-      <div className="w-full max-w-2xl h-20 pt-6 flex items-center px-5">
+      <div className="w-full max-w-3xl h-20 pt-6 flex items-center px-5">
         <Image priority src="/logo-side-text-md.svg" width={162.8} height={30} alt="logo" />
 
         <div className="flex items-center space-x-2 ml-auto">
@@ -103,7 +104,7 @@ function Navbar() {
               className="absolute top-0 right-0 bottom-0 left-0 hidden"
               onChange={onImportBookmarks}
               type="file"
-              accept='.html'
+              accept=".html"
             />
           </div>
 

@@ -5,6 +5,7 @@ import { AuthContext } from '@/context/AuthContext'
 import { LinkUtils } from '@/utils/link-utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import fp from 'lodash/fp'
+import { useRouter } from 'next/router'
 import { useContext, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -14,11 +15,18 @@ interface UseLinksParams {
 
 export function useLinks(params: UseLinksParams) {
   const queryClient = useQueryClient()
+  const router = useRouter()
   const { user } = useContext(AuthContext)
+
   const [searchQ, setSearchQ] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editLinkId, setEditLinkId] = useState<string | null>(null)
+
+  const selectedId = router.query.selected as string
+
+  function setSelectedId(value: string | undefined | null) {
+    router.replace({ query: { ...router.query, selected: value } }, undefined, { shallow: true })
+  }
 
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks, user?.uid],
@@ -81,7 +89,9 @@ export function useLinks(params: UseLinksParams) {
     setSearchQ('')
 
     const createPromise = createLinkMutation.mutateAsync(
-      { url },
+      // TODO: Consider having it different
+      // from the UI instead of mocked here? 🤔
+      { url, title: 'Give me a name' },
       {
         onSuccess: (newLink) => {
           queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
@@ -152,7 +162,7 @@ export function useLinks(params: UseLinksParams) {
         setEditLinkId(null)
       }
     } else {
-      setSelectedId(null)
+      setSelectedId(undefined)
       setEditLinkId(null)
     }
 

@@ -5,6 +5,7 @@ import { DateUtils } from '@/utils/date-utils'
 import { LinkUtils } from '@/utils/link-utils'
 import { UrlUtils } from '@/utils/url-utils'
 import classNames from 'classnames'
+import { trim } from 'lodash'
 import fp from 'lodash/fp'
 import Image from 'next/image'
 import React from 'react'
@@ -25,34 +26,31 @@ interface Props {
 
 function LinkRow(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const [value, setValue] = useState<string>(props.link.url)
+  const [title, setTitle] = useState<string>(props.link.title)
+  const [url, setUrl] = useState<string>(props.link.url)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
   const createdAtText = useMemo(() => {
     return DateUtils.timeSince(new Date(props.link.createdAt))
   }, [props.link.createdAt])
 
-  const isPinned = useMemo(() => {
-    return props.link.tags.includes('pinned')
-  }, [props.link.tags])
-
   const isValidUrl = useMemo(() => {
-    return UrlUtils.isValidUrl(value)
-  }, [value])
+    return UrlUtils.isValidUrl(url)
+  }, [url])
 
   const displayValue = useMemo(() => {
     return fp.compose(
-      (value: string) => value.replace('www.', ''),
-      (value: string) => value.replace('https://', ''),
-      (value: string) => value.replace('http://', '')
-    )(value)
-  }, [value])
+      (url: string) => url.replace('www.', ''),
+      (url: string) => url.replace('https://', ''),
+      (url: string) => url.replace('http://', '')
+    )(url)
+  }, [url])
 
   useEffect(() => {
-    if (!props.isEditMode && !value.length) {
-      setValue(props.link.url)
+    if (!props.isEditMode && !url.length) {
+      setUrl(props.link.url)
     }
-  }, [props.isEditMode, props.link.url, value])
+  }, [props.isEditMode, props.link.url, url])
 
   // TODO: Make this work
   // useEffect(() => {
@@ -81,7 +79,7 @@ function LinkRow(props: Props) {
     },
     () => {
       if (props.isSelected) {
-        navigator.clipboard.writeText(value)
+        navigator.clipboard.writeText(url)
         showCopiedMessage()
       }
     }
@@ -90,24 +88,26 @@ function LinkRow(props: Props) {
   useKey(
     'Enter',
     () => {
-      const trimmedValue = value.trim()
+      const trimmedUrl = url.trim()
+      const trimmedTitle = title.trim()
 
-      if (!trimmedValue?.length) {
-        setValue(props.link.url)
+      if (!trimmedUrl?.length || !trimmedTitle?.length) {
+        setUrl(props.link.url)
+        setTitle(props.link.title)
         props.onExitEditMode()
 
         return
       }
 
       if (props.isEditMode) {
-        if (trimmedValue !== props.link.url) {
-          if (!UrlUtils.isValidUrl(trimmedValue)) {
+        if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
+          if (!UrlUtils.isValidUrl(trimmedUrl)) {
             toast('Invalid Link')
 
             return
           }
 
-          props.onUpdate({ id: props.link.id, url: trimmedValue })
+          props.onUpdate({ id: props.link.id, url: trimmedUrl, title: trimmedTitle })
           props.onExitEditMode()
 
           return
@@ -117,30 +117,30 @@ function LinkRow(props: Props) {
       }
     },
     {},
-    [props.isEditMode, value, props.link.url]
+    [props.isEditMode, title, url, props.link.url]
   )
 
   useClickAway(ref, () => {
-    const trimmedValue = value.trim()
+    const trimmedUrl = url.trim()
 
     if (props.isEditMode) {
-      if (!trimmedValue?.length) {
-        setValue(props.link.url)
+      if (!trimmedUrl?.length) {
+        setUrl(props.link.url)
         props.onExitEditMode()
 
         return
       }
 
-      if (trimmedValue !== props.link.url) {
-        if (!UrlUtils.isValidUrl(trimmedValue)) {
-          setValue(props.link.url)
+      if (trimmedUrl !== props.link.url) {
+        if (!UrlUtils.isValidUrl(trimmedUrl)) {
+          setUrl(props.link.url)
           toast('Invalid Link')
           props.onExitEditMode()
 
           return
         }
 
-        props.onUpdate({ id: props.link.id, url: trimmedValue })
+        props.onUpdate({ id: props.link.id, url: trimmedUrl })
         props.onExitEditMode()
         return
       }
@@ -149,6 +149,17 @@ function LinkRow(props: Props) {
     }
   })
 
+  useKey(
+    'Escape',
+    () => {
+      if (props.isEditMode) {
+        setUrl(props.link.url)
+      }
+    },
+    {},
+    [props.isEditMode, props.link.url]
+  )
+
   return (
     <div
       ref={ref}
@@ -156,16 +167,16 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'px-3 hover:bg-gray-100 rounded-lg cursor-pointer select-none -mx-1.5 flex items-center border border-solid group':
-          true,
-        'border-gray-50': !props.isSelected,
-        'hover:border-gray-200 bg-gray-100 border border-solid border-gray-200': props.isSelected,
+        'px-3 hover:bg-slate-100 rounded-lg cursor-default select-none flex border border-solid group': true,
+        'border-slate-200 bg-white': !props.isSelected,
+        'hover:border-slate-200 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200':
+          props.isSelected,
         'cursor-default bg-white hover:bg-white shadow-sm': props.isEditMode,
       })}
     >
-      <div className="relative">
-        <div className="absolute top-0 right-0 bottom-0 left-0 z-1">
-          {isValidUrl && <MemoLinkRowImage url={value} isEditMode={props.isEditMode} />}
+      <div className="relative pt-3">
+        <div className="absolute top-3 right-0 bottom-0 left-0 z-1">
+          {isValidUrl && <MemoLinkRowImage url={url} isEditMode={props.isEditMode} />}
         </div>
 
         <svg
@@ -182,44 +193,57 @@ function LinkRow(props: Props) {
         </svg>
       </div>
 
-      {!showCopied && !props.isEditMode && <p className="py-2 pr-4 truncate flex-1">{displayValue}</p>}
+      {!props.isEditMode && (
+        <div className="flex-1 truncate py-2 space-y-1">
+          {showCopied && <div className="flex-1">Copied to clipboard</div>}
 
-      {showCopied && <div className="py-2 flex items-center">Copied to clipboard</div>}
+          {!showCopied && <p className="flex-1">{title}</p>}
+          <p className="truncate flex-1 text-xs text-gray-400">{displayValue}</p>
+        </div>
+      )}
 
       {props.isEditMode && (
-        <input
-          onChange={(event) => setValue(event.target.value)}
-          value={value}
-          autoFocus
-          onFocus={(e) => e.target.select()}
-          type="text"
-          placeholder="Nike.com"
-          className="flex-1 py-2 focus:outline-none bg-transparent"
-        />
+        <div className="flex-1 py-2">
+          <input
+            onChange={(event) => setTitle(event.target.value)}
+            value={title}
+            autoFocus
+            onFocus={(e) => e.target.select()}
+            type="text"
+            placeholder="Nike website"
+            className="flex-1 focus:outline-none bg-transparent w-full"
+          />
+
+          <input
+            onChange={(event) => setUrl(event.target.value)}
+            value={url}
+            type="text"
+            placeholder="Nike.com"
+            className="flex-1 focus:outline-none text-sm text-gray-400 bg-transparent w-full"
+          />
+        </div>
       )}
 
       {!props.isEditMode && (
-        <>
-          <div className="flex items-center space-x-2 ml-auto">
-            {props.link.tags.map((tag) => {
-              const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
+        <div className="flex items-center space-x-2 ml-auto">
+          {props.link.tags.map((tag) => {
+            const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
 
-              return (
-                <span
-                  key={tag}
-                  className={classNames({
-                    'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
-                    [tagColorClasses]: true,
-                  })}
-                >
-                  #{tag}
-                </span>
-              )
-            })}
+            return (
+              <span
+                key={tag}
+                className={classNames({
+                  'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
+                  [tagColorClasses]: true,
+                })}
+              >
+                #{tag}
+              </span>
+            )
+          })}
 
-            <p className="ml-auto text-xs">{createdAtText}</p>
-          </div>
-        </>
+          <p className="ml-auto text-xs">{createdAtText}</p>
+        </div>
       )}
     </div>
   )

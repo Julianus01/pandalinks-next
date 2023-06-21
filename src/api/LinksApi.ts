@@ -60,6 +60,7 @@ async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<
 }
 
 export interface CreateLinkRequestParams {
+  title: string
   url: string
 }
 
@@ -69,6 +70,7 @@ async function createLink(params: CreateLinkRequestParams) {
   const visitedAt = Date.now()
 
   const newLink: Partial<Link> = {
+    title: params.title,
     url: params.url,
     userId: auth.currentUser?.uid,
     tags: [],

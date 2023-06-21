@@ -7,16 +7,16 @@ import LoadingPage from '@/components/shared/LoadingPage'
 export const withAuth =
   <P extends {}>(Component: ComponentType<P>): ComponentType<P> =>
   (props) => {
-    const { user } = useContext(AuthContext)
+    const { user, loading } = useContext(AuthContext)
     const router = useRouter()
 
     useEffect(() => {
-      if (!user) {
+      if (!loading && !user) {
         router.push('/login')
       }
-    }, [router, user])
+    }, [loading, router, user])
 
-    if (!user) {
+    if (!user && loading) {
       return <LoadingPage />
     }
 
