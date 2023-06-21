@@ -10,14 +10,14 @@ function splitByPinned(links: Link[]) {
   return [...pinnedLinks, ...unpinnedLinks] as Link[]
 }
 
-function sortByVisitedAt(links: Link[]) {
+function sortByCreatedAt(links: Link[]) {
   return links.sort((first: Link, second: Link) => {
-    return new Date(second.visitedAt).valueOf() - new Date(first.visitedAt).valueOf()
+    return new Date(second.createdAt).valueOf() - new Date(first.createdAt).valueOf()
   })
 }
 
-function applyPinAndSortByVisitedAt(links: Link[]) {
-  const sorted = sortByVisitedAt(links)
+function applyPinAndSortByCreatedAt(links: Link[]) {
+  const sorted = sortByCreatedAt(links)
   const sortedAndSplitByPinned = splitByPinned(sorted)
 
   return sortedAndSplitByPinned
@@ -60,7 +60,7 @@ function getBookmarksFromImportedJson(json: HTMLBookmark[]): Bookmark[] {
 
 export const LinkUtils = {
   splitByPinned,
-  sortByVisitedAt,
-  applyPinAndSortByVisitedAt,
+  sortByCreatedAt,
+  applyPinAndSortByCreatedAt,
   getBookmarksFromImportedJson,
 }

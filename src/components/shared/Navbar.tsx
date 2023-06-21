@@ -35,6 +35,7 @@ function Navbar() {
         })
 
         const newLinks = fp.compose(
+          LinkUtils.applyPinAndSortByCreatedAt,
           fp.map((bookmark: Bookmark) => ({
             // TODO: Add also title here
             // Generate id to use it for batch write
@@ -42,7 +43,7 @@ function Navbar() {
             url: bookmark.url,
             userId: user?.uid,
             tags: bookmark.tags || [],
-            createdAt: bookmark.addDate,
+            createdAt: Date.now(),
             updatedAt: Date.now(),
             visitedAt: Date.now(),
           })),
@@ -50,6 +51,7 @@ function Navbar() {
           (content: string) => JSON.parse(content)
         )(stringContent)
 
+        // TODO: Remove slice
         const createPromise = batchCreateLinksMutation.mutateAsync(newLinks, {
           onSuccess: () => {
             queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
@@ -57,7 +59,7 @@ function Navbar() {
 
               const updatedLinks: Link[] = [...newLinks, ...oldLinks] as Link[]
 
-              return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
+              return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
             })
 
             event.target.value = ''

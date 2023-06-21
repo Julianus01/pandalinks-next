@@ -184,7 +184,7 @@ function HomePage(props: Props) {
 
       const updatedLinks = oldLinks.filter((oldLink) => oldLink.id !== selectedId)
 
-      return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
+      return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
     })
 
     if (selectedId) {
@@ -227,7 +227,7 @@ function HomePage(props: Props) {
             return oldLink
           })
 
-          return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
+          return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
         })
       },
     })
@@ -253,7 +253,7 @@ function HomePage(props: Props) {
 
             const updatedLinks: Link[] = [newLink, ...oldLinks] as Link[]
 
-            return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
+            return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
           })
         },
       }
@@ -402,7 +402,7 @@ function HomePage(props: Props) {
           return link
         })
 
-        return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
+        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
       })
     }
   }
@@ -431,7 +431,7 @@ function HomePage(props: Props) {
           return link
         })
 
-        return LinkUtils.applyPinAndSortByVisitedAt(updatedLinks)
+        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
       })
     }
   }
@@ -477,7 +477,7 @@ function HomePage(props: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
                 </svg>
 
-                <p className="text-sm text-gray-500">last visited</p>
+                <p className="text-sm text-gray-500">created at</p>
               </div>
             </div>
           )}

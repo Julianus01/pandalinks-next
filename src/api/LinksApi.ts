@@ -27,7 +27,7 @@ async function getLinks(): Promise<Link[]> {
     query(
       collection(firestore, FirestoreCollection.links),
       where('userId', '==', auth.currentUser?.uid),
-      orderBy('visitedAt', 'desc')
+      orderBy('createdAt', 'desc')
     )
   )
 

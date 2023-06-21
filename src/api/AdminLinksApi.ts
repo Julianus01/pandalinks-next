@@ -39,7 +39,7 @@ async function getLinks(userId: string): Promise<Link[]> {
   const querySnapshot = await db
     .collection(FirestoreCollection.links)
     .where('userId', '==', userId)
-    .orderBy('visitedAt', 'desc')
+    .orderBy('createdAt', 'desc')
     .get()
 
   const links = fp.compose(

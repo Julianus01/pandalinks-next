@@ -27,9 +27,9 @@ function LinkRow(props: Props) {
   const [value, setValue] = useState<string>(props.link.url)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
-  const lastVisitedText = useMemo(() => {
-    return DateUtils.timeSince(new Date(props.link.visitedAt))
-  }, [props.link.visitedAt])
+  const createdAtText = useMemo(() => {
+    return DateUtils.timeSince(new Date(props.link.createdAt))
+  }, [props.link.createdAt])
 
   const isPinned = useMemo(() => {
     return props.link.tags.includes('pinned')
@@ -216,7 +216,7 @@ function LinkRow(props: Props) {
                 )
               })}
 
-            <p className="ml-auto text-xs">{lastVisitedText}</p>
+            <p className="ml-auto text-xs">{createdAtText}</p>
           </div>
         </>
       )}
