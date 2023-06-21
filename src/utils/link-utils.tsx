@@ -58,9 +58,40 @@ function getBookmarksFromImportedJson(json: HTMLBookmark[]): Bookmark[] {
   return result
 }
 
+const TAG_COLOR_CLASSES = [
+  'bg-red-50 text-red-800 ring-red-600/20',
+  'bg-orange-50 text-orange-800 ring-orange-600/20',
+  'bg-amber-50 text-amber-800 ring-amber-600/20',
+  'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
+  'bg-lime-50 text-lime-800 ring-lime-600/20',
+  'bg-green-50 text-green-800 ring-green-600/20',
+  'bg-emerald-50 text-emerald-800 ring-emerald-600/20',
+  'bg-teal-50 text-teal-800 ring-teal-600/20',
+  'bg-cyan-50 text-cyan-800 ring-cyan-600/20',
+  'bg-sky-50 text-sky-800 ring-sky-600/20',
+  'bg-blue-50 text-blue-800 ring-blue-600/20',
+  'bg-indigo-50 text-indigo-800 ring-indigo-600/20',
+  'bg-violet-50 text-violet-800 ring-violet-600/20',
+  'bg-purple-50 text-purple-800 ring-purple-600/20',
+  'bg-fuchsia-50 text-fuchsia-800 ring-fuchsia-600/20',
+  'bg-pink-50 text-pink-800 ring-pink-600/20',
+  'bg-rose-50 text-rose-800 ring-rose-600/20',
+]
+
+const getRandomTagColorClasses = (tag: string) => {
+  if (tag === 'pinned') {
+    return 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'
+  }
+
+  const rand = parseInt(tag, 36)
+
+  return TAG_COLOR_CLASSES[rand ? rand % TAG_COLOR_CLASSES.length : 0]
+}
+
 export const LinkUtils = {
   splitByPinned,
   sortByCreatedAt,
   applyPinAndSortByCreatedAt,
   getBookmarksFromImportedJson,
+  getRandomTagColorClasses,
 }

@@ -15,6 +15,8 @@ import { LinkUtils } from '@/utils/link-utils'
 import { GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
 import firebaseAdmin from '@/utils/firebaseAdmin'
+import fp from 'lodash/fp'
+import GlobalTagsSelector from '@/components/tags/GlobalTagsSelector'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   try {
@@ -49,6 +51,7 @@ function HomePage(props: Props) {
   const queryClient = useQueryClient()
   const { user } = useContext(AuthContext)
   const [searchQ, setSearchQ] = useState<string>('')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editLinkId, setEditLinkId] = useState<string | null>(null)
   const linksContainerRef = useRef(null)
@@ -69,19 +72,35 @@ function HomePage(props: Props) {
   }, [linksQuery.data])
 
   const filteredLinks = useMemo(() => {
-    if (!searchQ) {
-      return links
-    }
+    const query = searchQ.toLowerCase()
 
-    return links.filter((link) => {
-      const query = searchQ.toLowerCase()
+    return fp.compose(
+      fp.filter((link: Link) => {
+        if (!selectedTags.length) {
+          return true
+        }
 
-      const isUrlMatch = link.url.toLowerCase().includes(query)
-      const hasTagMatch = !!link.tags.filter((tag) => tag.includes(query))?.length
+        return link.tags.some((tag) => selectedTags.includes(tag))
+      }),
+      fp.filter((link: Link) => {
+        if (!searchQ) {
+          return true
+        }
 
-      return isUrlMatch || hasTagMatch
-    })
-  }, [links, searchQ])
+        const isUrlMatch = link.url.toLowerCase().includes(query)
+        const hasTagMatch = !!link.tags.filter((tag) => tag.includes(query))?.length
+
+        return isUrlMatch || hasTagMatch
+      })
+    )(links)
+  }, [links, searchQ, selectedTags])
+
+  const allTags = useMemo(() => {
+    return fp.compose(
+      fp.uniq,
+      fp.flatMap((link: Link) => link.tags)
+    )(links)
+  }, [links])
 
   const selectedLink = useMemo(() => {
     return filteredLinks.find((link) => link.id === selectedId)
@@ -449,6 +468,8 @@ function HomePage(props: Props) {
           value={searchQ}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchQ(event.target.value)}
         />
+
+        <GlobalTagsSelector tags={allTags} selectedTags={selectedTags} onChange={setSelectedTags} />
 
         <div ref={linksContainerRef} className="space-y-2">
           {!linksQuery.isLoading && !filteredLinks.length && (

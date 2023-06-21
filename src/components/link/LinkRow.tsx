@@ -2,6 +2,7 @@ import { Link } from '@/api/AdminLinksApi'
 import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
 import { DateUtils } from '@/utils/date-utils'
+import { LinkUtils } from '@/utils/link-utils'
 import { UrlUtils } from '@/utils/url-utils'
 import classNames from 'classnames'
 import fp from 'lodash/fp'
@@ -201,7 +202,7 @@ function LinkRow(props: Props) {
 
             {!isPinned &&
               props.link.tags.map((tag) => {
-                const tagColorClasses = getRandomColor(tag)
+                const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
 
                 return (
                   <span
@@ -251,33 +252,3 @@ function LinkRowImage(props: LinkRowImageProps) {
 }
 
 const MemoLinkRowImage = React.memo(LinkRowImage)
-
-const COLORS = [
-  'bg-slate-50 text-slate-800 ring-slate-600/20',
-  'bg-gray-50 text-gray-800 ring-gray-600/20',
-  'bg-neutral-50 text-neutral-800 ring-neutral-600/20',
-  'bg-stone-50 text-stone-800 ring-stone-600/20',
-  'bg-red-50 text-red-800 ring-red-600/20',
-  'bg-orange-50 text-orange-800 ring-orange-600/20',
-  'bg-amber-50 text-amber-800 ring-amber-600/20',
-  'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
-  'bg-lime-50 text-lime-800 ring-lime-600/20',
-  'bg-green-50 text-green-800 ring-green-600/20',
-  'bg-emerald-50 text-emerald-800 ring-emerald-600/20',
-  'bg-teal-50 text-teal-800 ring-teal-600/20',
-  'bg-cyan-50 text-cyan-800 ring-cyan-600/20',
-  'bg-sky-50 text-sky-800 ring-sky-600/20',
-  'bg-blue-50 text-blue-800 ring-blue-600/20',
-  'bg-indigo-50 text-indigo-800 ring-indigo-600/20',
-  'bg-violet-50 text-violet-800 ring-violet-600/20',
-  'bg-purple-50 text-purple-800 ring-purple-600/20',
-  'bg-fuchsia-50 text-fuchsia-800 ring-fuchsia-600/20',
-  'bg-pink-50 text-pink-800 ring-pink-600/20',
-  'bg-rose-50 text-rose-800 ring-rose-600/20',
-]
-
-const getRandomColor = (seed: string) => {
-  const rand = parseInt(seed, 36)
-
-  return COLORS[rand ? rand % COLORS.length : 0]
-}
