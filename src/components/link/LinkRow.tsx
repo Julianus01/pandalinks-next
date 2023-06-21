@@ -140,8 +140,7 @@ function LinkRow(props: Props) {
         'px-3 hover:bg-slate-100 rounded-lg cursor-default select-none flex border border-solid group': true,
         'border-slate-200 bg-white': !props.isSelected,
         'hover:border-slate-200 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200':
-          props.isSelected,
-        'cursor-default bg-white hover:bg-white shadow-sm': props.isEditMode,
+          props.isSelected || props.isEditMode,
       })}
     >
       <div className="relative pt-3">

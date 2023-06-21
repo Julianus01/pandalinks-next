@@ -9,6 +9,11 @@ import { useRouter } from 'next/router'
 import { useContext, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+interface SetSelectionParams {
+  selectedId?: string | undefined | null
+  editLinkId?: string | undefined | null
+}
+
 interface UseLinksParams {
   initialData?: Link[]
 }
@@ -20,12 +25,15 @@ export function useLinks(params: UseLinksParams) {
 
   const [searchQ, setSearchQ] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [editLinkId, setEditLinkId] = useState<string | null>(null)
 
-  const selectedId = router.query.selected as string
+  const selectedId = router.query.selectedId as string
+  const editLinkId = router.query.editLinkId as string
 
-  function setSelectedId(value: string | undefined | null) {
-    router.replace({ query: { ...router.query, selected: value } }, undefined, { shallow: true })
+  function setSelectionParams(params: SetSelectionParams) {
+    console.log('Update')
+    console.log(params)
+
+    router.replace({ query: { ...params } }, undefined, { shallow: true })
   }
 
   const linksQuery = useQuery({
@@ -155,15 +163,15 @@ export function useLinks(params: UseLinksParams) {
       const index = links.map((link) => link.id).indexOf(selectedId)
 
       if (links[index + 1]) {
-        setSelectedId(links[index + 1].id)
-        setEditLinkId(null)
+        // setSelectedId(links[index + 1].id)
+        // setEditLinkId(null)
+
+        setSelectionParams({ selectedId: links[index + 1].id, editLinkId: null })
       } else if (links[index - 1]) {
-        setSelectedId(links[index - 1].id)
-        setEditLinkId(null)
+        setSelectionParams({ selectedId: links[index - 1].id, editLinkId: null })
       }
     } else {
-      setSelectedId(undefined)
-      setEditLinkId(null)
+      setSelectionParams({ selectedId: null, editLinkId: null })
     }
 
     const deletePromise = deleteLinkMutation.mutateAsync(linkId)
@@ -247,8 +255,7 @@ export function useLinks(params: UseLinksParams) {
     actions: {
       setSearchQ: setSearchQ,
       setSelectedTags: setSelectedTags,
-      setSelectedId: setSelectedId,
-      setEditLinkId: setEditLinkId,
+      setSelectionParams: setSelectionParams,
 
       createLink: createLink,
       updateLink: updateLink,

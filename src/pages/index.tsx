@@ -60,11 +60,11 @@ function HomePage(props: Props) {
       resetContextMenu()
 
       if (useLinksHooks.editLinkId) {
-        useLinksHooks.actions.setEditLinkId(null)
+        useLinksHooks.actions.setSelectionParams({ editLinkId: null })
         return
       }
 
-      useLinksHooks.actions.setSelectedId(undefined)
+      useLinksHooks.actions.setSelectionParams({ selectedId: null })
     },
     {},
     [useLinksHooks.editLinkId]
@@ -80,13 +80,13 @@ function HomePage(props: Props) {
       }
 
       if (!useLinksHooks.selectedId) {
-        useLinksHooks.actions.setSelectedId(useLinksHooks.links[0].id)
+        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[0].id })
       }
 
       const currentIndex = useLinksHooks.links.findIndex((link) => link.id === useLinksHooks.selectedId)
 
       if (useLinksHooks.links[currentIndex - 1]) {
-        useLinksHooks.actions.setSelectedId(useLinksHooks.links[currentIndex - 1].id)
+        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[currentIndex - 1].id })
       }
     },
     {},
@@ -103,13 +103,13 @@ function HomePage(props: Props) {
       }
 
       if (!useLinksHooks.selectedId) {
-        useLinksHooks.actions.setSelectedId(useLinksHooks.links[0].id)
+        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[0].id })
       }
 
       const currentIndex = useLinksHooks.links.findIndex((link) => link.id === useLinksHooks.selectedId)
 
       if (useLinksHooks.links[currentIndex + 1]) {
-        useLinksHooks.actions.setSelectedId(useLinksHooks.links[currentIndex + 1].id)
+        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[currentIndex + 1].id })
       }
     },
     {},
@@ -120,7 +120,7 @@ function HomePage(props: Props) {
     'Enter',
     () => {
       if (useLinksHooks.selectedId && !useLinksHooks.editLinkId) {
-        useLinksHooks.actions.setEditLinkId(useLinksHooks.selectedId)
+        useLinksHooks.actions.setSelectionParams({ editLinkId: useLinksHooks.selectedId })
       }
     },
     {},
@@ -183,11 +183,11 @@ function HomePage(props: Props) {
   )
 
   useClickAway(linksContainerRef, () => {
-    useLinksHooks.actions.setSelectedId(undefined)
+    useLinksHooks.actions.setSelectionParams({ selectedId: null })
   })
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
-    useLinksHooks.actions.setSelectedId(link.id)
+    useLinksHooks.actions.setSelectionParams({ selectedId: link.id })
     e.preventDefault()
     const { pageX, pageY } = e
     setShowContextMenu(true)
@@ -265,7 +265,7 @@ function HomePage(props: Props) {
       }
 
       case ContextMenuAction.edit: {
-        useLinksHooks.actions.setEditLinkId(useLinksHooks.selectedId)
+        useLinksHooks.actions.setSelectionParams({ editLinkId: useLinksHooks.selectedId })
 
         break
       }
@@ -358,13 +358,16 @@ function HomePage(props: Props) {
             return (
               <LinkRow
                 onUpdate={useLinksHooks.actions.updateLink}
-                onExitEditMode={() => useLinksHooks.actions.setEditLinkId(null)}
+                onExitEditMode={() => {
+                  console.log('here')
+                  useLinksHooks.actions.setSelectionParams({ editLinkId: null })
+                }}
                 isEditMode={useLinksHooks.editLinkId === link.id}
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
                 onClick={() => {
-                  useLinksHooks.actions.setSelectedId(link.id)
+                  useLinksHooks.actions.setSelectionParams({ selectedId: link.id })
                 }}
                 onDoubleClick={() => navigateToLink(link)}
                 isSelected={isSelected}
