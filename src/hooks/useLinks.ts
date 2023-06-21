@@ -6,6 +6,7 @@ import { LinkUtils } from '@/utils/link-utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import fp from 'lodash/fp'
 import { useRouter } from 'next/router'
+import { ParsedUrlQueryInput } from 'querystring'
 import { useContext, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -30,10 +31,7 @@ export function useLinks(params: UseLinksParams) {
   const editLinkId = router.query.editLinkId as string
 
   function setSelectionParams(params: SetSelectionParams) {
-    console.log('Update')
-    console.log(params)
-
-    router.replace({ query: { ...params } }, undefined, { shallow: true })
+    router.replace({ query: params as ParsedUrlQueryInput }, undefined, { shallow: true })
   }
 
   const linksQuery = useQuery({

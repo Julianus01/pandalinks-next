@@ -359,7 +359,6 @@ function HomePage(props: Props) {
               <LinkRow
                 onUpdate={useLinksHooks.actions.updateLink}
                 onExitEditMode={() => {
-                  console.log('here')
                   useLinksHooks.actions.setSelectionParams({ editLinkId: null })
                 }}
                 isEditMode={useLinksHooks.editLinkId === link.id}
