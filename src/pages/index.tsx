@@ -22,7 +22,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   try {
     const cookies = nookies.get(ctx)
     const token = await firebaseAdmin.auth().verifyIdToken(cookies.token)
-
     const links = await AdminLinksApi.getLinks(token.uid)
 
     return {
