@@ -61,8 +61,6 @@ export function useLinks(params: UseLinksParams) {
     )(links)
   }, [links])
 
-  console.log(filteredLinks)
-
   const selectedLink = useMemo(() => {
     return filteredLinks.find((link) => link.id === selectedId)
   }, [filteredLinks, selectedId])

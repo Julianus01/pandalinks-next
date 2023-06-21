@@ -42,7 +42,7 @@ function GlobalTagsSelector(props: Props) {
           onClick={onAllClick}
           className={classNames({
             'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
-            'bg-gray-50 text-gray-800 ring-gray-600/20': !isAllSelected,
+            'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100': !isAllSelected,
             [allTagColorClasses]: isAllSelected,
           })}
         >
@@ -61,7 +61,7 @@ function GlobalTagsSelector(props: Props) {
             className={classNames({
               'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset':
                 true,
-              'bg-gray-50 text-gray-800 ring-gray-600/20': !isSelected,
+              'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100': !isSelected,
               [tagColorClasses]: isSelected,
             })}
           >
