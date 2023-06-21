@@ -1,11 +1,10 @@
 import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
-import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/firebase/withAuth'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
@@ -58,18 +57,6 @@ function HomePage(props: Props) {
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
   const linksHook = useLinks({ initialData: props.links })
-
-  const updateLinkMutation = useMutation({
-    mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
-  })
-
-  const createLinkMutation = useMutation({
-    mutationFn: (newLink: CreateLinkRequestParams) => LinksApi.createLink(newLink),
-  })
-
-  const deleteLinkMutation = useMutation({
-    mutationFn: (linkId: string) => LinksApi.deleteLink(linkId),
-  })
 
   // Close context menu when clicking away
   useClickAway(contextMenuRef, resetContextMenu)
@@ -139,7 +126,7 @@ function HomePage(props: Props) {
     },
     () => {
       if (linksHook.selectedId) {
-        onDeleteLink(linksHook.selectedId)
+        linksHook.actions.deleteLink(linksHook.selectedId)
       }
     },
     {},
@@ -149,96 +136,6 @@ function HomePage(props: Props) {
   useClickAway(linksContainerRef, () => {
     linksHook.actions.setSelectedId(null)
   })
-
-  function onDeleteLink(linkId: string) {
-    queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
-      const oldLinks = data as Link[]
-
-      const updatedLinks = oldLinks.filter((oldLink) => oldLink.id !== linksHook.selectedId)
-
-      return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
-    })
-
-    if (linksHook.selectedId) {
-      const index = linksHook.links.map((link) => link.id).indexOf(linksHook.selectedId)
-
-      if (linksHook.links[index + 1]) {
-        linksHook.actions.setSelectedId(linksHook.links[index + 1].id)
-        linksHook.actions.setEditLinkId(null)
-      } else if (linksHook.links[index - 1]) {
-        linksHook.actions.setSelectedId(linksHook.links[index - 1].id)
-        linksHook.actions.setEditLinkId(null)
-      }
-    } else {
-      linksHook.actions.setSelectedId(null)
-      linksHook.actions.setEditLinkId(null)
-    }
-
-    const deletePromise = deleteLinkMutation.mutateAsync(linkId)
-
-    toast.promise(deletePromise, {
-      loading: 'Removing link...',
-      success: () => {
-        return `Link has been removed`
-      },
-      error: 'Something went wrong',
-    })
-  }
-
-  function onUpdateLink(updatedLink: UpdateLinkRequestParams) {
-    const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
-      onSuccess: () => {
-        queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
-          const oldLinks = data as Link[]
-
-          const updatedLinks = oldLinks.map((oldLink) => {
-            if (oldLink.id === updatedLink.id) {
-              return { ...oldLink, ...updatedLink }
-            }
-
-            return oldLink
-          })
-
-          return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
-        })
-      },
-    })
-
-    toast.promise(updatePromise, {
-      loading: 'Updating link...',
-      success: () => {
-        return `Link has been updated`
-      },
-      error: 'Something went wrong',
-    })
-  }
-
-  function onCreateLink(url: string) {
-    linksHook.actions.setSearchQ('')
-
-    const createPromise = createLinkMutation.mutateAsync(
-      { url },
-      {
-        onSuccess: (newLink) => {
-          queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
-            const oldLinks = data as Link[]
-
-            const updatedLinks: Link[] = [newLink, ...oldLinks] as Link[]
-
-            return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
-          })
-        },
-      }
-    )
-
-    toast.promise(createPromise, {
-      loading: 'Creating link...',
-      success: () => {
-        return `Link has been created`
-      },
-      error: 'Something went wrong',
-    })
-  }
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
     linksHook.actions.setSelectedId(link.id)
@@ -326,7 +223,7 @@ function HomePage(props: Props) {
 
       case ContextMenuAction.delete: {
         if (linksHook.selectedId) {
-          onDeleteLink(linksHook.selectedId)
+          linksHook.actions.deleteLink(linksHook.selectedId)
         }
 
         break
@@ -343,7 +240,7 @@ function HomePage(props: Props) {
 
   function navigateToLink(link: Link) {
     const updatedLink: Link = { ...link, visitedAt: Date.now() }
-    updateLinkMutation.mutate(updatedLink)
+    linksHook.mutations.updateLinkMutation.mutate(updatedLink)
 
     if (!link.url.match(/^https?:\/\//i)) {
       return window.open(`http://${link.url}`, '_blank')
@@ -358,7 +255,7 @@ function HomePage(props: Props) {
     toast('Pinned')
 
     if (linkToPin) {
-      updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
+      linksHook.mutations.updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
 
       queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
         const oldLinks = data as Link[]
@@ -387,7 +284,7 @@ function HomePage(props: Props) {
     if (linkToUnpin) {
       const newTags = linkToUnpin.tags.filter((tag) => tag !== 'pinned')
 
-      updateLinkMutation.mutate({ ...linkToUnpin, tags: newTags })
+      linksHook.mutations.updateLinkMutation.mutate({ ...linkToUnpin, tags: newTags })
 
       queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
         const oldLinks = data as Link[]
@@ -417,7 +314,7 @@ function HomePage(props: Props) {
       <div className="w-full max-w-2xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
           isCreateMode={!linksHook.isLoading && !linksHook.links?.length}
-          onCreate={onCreateLink}
+          onCreate={linksHook.actions.createLink}
           value={linksHook.searchQ}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => linksHook.actions.setSearchQ(event.target.value)}
         />
@@ -465,7 +362,7 @@ function HomePage(props: Props) {
 
             return (
               <LinkRow
-                onUpdate={onUpdateLink}
+                onUpdate={linksHook.actions.updateLink}
                 onExitEditMode={() => linksHook.actions.setEditLinkId(null)}
                 isEditMode={linksHook.editLinkId === link.id}
                 onContextMenu={(event) => handleContextMenu(event, link)}
