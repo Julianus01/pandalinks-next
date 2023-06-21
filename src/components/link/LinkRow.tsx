@@ -35,6 +35,10 @@ function LinkRow(props: Props) {
     return props.link.tags.includes('pinned')
   }, [props.link.tags])
 
+  const isValidUrl = useMemo(() => {
+    return UrlUtils.isValidUrl(value)
+  }, [value])
+
   const displayValue = useMemo(() => {
     return fp.compose(
       (value: string) => value.replace('www.', ''),
@@ -153,7 +157,7 @@ function LinkRow(props: Props) {
     >
       <div className="relative">
         <div className="absolute top-0 right-0 bottom-0 left-0 z-1">
-          {UrlUtils.isValidUrl(value) && <MemoLinkRowImage url={value} isEditMode={props.isEditMode} />}
+          {isValidUrl && <MemoLinkRowImage url={value} isEditMode={props.isEditMode} />}
         </div>
 
         <svg
