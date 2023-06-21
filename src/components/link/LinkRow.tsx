@@ -5,10 +5,9 @@ import { DateUtils } from '@/utils/date-utils'
 import { LinkUtils } from '@/utils/link-utils'
 import { UrlUtils } from '@/utils/url-utils'
 import classNames from 'classnames'
-import { trim } from 'lodash'
 import fp from 'lodash/fp'
 import Image from 'next/image'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
@@ -85,75 +84,46 @@ function LinkRow(props: Props) {
     }
   )
 
-  useKey(
-    'Enter',
-    () => {
-      const trimmedUrl = url.trim()
-      const trimmedTitle = title.trim()
+  const onSaveEdit = useCallback(() => {
+    const trimmedUrl = url.trim()
+    const trimmedTitle = title.trim()
 
+    if (props.isEditMode) {
       if (!trimmedUrl?.length || !trimmedTitle?.length) {
         setUrl(props.link.url)
         setTitle(props.link.title)
+        toast('Title or url cannot be empty')
         props.onExitEditMode()
 
         return
       }
 
-      if (props.isEditMode) {
-        if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
-          if (!UrlUtils.isValidUrl(trimmedUrl)) {
-            toast('Invalid Link')
-
-            return
-          }
-
-          props.onUpdate({ id: props.link.id, url: trimmedUrl, title: trimmedTitle })
-          props.onExitEditMode()
-
-          return
-        }
-
-        props.onExitEditMode()
-      }
-    },
-    {},
-    [props.isEditMode, title, url, props.link.url]
-  )
-
-  useClickAway(ref, () => {
-    const trimmedUrl = url.trim()
-
-    if (props.isEditMode) {
-      if (!trimmedUrl?.length) {
-        setUrl(props.link.url)
-        props.onExitEditMode()
-
-        return
-      }
-
-      if (trimmedUrl !== props.link.url) {
+      if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
         if (!UrlUtils.isValidUrl(trimmedUrl)) {
-          setUrl(props.link.url)
           toast('Invalid Link')
-          props.onExitEditMode()
 
           return
         }
 
-        props.onUpdate({ id: props.link.id, url: trimmedUrl })
+        props.onUpdate({ id: props.link.id, url: trimmedUrl, title: trimmedTitle })
         props.onExitEditMode()
+
         return
       }
 
       props.onExitEditMode()
     }
-  })
+  }, [url, title, props])
+
+  useKey('Enter', onSaveEdit, {}, [props.isEditMode, title, url, props.link.url])
+  useClickAway(ref, onSaveEdit)
 
   useKey(
     'Escape',
     () => {
       if (props.isEditMode) {
         setUrl(props.link.url)
+        setTitle(props.link.title)
       }
     },
     {},

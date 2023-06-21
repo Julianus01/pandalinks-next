@@ -87,7 +87,6 @@ function SearchAndCreateLinksInput(props: Props) {
         </svg>
       )}
 
-      {/* TODO: Type html only and validation */}
       <input
         ref={ref}
         value={props.value}
