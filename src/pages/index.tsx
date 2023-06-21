@@ -264,8 +264,12 @@ function HomePage(props: Props) {
         break
       }
 
+      // TODO: This scrolls the page to top in Safari
       case ContextMenuAction.edit: {
-        useLinksHooks.actions.setSelectionParams({ editLinkId: useLinksHooks.selectedId })
+        useLinksHooks.actions.setSelectionParams({
+          selectedId: useLinksHooks.selectedId,
+          editLinkId: useLinksHooks.selectedId,
+        })
 
         break
       }
