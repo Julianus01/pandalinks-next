@@ -29,11 +29,17 @@ function GlobalTagsSelector(props: Props) {
   const isAllSelected = Boolean(props.selectedTags.length === 0)
   const allTagColorClasses = LinkUtils.getRandomTagColorClasses(ALL_TAG)
 
+  function onAllClick() {
+    if (props.selectedTags.length) {
+      props.onChange([])
+    }
+  }
+
   return (
     <div className="space-x-2 space-y-2 text-center">
       {props.tags.length > 0 && (
         <span
-          onClick={() => props.onChange([])}
+          onClick={onAllClick}
           className={classNames({
             'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
             'bg-gray-50 text-gray-800 ring-gray-600/20': !isAllSelected,
