@@ -96,6 +96,7 @@ function SearchAndCreateLinksInput(props: Props) {
         value={props.value}
         onChange={props.onChange}
         type="text"
+        onFocus={(e) => e.target.select()}
         placeholder={props.isCreateMode ? 'Instagram.com...' : 'Search your links...'}
         className="w-full pl-12 pr-3 py-2 text-gray-700 bg-white outline-none border focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg"
       />
