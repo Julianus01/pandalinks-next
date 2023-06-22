@@ -335,7 +335,7 @@ function HomePage(props: Props) {
 
         <div ref={linksContainerRef} className="space-y-2">
           {!useLinksHooks.isLoading && !useLinksHooks.links.length && (
-            <div className="inline mt-2">
+            <div className="inline mt-2 text-gray-800">
               Press{' '}
               <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg">
                 Enter

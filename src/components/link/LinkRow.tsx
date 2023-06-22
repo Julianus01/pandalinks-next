@@ -188,7 +188,7 @@ function LinkRow(props: Props) {
         <div className="flex-1 truncate py-2 space-y-1 mr-4">
           {showCopied && <div className="flex-1">Copied to clipboard</div>}
 
-          {!showCopied && <p className="whitespace-normal flex-1">{title}</p>}
+          {!showCopied && <p className="whitespace-normal text-gray-800 flex-1">{title}</p>}
           <p className="truncate flex-1 text-xs text-gray-400">{displayUrl}</p>
         </div>
       )}
@@ -202,7 +202,7 @@ function LinkRow(props: Props) {
             onFocus={(e) => e.target.select()}
             type="text"
             placeholder="Nike website"
-            className="flex-1 focus:outline-none bg-transparent w-full"
+            className="flex-1 focus:outline-none bg-transparent w-full text-gray-800"
           />
 
           <input
@@ -233,7 +233,7 @@ function LinkRow(props: Props) {
             )
           })}
 
-          <p className="ml-auto text-xs">{createdAtText}</p>
+          <p className="ml-auto text-xs text-gray-800">{createdAtText}</p>
         </div>
       )}
     </div>
