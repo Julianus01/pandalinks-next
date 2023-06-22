@@ -97,11 +97,11 @@ function SearchAndCreateLinksInput(props: Props) {
       />
 
       <div className="absolute flex items-center space-x-1 right-3 inset-y-0 my-auto">
-        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">
           ⌘
         </kbd>
 
-        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">
           F
         </kbd>
       </div>
