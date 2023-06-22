@@ -45,7 +45,7 @@ export function useLinks(params: UseLinksParams) {
   }, [linksQuery.data])
 
   const filteredLinks = useMemo(() => {
-    const query = searchQ.toLowerCase()
+    const query = searchQ.toLowerCase().trim()
 
     return fp.compose(
       fp.filter((link: Link) => {
@@ -60,10 +60,11 @@ export function useLinks(params: UseLinksParams) {
           return true
         }
 
+        const isTitleMatch = link.title.toLowerCase().includes(query)
         const isUrlMatch = link.url.toLowerCase().includes(query)
         const hasTagMatch = !!link.tags.filter((tag) => tag.includes(query))?.length
 
-        return isUrlMatch || hasTagMatch
+        return isTitleMatch || isUrlMatch || hasTagMatch
       })
     )(links)
   }, [links, searchQ, selectedTags])
