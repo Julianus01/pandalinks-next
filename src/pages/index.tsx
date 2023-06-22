@@ -49,7 +49,7 @@ function HomePage(props: Props) {
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
-  const useLinksHooks = useLinks({ initialData: props.links })
+  const useLinksHook = useLinks({ initialData: props.links })
 
   // Close context menu when clicking away
   useClickAway(contextMenuRef, resetContextMenu)
@@ -59,15 +59,15 @@ function HomePage(props: Props) {
     () => {
       resetContextMenu()
 
-      if (useLinksHooks.editLinkId) {
-        useLinksHooks.actions.setSelectionParams({ editLinkId: null })
+      if (useLinksHook.editLinkId) {
+        useLinksHook.actions.setSelectionParams({ editLinkId: null })
         return
       }
 
-      useLinksHooks.actions.setSelectionParams({ selectedId: null })
+      useLinksHook.actions.setSelectionParams({ selectedId: null })
     },
     {},
-    [useLinksHooks.editLinkId]
+    [useLinksHook.editLinkId]
   )
 
   useKey(
@@ -75,22 +75,22 @@ function HomePage(props: Props) {
     (event) => {
       event.preventDefault()
 
-      if (useLinksHooks.editLinkId) {
+      if (useLinksHook.editLinkId) {
         return
       }
 
-      if (!useLinksHooks.selectedId) {
-        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[0].id })
+      if (!useLinksHook.selectedId) {
+        useLinksHook.actions.setSelectionParams({ selectedId: useLinksHook.links[0].id })
       }
 
-      const currentIndex = useLinksHooks.links.findIndex((link) => link.id === useLinksHooks.selectedId)
+      const currentIndex = useLinksHook.links.findIndex((link) => link.id === useLinksHook.selectedId)
 
-      if (useLinksHooks.links[currentIndex - 1]) {
-        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[currentIndex - 1].id })
+      if (useLinksHook.links[currentIndex - 1]) {
+        useLinksHook.actions.setSelectionParams({ selectedId: useLinksHook.links[currentIndex - 1].id })
       }
     },
     {},
-    [useLinksHooks.selectedId, useLinksHooks.editLinkId]
+    [useLinksHook.selectedId, useLinksHook.editLinkId]
   )
 
   useKey(
@@ -98,36 +98,36 @@ function HomePage(props: Props) {
     (event) => {
       event.preventDefault()
 
-      if (useLinksHooks.editLinkId) {
+      if (useLinksHook.editLinkId) {
         return
       }
 
-      if (!useLinksHooks.selectedId) {
-        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[0].id })
+      if (!useLinksHook.selectedId) {
+        useLinksHook.actions.setSelectionParams({ selectedId: useLinksHook.links[0].id })
       }
 
-      const currentIndex = useLinksHooks.links.findIndex((link) => link.id === useLinksHooks.selectedId)
+      const currentIndex = useLinksHook.links.findIndex((link) => link.id === useLinksHook.selectedId)
 
-      if (useLinksHooks.links[currentIndex + 1]) {
-        useLinksHooks.actions.setSelectionParams({ selectedId: useLinksHooks.links[currentIndex + 1].id })
+      if (useLinksHook.links[currentIndex + 1]) {
+        useLinksHook.actions.setSelectionParams({ selectedId: useLinksHook.links[currentIndex + 1].id })
       }
     },
     {},
-    [useLinksHooks.selectedId, useLinksHooks.editLinkId, useLinksHooks.links]
+    [useLinksHook.selectedId, useLinksHook.editLinkId, useLinksHook.links]
   )
 
   useKey(
     'Enter',
     () => {
-      if (useLinksHooks.selectedId && !useLinksHooks.editLinkId) {
-        useLinksHooks.actions.setSelectionParams({
-          selectedId: useLinksHooks.selectedId,
-          editLinkId: useLinksHooks.selectedId,
+      if (useLinksHook.selectedId && !useLinksHook.editLinkId) {
+        useLinksHook.actions.setSelectionParams({
+          selectedId: useLinksHook.selectedId,
+          editLinkId: useLinksHook.selectedId,
         })
       }
     },
     {},
-    [useLinksHooks.selectedId, useLinksHooks.editLinkId]
+    [useLinksHook.selectedId, useLinksHook.editLinkId]
   )
 
   useKey(
@@ -140,12 +140,12 @@ function HomePage(props: Props) {
       return false
     },
     () => {
-      if (useLinksHooks.selectedLink) {
-        navigateToLink(useLinksHooks.selectedLink)
+      if (useLinksHook.selectedLink) {
+        navigateToLink(useLinksHook.selectedLink)
       }
     },
     {},
-    [useLinksHooks.selectedId]
+    [useLinksHook.selectedId]
   )
 
   useKey(
@@ -158,18 +158,18 @@ function HomePage(props: Props) {
       return false
     },
     () => {
-      if (useLinksHooks.selectedLink) {
-        const isPinned = useLinksHooks.selectedLink?.tags?.includes('pinned')
+      if (useLinksHook.selectedLink) {
+        const isPinned = useLinksHook.selectedLink?.tags?.includes('pinned')
 
         if (!isPinned) {
-          useLinksHooks.actions.pinLink(useLinksHooks.selectedLink.id)
+          useLinksHook.actions.pinLink(useLinksHook.selectedLink.id)
         } else {
-          useLinksHooks.actions.unpinLink(useLinksHooks.selectedLink.id)
+          useLinksHook.actions.unpinLink(useLinksHook.selectedLink.id)
         }
       }
     },
     {},
-    [useLinksHooks.selectedLink]
+    [useLinksHook.selectedLink]
   )
 
   useKey(
@@ -177,20 +177,20 @@ function HomePage(props: Props) {
       return (event.ctrlKey || event.metaKey) && (event.keyCode === 46 || event.key === 'Backspace')
     },
     () => {
-      if (useLinksHooks.selectedId) {
-        useLinksHooks.actions.deleteLink(useLinksHooks.selectedId)
+      if (useLinksHook.selectedId) {
+        useLinksHook.actions.deleteLink(useLinksHook.selectedId)
       }
     },
     {},
-    [useLinksHooks.selectedId]
+    [useLinksHook.selectedId]
   )
 
   useClickAway(linksContainerRef, () => {
-    useLinksHooks.actions.setSelectionParams({ selectedId: null })
+    useLinksHook.actions.setSelectionParams({ selectedId: null })
   })
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
-    useLinksHooks.actions.setSelectionParams({ selectedId: link.id })
+    useLinksHook.actions.setSelectionParams({ selectedId: link.id })
     e.preventDefault()
     const { pageX, pageY } = e
     setShowContextMenu(true)
@@ -210,7 +210,7 @@ function HomePage(props: Props) {
   }
 
   function onContextMenuRowClick(contextMenuRow: ContextMenuRow) {
-    const link = useLinksHooks.links.find((link) => link.id === useLinksHooks.selectedId)
+    const link = useLinksHook.links.find((link) => link.id === useLinksHook.selectedId)
 
     if (!link) {
       resetContextMenu()
@@ -219,8 +219,8 @@ function HomePage(props: Props) {
 
     switch (contextMenuRow.action) {
       case ContextMenuAction.visit: {
-        if (useLinksHooks.selectedLink) {
-          navigateToLink(useLinksHooks.selectedLink)
+        if (useLinksHook.selectedLink) {
+          navigateToLink(useLinksHook.selectedLink)
         }
 
         break
@@ -252,16 +252,16 @@ function HomePage(props: Props) {
       }
 
       case ContextMenuAction.pin: {
-        if (useLinksHooks.selectedId) {
-          useLinksHooks.actions.pinLink(useLinksHooks.selectedId)
+        if (useLinksHook.selectedId) {
+          useLinksHook.actions.pinLink(useLinksHook.selectedId)
         }
 
         break
       }
 
       case ContextMenuAction.unpin: {
-        if (useLinksHooks.selectedId) {
-          useLinksHooks.actions.unpinLink(useLinksHooks.selectedId)
+        if (useLinksHook.selectedId) {
+          useLinksHook.actions.unpinLink(useLinksHook.selectedId)
         }
 
         break
@@ -269,17 +269,17 @@ function HomePage(props: Props) {
 
       // TODO: This scrolls the page to top in Safari
       case ContextMenuAction.edit: {
-        useLinksHooks.actions.setSelectionParams({
-          selectedId: useLinksHooks.selectedId,
-          editLinkId: useLinksHooks.selectedId,
+        useLinksHook.actions.setSelectionParams({
+          selectedId: useLinksHook.selectedId,
+          editLinkId: useLinksHook.selectedId,
         })
 
         break
       }
 
       case ContextMenuAction.delete: {
-        if (useLinksHooks.selectedId) {
-          useLinksHooks.actions.deleteLink(useLinksHooks.selectedId)
+        if (useLinksHook.selectedId) {
+          useLinksHook.actions.deleteLink(useLinksHook.selectedId)
         }
 
         break
@@ -296,7 +296,7 @@ function HomePage(props: Props) {
 
   function navigateToLink(link: Link) {
     const updatedLink: Link = { ...link, visitedAt: Date.now() }
-    useLinksHooks.mutations.updateLinkMutation.mutate(updatedLink)
+    useLinksHook.mutations.updateLinkMutation.mutate(updatedLink)
 
     if (!link.url.match(/^https?:\/\//i)) {
       return window.open(`http://${link.url}`, '_blank')
@@ -306,12 +306,12 @@ function HomePage(props: Props) {
   }
 
   function onClickLink(link: Link) {
-    if (useLinksHooks.selectedId !== link.id) {
-      useLinksHooks.actions.setSelectionParams({ selectedId: link.id })
+    if (useLinksHook.selectedId !== link.id) {
+      useLinksHook.actions.setSelectionParams({ selectedId: link.id })
     }
   }
 
-  if (useLinksHooks.isLoading) {
+  if (useLinksHook.isLoading) {
     return <LoadingPage />
   }
 
@@ -319,34 +319,30 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-3xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
-          isCreateMode={!useLinksHooks.isLoading && !useLinksHooks.links?.length}
-          onCreate={useLinksHooks.actions.createLink}
-          value={useLinksHooks.searchQ}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            useLinksHooks.actions.setSearchQ(event.target.value)
-          }
+          isCreateMode={!useLinksHook.isLoading && !useLinksHook.links?.length}
+          onCreate={useLinksHook.actions.createLink}
+          value={useLinksHook.searchQ}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => useLinksHook.actions.setSearchQ(event.target.value)}
         />
 
         <GlobalTagsSelector
-          tags={useLinksHooks.allTags}
-          selectedTags={useLinksHooks.selectedTags}
-          onChange={useLinksHooks.actions.setSelectedTags}
+          tags={useLinksHook.allTags}
+          selectedTags={useLinksHook.selectedTags}
+          onChange={useLinksHook.actions.setSelectedTags}
         />
 
         <div ref={linksContainerRef} className="space-y-2">
-          {!useLinksHooks.isLoading && !useLinksHooks.links.length && (
+          {!useLinksHook.isLoading && !useLinksHook.links.length && (
             <div className="inline mt-2 text-gray-800">
               Press{' '}
-              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg">
-                Enter
-              </kbd>{' '}
+              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg">Enter</kbd>{' '}
               to add the link
             </div>
           )}
 
-          {!!useLinksHooks.links.length && (
-            <div className="px-2 pb-2 flex items-center border-b">
-              <p className="text-sm text-gray-500">{useLinksHooks.links?.length} Results - Destination</p>
+          {!!useLinksHook.links.length && (
+            <div className="px-2 pb-1 flex items-center">
+              <p className="text-sm text-gray-500">{useLinksHook.links?.length} Results - Destination</p>
 
               <div className="ml-auto flex items-center space-x-1">
                 <svg
@@ -365,34 +361,38 @@ function HomePage(props: Props) {
             </div>
           )}
 
-          {useLinksHooks.links.map((link: Link) => {
-            const isSelected = useLinksHooks.selectedId === link.id
+          <div className="-space-y-0.5">
+            {useLinksHook.links.map((link: Link, index: number) => {
+              const isSelected = useLinksHook.selectedId === link.id
 
-            return (
-              <LinkRow
-                onUpdate={useLinksHooks.actions.updateLink}
-                onExitEditMode={() => {
-                  useLinksHooks.actions.setSelectionParams({ editLinkId: null })
-                }}
-                isEditMode={useLinksHooks.editLinkId === link.id}
-                onContextMenu={(event) => handleContextMenu(event, link)}
-                link={link}
-                key={link.id}
-                onClick={() => onClickLink(link)}
-                onDoubleClick={() => navigateToLink(link)}
-                isSelected={isSelected}
-              />
-            )
-          })}
+              return (
+                <LinkRow
+                  isFirst={index === 0}
+                  isLast={index === useLinksHook.links.length - 1}
+                  onUpdate={useLinksHook.actions.updateLink}
+                  onExitEditMode={() => {
+                    useLinksHook.actions.setSelectionParams({ editLinkId: null })
+                  }}
+                  isEditMode={useLinksHook.editLinkId === link.id}
+                  onContextMenu={(event) => handleContextMenu(event, link)}
+                  link={link}
+                  key={link.id}
+                  onClick={() => onClickLink(link)}
+                  onDoubleClick={() => navigateToLink(link)}
+                  isSelected={isSelected}
+                />
+              )
+            })}
+          </div>
 
-          {showContextMenu && useLinksHooks.selectedLink && (
+          {showContextMenu && useLinksHook.selectedLink && (
             <div
               ref={contextMenuRef}
               className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
               style={{ top: `${position.y}px`, left: `${position.x}px` }}
             >
               {[
-                ContentMenuUtils.getContextMenuGroupOne(useLinksHooks.selectedLink),
+                ContentMenuUtils.getContextMenuGroupOne(useLinksHook.selectedLink),
                 ContentMenuUtils.getContextMenuGroupTwo(),
               ].map((group, i) => (
                 <ul className="px-2 py-2 border-t" role="menu" key={i}>

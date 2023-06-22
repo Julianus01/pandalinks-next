@@ -14,6 +14,8 @@ import { toast } from 'sonner'
 
 interface Props {
   link: Link
+  isFirst: boolean
+  isLast: boolean
   isSelected: boolean
   isEditMode: boolean
   onClick: () => void
@@ -41,13 +43,13 @@ function LinkRow(props: Props) {
     return props.link.tags.includes('pinned')
   }, [props.link.tags])
 
-  const displayUrl = useMemo(() => {
-    return fp.compose(
-      (url: string) => url.replace('www.', ''),
-      (url: string) => url.replace('https://', ''),
-      (url: string) => url.replace('http://', '')
-    )(url)
-  }, [url])
+  // const displayUrl = useMemo(() => {
+  //   return fp.compose(
+  //     (url: string) => url.replace('www.', ''),
+  //     (url: string) => url.replace('https://', ''),
+  //     (url: string) => url.replace('http://', '')
+  //   )(url)
+  // }, [url])
 
   useEffect(() => {
     if (!props.isEditMode && !url.length) {
@@ -141,14 +143,16 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'px-3 hover:bg-slate-100 rounded-lg cursor-default select-none flex border border-solid group': true,
+        'px-3 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group': true,
         'border-slate-200 bg-white': !props.isSelected,
-        'hover:border-slate-200 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200':
+        'hover:border-slate-200 z-10 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200':
           props.isSelected || props.isEditMode,
+        'rounded-t-md': props.isFirst,
+        'rounded-b-md': props.isLast,
       })}
     >
-      <div className="relative pt-3 flex flex-col items-center mr-2">
-        <div className="absolute top-3 right-0 bottom-0 left-0 z-1">
+      <div className="relative pt-5 flex flex-col items-center mr-2">
+        <div className="absolute top-5 right-0 bottom-0 left-0 z-1">
           {isValidUrl && <MemoLinkRowImage url={url} isEditMode={props.isEditMode} />}
         </div>
 
@@ -164,32 +168,37 @@ function LinkRow(props: Props) {
             clipRule="evenodd"
           />
         </svg>
-
-        {isPinned && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-3 h-3 text-yellow-500 mt-2.5"
-          >
-            <line x1="12" x2="12" y1="17" y2="22" />
-            <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
-          </svg>
-        )}
       </div>
 
       {!props.isEditMode && (
-        <div className="flex-1 truncate py-2 space-y-1 mr-4">
+        <div className="flex-1 truncate py-4 space-y-1 mr-4">
           {showCopied && <div className="flex-1">Copied to clipboard</div>}
 
-          {!showCopied && <p className="whitespace-normal text-gray-800 flex-1">{title}</p>}
-          <p className="truncate flex-1 text-xs text-gray-400">{displayUrl}</p>
+          {!showCopied && (
+            <p className="whitespace-normal text-gray-800">
+              {isPinned && (
+                <span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3 h-3 text-yellow-500 inline-flex"
+                  >
+                    <line x1="12" x2="12" y1="17" y2="22" />
+                    <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+                  </svg>
+                </span>
+              )}
+              {'  '}
+              {title}
+            </p>
+          )}
         </div>
       )}
 
