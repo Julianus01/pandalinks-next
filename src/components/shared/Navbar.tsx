@@ -59,12 +59,12 @@ function Navbar() {
         }
 
         // TODO: Remove slice
-        const createPromise = batchCreateLinksMutation.mutateAsync(newLinks.slice(0, 12), {
+        const createPromise = batchCreateLinksMutation.mutateAsync(newLinks, {
           onSuccess: () => {
             queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
               const oldLinks = data as Link[]
 
-              const updatedLinks: Link[] = [...newLinks.slice(0, 12), ...oldLinks] as Link[]
+              const updatedLinks: Link[] = [...newLinks, ...oldLinks] as Link[]
 
               return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
             })

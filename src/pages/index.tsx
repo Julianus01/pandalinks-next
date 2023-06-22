@@ -120,7 +120,10 @@ function HomePage(props: Props) {
     'Enter',
     () => {
       if (useLinksHooks.selectedId && !useLinksHooks.editLinkId) {
-        useLinksHooks.actions.setSelectionParams({ editLinkId: useLinksHooks.selectedId })
+        useLinksHooks.actions.setSelectionParams({
+          selectedId: useLinksHooks.selectedId,
+          editLinkId: useLinksHooks.selectedId,
+        })
       }
     },
     {},
@@ -302,6 +305,12 @@ function HomePage(props: Props) {
     return window.open(link.url, '_blank')
   }
 
+  function onClickLink(link: Link) {
+    if (useLinksHooks.selectedId !== link.id) {
+      useLinksHooks.actions.setSelectionParams({ selectedId: link.id })
+    }
+  }
+
   if (useLinksHooks.isLoading) {
     return <LoadingPage />
   }
@@ -369,9 +378,7 @@ function HomePage(props: Props) {
                 onContextMenu={(event) => handleContextMenu(event, link)}
                 link={link}
                 key={link.id}
-                onClick={() => {
-                  useLinksHooks.actions.setSelectionParams({ selectedId: link.id })
-                }}
+                onClick={() => onClickLink(link)}
                 onDoubleClick={() => navigateToLink(link)}
                 isSelected={isSelected}
               />

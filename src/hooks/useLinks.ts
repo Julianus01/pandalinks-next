@@ -98,7 +98,7 @@ export function useLinks(params: UseLinksParams) {
     const createPromise = createLinkMutation.mutateAsync(
       // TODO: Consider having it different
       // from the UI instead of mocked here? 🤔
-      { url, title: 'Give me a name' },
+      { url, title: 'My name needs an update 👈' },
       {
         onSuccess: (newLink) => {
           queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
