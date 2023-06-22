@@ -138,6 +138,7 @@ function LinkRow(props: Props) {
 
   return (
     <div
+      id={props.link.id}
       ref={ref}
       onClick={props.onClick}
       onDoubleClick={props.onDoubleClick}

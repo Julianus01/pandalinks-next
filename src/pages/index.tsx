@@ -73,7 +73,7 @@ function HomePage(props: Props) {
   )
 
   useKey(
-    'ArrowUp',
+    (event) => !event.ctrlKey && !event.metaKey && event.key === 'ArrowUp',
     (event) => {
       event.preventDefault()
 
@@ -96,7 +96,7 @@ function HomePage(props: Props) {
   )
 
   useKey(
-    'ArrowDown',
+    (event) => !event.ctrlKey && !event.metaKey && event.key === 'ArrowDown',
     (event) => {
       event.preventDefault()
 
