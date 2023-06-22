@@ -144,12 +144,12 @@ function LinkRow(props: Props) {
       onDoubleClick={props.onDoubleClick}
       onContextMenu={props.onContextMenu}
       className={classNames({
-        'px-3 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group': true,
+        'px-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group': true,
         'border-slate-200 bg-white': !props.isSelected,
         'hover:border-slate-200 z-10 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200':
           props.isSelected || props.isEditMode,
-        'rounded-t-md': props.isFirst,
-        'rounded-b-md': props.isLast,
+        'rounded-t-lg': props.isFirst,
+        'rounded-b-lg': props.isLast,
       })}
     >
       <div className="relative pt-5 flex flex-col items-center mr-2">
