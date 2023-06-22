@@ -1,3 +1,4 @@
+import { useLinksSelection } from '@/hooks/useLinksSelection'
 import { UrlUtils } from '@/utils/url-utils'
 import { useRef } from 'react'
 import { useKey } from 'react-use'
@@ -12,6 +13,7 @@ interface Props {
 
 function SearchAndCreateLinksInput(props: Props) {
   const ref = useRef<HTMLInputElement>(null)
+  const linksSelection = useLinksSelection()
 
   useKey(
     'Enter',
@@ -47,6 +49,8 @@ function SearchAndCreateLinksInput(props: Props) {
       return false
     },
     () => {
+      linksSelection.setSelectionParams({ selectedId: null, editLinkId: null })
+
       ref.current?.focus()
     }
   )
@@ -93,17 +97,13 @@ function SearchAndCreateLinksInput(props: Props) {
         onChange={props.onChange}
         type="text"
         placeholder={props.isCreateMode ? 'Instagram.com...' : 'Search your links...'}
-        className="w-full pl-12 pr-3 py-2 text-gray-700 bg-white outline-none border focus:border-slate-300 shadow-sm rounded-lg"
+        className="w-full pl-12 pr-3 py-2 text-gray-700 bg-white outline-none border focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg"
       />
 
       <div className="absolute flex items-center space-x-1 right-3 inset-y-0 my-auto">
-        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">
-          ⌘
-        </kbd>
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">⌘</kbd>
 
-        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">
-          F
-        </kbd>
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">F</kbd>
       </div>
     </div>
   )
