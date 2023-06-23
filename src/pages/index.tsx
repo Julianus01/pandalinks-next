@@ -54,8 +54,6 @@ function HomePage(props: Props) {
   const useLinksHook = useLinks({ initialData: props.links })
   const linksSelection = useLinksSelection()
 
-  console.log(useLinksHook.links)
-
   // Close context menu when clicking away
   useClickAway(contextMenuRef, resetContextMenu)
 
