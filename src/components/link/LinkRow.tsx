@@ -5,7 +5,6 @@ import { DateUtils } from '@/utils/date-utils'
 import { LinkUtils } from '@/utils/link-utils'
 import { UrlUtils } from '@/utils/url-utils'
 import classNames from 'classnames'
-import fp from 'lodash/fp'
 import Image from 'next/image'
 import React, { useCallback } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -106,7 +105,10 @@ function LinkRow(props: Props) {
 
       if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
         if (!UrlUtils.isValidUrl(trimmedUrl)) {
+          setUrl(props.link.url)
+          setTitle(props.link.title)
           toast('Invalid Link')
+          props.onExitEditMode()
 
           return
         }
@@ -121,7 +123,6 @@ function LinkRow(props: Props) {
     }
   }, [url, title, props])
 
-  useKey('Enter', onSaveEdit, {}, [props.isEditMode, title, url, props.link.url])
   useClickAway(ref, onSaveEdit)
 
   useKey(
@@ -148,8 +149,15 @@ function LinkRow(props: Props) {
     }
   }
 
+  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if(event.key === 'Enter') {
+      onSaveEdit()
+    }
+  }
+
   return (
     <div
+      onKeyDown={onKeyDown}
       id={props.link.id}
       ref={ref}
       onClick={props.onClick}
