@@ -3,7 +3,7 @@ import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/firebase/withAuth'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LoadingPage from '@/components/shared/LoadingPage'
@@ -14,6 +14,7 @@ import GlobalTagsSelector from '@/components/tags/GlobalTagsSelector'
 import { useLinks } from '@/hooks/useLinks'
 import { ContentMenuUtils, ContextMenuAction, ContextMenuRow } from '@/utils/context-menu-utils'
 import { useLinksSelection } from '@/hooks/useLinksSelection'
+import fp from 'lodash/fp'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   try {
@@ -53,8 +54,19 @@ function HomePage(props: Props) {
   const useLinksHook = useLinks({ initialData: props.links })
   const linksSelection = useLinksSelection()
 
+  console.log(useLinksHook.links)
+
   // Close context menu when clicking away
   useClickAway(contextMenuRef, resetContextMenu)
+
+  const [pinnedLinks, unpinnedLinks] = useMemo(() => {
+    const numberOfPinnedLinks = useLinksHook.links.filter((link) => link.tags.includes('pinned')).length
+
+    return [
+      fp.slice(0, numberOfPinnedLinks)(useLinksHook.links),
+      fp.slice(numberOfPinnedLinks, Infinity)(useLinksHook.links),
+    ]
+  }, [useLinksHook.links])
 
   useKey(
     'Escape',
@@ -363,29 +375,57 @@ function HomePage(props: Props) {
             </div>
           )}
 
-          <div className="-space-y-0.5">
-            {useLinksHook.links.map((link: Link, index: number) => {
-              const isSelected = linksSelection.selectedId === link.id
+          {!!pinnedLinks.length && (
+            <div className="-space-y-0.5 pb-4">
+              {pinnedLinks.map((link: Link, index: number) => {
+                const isSelected = linksSelection.selectedId === link.id
 
-              return (
-                <LinkRow
-                  isFirst={index === 0}
-                  isLast={index === useLinksHook.links.length - 1}
-                  onUpdate={useLinksHook.actions.updateLink}
-                  onExitEditMode={() => {
-                    linksSelection.setSelectionParams({ editLinkId: null })
-                  }}
-                  isEditMode={linksSelection.editLinkId === link.id}
-                  onContextMenu={(event) => handleContextMenu(event, link)}
-                  link={link}
-                  key={link.id}
-                  onClick={() => onClickLink(link)}
-                  onDoubleClick={() => navigateToLink(link)}
-                  isSelected={isSelected}
-                />
-              )
-            })}
-          </div>
+                return (
+                  <LinkRow
+                    isFirst={index === 0}
+                    isLast={index === pinnedLinks.length - 1}
+                    onUpdate={useLinksHook.actions.updateLink}
+                    onExitEditMode={() => {
+                      linksSelection.setSelectionParams({ editLinkId: null })
+                    }}
+                    isEditMode={linksSelection.editLinkId === link.id}
+                    onContextMenu={(event) => handleContextMenu(event, link)}
+                    link={link}
+                    key={link.id}
+                    onClick={() => onClickLink(link)}
+                    onDoubleClick={() => navigateToLink(link)}
+                    isSelected={isSelected}
+                  />
+                )
+              })}
+            </div>
+          )}
+
+          {!!unpinnedLinks.length && (
+            <div className="-space-y-0.5">
+              {unpinnedLinks.map((link: Link, index: number) => {
+                const isSelected = linksSelection.selectedId === link.id
+
+                return (
+                  <LinkRow
+                    isFirst={index === 0}
+                    isLast={index === unpinnedLinks.length - 1}
+                    onUpdate={useLinksHook.actions.updateLink}
+                    onExitEditMode={() => {
+                      linksSelection.setSelectionParams({ editLinkId: null })
+                    }}
+                    isEditMode={linksSelection.editLinkId === link.id}
+                    onContextMenu={(event) => handleContextMenu(event, link)}
+                    link={link}
+                    key={link.id}
+                    onClick={() => onClickLink(link)}
+                    onDoubleClick={() => navigateToLink(link)}
+                    isSelected={isSelected}
+                  />
+                )
+              })}
+            </div>
+          )}
 
           {showContextMenu && useLinksHook.selectedLink && (
             <div
