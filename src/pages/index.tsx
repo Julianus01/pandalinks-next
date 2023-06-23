@@ -344,7 +344,7 @@ function HomePage(props: Props) {
 
           {!!useLinksHook.links.length && (
             <div className="px-5 pb-1 flex items-center">
-              <p className="text-sm text-gray-500">{useLinksHook.links?.length} Results - Name</p>
+              <p className="text-sm text-gray-500">Name - {useLinksHook.links?.length} Results</p>
 
               <div className="ml-auto flex items-center space-x-1">
                 <svg

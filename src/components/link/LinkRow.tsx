@@ -136,13 +136,25 @@ function LinkRow(props: Props) {
     [props.isEditMode, props.link.url]
   )
 
+  function openContextMenu(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    if (!props.isEditMode) {
+      props.onContextMenu(event)
+    }
+  }
+
+  function onDoubleClick() {
+    if (!props.isEditMode) {
+      props.onDoubleClick()
+    }
+  }
+
   return (
     <div
       id={props.link.id}
       ref={ref}
       onClick={props.onClick}
-      onDoubleClick={props.onDoubleClick}
-      onContextMenu={props.onContextMenu}
+      onDoubleClick={onDoubleClick}
+      onContextMenu={openContextMenu}
       className={classNames({
         'px-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group': true,
         'border-slate-200 bg-white': !props.isSelected,
@@ -246,7 +258,7 @@ function LinkRow(props: Props) {
 
           <p className="ml-auto text-xs text-gray-800">{createdAtText}</p>
 
-          <div onClick={props.onContextMenu} className="p-2 !ml-0 !-mr-2">
+          <div onClick={openContextMenu} className="p-2 !ml-0 !-mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
