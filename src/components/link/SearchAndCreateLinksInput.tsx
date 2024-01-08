@@ -1,5 +1,4 @@
 import { useLinksSelection } from '@/hooks/useLinksSelection'
-import { UrlUtils } from '@/utils/url-utils'
 import { useRef } from 'react'
 import { useKey } from 'react-use'
 import { toast } from 'sonner'
