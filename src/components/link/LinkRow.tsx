@@ -3,7 +3,6 @@ import { UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
 import { DateUtils } from '@/utils/date-utils'
 import { LinkUtils } from '@/utils/link-utils'
-import { UrlUtils } from '@/utils/url-utils'
 import classNames from 'classnames'
 import Image from 'next/image'
 import React, { useCallback } from 'react'
@@ -33,10 +32,6 @@ function LinkRow(props: Props) {
   const createdAtText = useMemo(() => {
     return DateUtils.timeSince(new Date(props.link.createdAt))
   }, [props.link.createdAt])
-
-  const isValidUrl = useMemo(() => {
-    return UrlUtils.isValidUrl(url)
-  }, [url])
 
   const isPinned = useMemo(() => {
     return props.link.tags.includes('pinned')
@@ -104,15 +99,6 @@ function LinkRow(props: Props) {
       }
 
       if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
-        if (!UrlUtils.isValidUrl(trimmedUrl)) {
-          setUrl(props.link.url)
-          setTitle(props.link.title)
-          toast('Invalid Link')
-          props.onExitEditMode()
-
-          return
-        }
-
         props.onUpdate({ id: props.link.id, url: trimmedUrl, title: trimmedTitle })
         props.onExitEditMode()
 
@@ -150,7 +136,7 @@ function LinkRow(props: Props) {
   }
 
   function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if(event.key === 'Enter') {
+    if (event.key === 'Enter') {
       onSaveEdit()
     }
   }
@@ -174,7 +160,7 @@ function LinkRow(props: Props) {
     >
       <div className="relative pt-5 flex flex-col items-center mr-2">
         <div className="absolute top-5 right-0 bottom-0 left-0 z-1">
-          {isValidUrl && <MemoLinkRowImage url={url} isEditMode={props.isEditMode} />}
+          <MemoLinkRowImage url={url} isEditMode={props.isEditMode} />
         </div>
 
         <svg
