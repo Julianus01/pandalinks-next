@@ -25,12 +25,6 @@ function SearchAndCreateLinksInput(props: Props) {
           return
         }
 
-        if (!UrlUtils.isValidUrl(trimmedValue)) {
-          toast('Invalid Link')
-
-          return
-        }
-
         props.onCreate(trimmedValue)
       }
     },
