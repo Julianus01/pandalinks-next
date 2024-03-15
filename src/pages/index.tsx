@@ -72,20 +72,21 @@ function HomePage(props: Props) {
       resetContextMenu()
 
       if (linksSelection.editLinkId) {
-        linksSelection.setSelectionParams({ editLinkId: null })
+        linksSelection.setSelectionParams({ selectedId: linksSelection.selectedId, editLinkId: null })
         return
       }
 
       linksSelection.setSelectionParams({ selectedId: null })
     },
     {},
-    [linksSelection.editLinkId]
+    [linksSelection.editLinkId, linksSelection.selectedId]
   )
 
   useKey(
     (event) => !event.ctrlKey && !event.metaKey && event.key === 'ArrowUp',
     (event) => {
       event.preventDefault()
+      setShowContextMenu(false)
 
       if (linksSelection.editLinkId) {
         return
@@ -93,12 +94,34 @@ function HomePage(props: Props) {
 
       if (!linksSelection.selectedId) {
         linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].id })
+
+        const element = document.getElementById(useLinksHook.links[0].id)
+
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'instant',
+            inline: 'nearest',
+            block: 'nearest',
+          })
+        }
+
+        return
       }
 
       const currentIndex = useLinksHook.links.findIndex((link) => link.id === linksSelection.selectedId)
 
       if (useLinksHook.links[currentIndex - 1]) {
         linksSelection.setSelectionParams({ selectedId: useLinksHook.links[currentIndex - 1].id })
+
+        const element = document.getElementById(useLinksHook.links[currentIndex - 1].id)
+
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'instant',
+            inline: 'nearest',
+            block: 'nearest',
+          })
+        }
       }
     },
     {},
@@ -109,6 +132,7 @@ function HomePage(props: Props) {
     (event) => !event.ctrlKey && !event.metaKey && event.key === 'ArrowDown',
     (event) => {
       event.preventDefault()
+      setShowContextMenu(false)
 
       if (linksSelection.editLinkId) {
         return
@@ -116,12 +140,34 @@ function HomePage(props: Props) {
 
       if (!linksSelection.selectedId) {
         linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].id })
+
+        const element = document.getElementById(useLinksHook.links[0].id)
+
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'instant',
+            inline: 'nearest',
+            block: 'nearest',
+          })
+        }
+
+        return
       }
 
       const currentIndex = useLinksHook.links.findIndex((link) => link.id === linksSelection.selectedId)
 
       if (useLinksHook.links[currentIndex + 1]) {
         linksSelection.setSelectionParams({ selectedId: useLinksHook.links[currentIndex + 1].id })
+
+        const element = document.getElementById(useLinksHook.links[currentIndex + 1].id)
+
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'instant',
+            inline: 'nearest',
+            block: 'nearest',
+          })
+        }
       }
     },
     {},
@@ -206,11 +252,19 @@ function HomePage(props: Props) {
     e.preventDefault()
     const { pageX, pageY } = e
     setShowContextMenu(true)
+
     setTimeout(() => {
       if (contextMenuRef?.current) {
         const rect = contextMenuRef.current.getBoundingClientRect()
-        const x =
-          pageX - scrollX + rect.width > window.innerWidth ? window.innerWidth - rect.width : pageX - scrollX + 2
+
+        let x =
+          pageX - scrollX - rect.width > window.innerWidth
+            ? window.innerWidth - rect.width
+            : pageX - scrollX - rect.width + 2
+
+        if (x < 0) {
+          x = 2
+        }
 
         const y =
           pageY - scrollY + rect.height > window.innerHeight ? window.innerHeight - rect.height : pageY - scrollY + 2

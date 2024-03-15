@@ -50,20 +50,20 @@ function LoginPage() {
   }
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4 py-28 gap-12 text-gray-600 md:px-8 xl:flex">
+    <div className="max-w-screen-xl mx-auto px-4 py-28 gap-12 text-gray-600 dark:text-slate-400 md:px-8 xl:flex">
       <div className="space-y-5 max-w-2xl mx-auto text-center">
         <div className="flex flex-wrap items-center justify-center gap-6">
           {features.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-x-2 text-gray-500 text-sm">
+            <div key={idx} className="flex items-center gap-x-2 text-gray-500 dark:text-slate-400 text-sm">
               {item.icon}
               {item.name}
             </div>
           ))}
         </div>
 
-        <h1 className="text-4xl text-gray-800 font-extrabold mx-auto md:text-5xl ">
+        <h1 className="text-4xl text-gray-800 dark:text-white font-extrabold mx-auto md:text-5xl ">
           Make your bookmarks life easier with{' '}
-          <span className="bg-gradient-to-r from-gray-800 via-red-400 to-rose-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-gray-800 dark:from-slate-200 dark:via-slate-400 dark:to-slate-600 via-red-400 to-rose-400 bg-clip-text text-transparent">
             Pandalinks
           </span>
         </h1>
