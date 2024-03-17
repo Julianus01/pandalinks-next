@@ -12,11 +12,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
 import fp from 'lodash/fp'
 import { v4 as uuidv4 } from 'uuid'
+import { useTheme } from 'next-themes'
 
 function Navbar() {
   const queryClient = useQueryClient()
   const importInputRef = useRef<HTMLInputElement>(null)
   const { user } = useContext(AuthContext)
+
+  const { theme, setTheme } = useTheme()
 
   const batchCreateLinksMutation = useMutation({
     mutationFn: (newLinks: Partial<Link>[]) => LinksApi.batchCreateLinks(newLinks),
@@ -90,10 +93,51 @@ function Navbar() {
         <Image className="dark:invert" priority src="/logo-side-text-md.svg" width={162.8} height={30} alt="logo" />
 
         <div className="flex items-center space-x-2 ml-auto">
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="flex items-center justify-center bg-white px-2.5 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
+          >
+            {theme === 'light' ? (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            ) : (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            )}
+          </button>
+
           <div className="relative">
             <button
               onClick={() => importInputRef.current?.click()}
-              className="flex items-center bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
+              className="flex items-center bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +167,7 @@ function Navbar() {
 
           <button
             onClick={logout}
-            className="block bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
+            className="block bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
           >
             logout
           </button>
