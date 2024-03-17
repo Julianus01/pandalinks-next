@@ -392,10 +392,15 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-3xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
-          isCreateMode={!useLinksHook.isLoading && !useLinksHook.links?.length}
           onCreate={useLinksHook.actions.createLink}
           value={useLinksHook.searchQ}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => useLinksHook.actions.setSearchQ(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            useLinksHook.actions.setSearchQ(event.target.value)
+
+            if (linksSelection.selectedId) {
+              linksSelection.setSelectionParams({ selectedId: null })
+            }
+          }}
         />
 
         <GlobalTagsSelector
@@ -406,13 +411,7 @@ function HomePage(props: Props) {
 
         <div ref={linksContainerRef} className="space-y-2">
           {!useLinksHook.isLoading && !useLinksHook.links.length && (
-            <div className="inline mt-2 text-gray-800 dark:text-slate-300">
-              Press{' '}
-              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                Enter
-              </kbd>{' '}
-              to add the link
-            </div>
+            <div className="inline mt-2 text-gray-800 dark:text-slate-300">No links found</div>
           )}
 
           {!!useLinksHook.links.length && (

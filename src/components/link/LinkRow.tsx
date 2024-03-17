@@ -250,7 +250,7 @@ function LinkRow(props: Props) {
             )
           })}
 
-          <p className="ml-auto text-xs text-gray-800 dark:text-slate-400">{createdAtText}</p>
+          {/* <p className="ml-auto text-xs text-gray-800 dark:text-slate-400">{createdAtText}</p> */}
 
           <div onClick={openContextMenu} className="p-2 !ml-0 !-mr-2">
             <svg
