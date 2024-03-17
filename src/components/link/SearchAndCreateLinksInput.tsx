@@ -61,7 +61,7 @@ function SearchAndCreateLinksInput(props: Props) {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-6 h-6 text-gray-400 absolute left-3 inset-y-0 my-auto"
+          className="w-6 h-6 text-gray-400 absolute left-3 inset-y-0 my-auto dark:text-slate-400"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
@@ -74,7 +74,7 @@ function SearchAndCreateLinksInput(props: Props) {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-6 h-6 text-gray-400 absolute left-3 inset-y-0 my-auto"
+          className="w-6 h-6 text-gray-400 absolute left-3 inset-y-0 my-auto dark:text-slate-400"
         >
           <path
             strokeLinecap="round"
@@ -91,13 +91,13 @@ function SearchAndCreateLinksInput(props: Props) {
         type="text"
         onFocus={(e) => e.target.select()}
         placeholder={props.isCreateMode ? 'Instagram.com...' : 'Search your links...'}
-        className="w-full pl-12 pr-20 py-2 text-gray-700 bg-white outline-none border focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg"
+        className="w-full pl-12 pr-20 py-2 text-gray-700 bg-white outline-none border focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:ring-slate-700"
       />
 
       <div className="absolute flex items-center space-x-1 right-3 inset-y-0 my-auto">
-        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">⌘</kbd>
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">⌘</kbd>
 
-        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg">F</kbd>
+        <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">F</kbd>
       </div>
     </div>
   )

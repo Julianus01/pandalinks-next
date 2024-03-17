@@ -18,12 +18,19 @@ function GlobalTagsSelector(props: Props) {
 
   function onClick(tag: string, selected: boolean) {
     if (selected) {
-      props.onChange([...props.selectedTags, tag])
-
-      return
+      return props.onChange([tag])
     }
 
-    props.onChange(props.selectedTags.filter((selectedTag) => selectedTag !== tag))
+    props.onChange([])
+
+    // Code for having multiple tags at the same time
+    // if (selected) {
+    //   props.onChange([...props.selectedTags, tag])
+
+    //   return
+    // }
+
+    // props.onChange(props.selectedTags.filter((selectedTag) => selectedTag !== tag))
   }
 
   const isAllSelected = Boolean(props.selectedTags.length === 0)
@@ -42,7 +49,8 @@ function GlobalTagsSelector(props: Props) {
           onClick={onAllClick}
           className={classNames({
             'inline-flex cursor-default items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
-            'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100': !isAllSelected,
+            'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100 dark:text-slate-400 dark:bg-gray-800 dark:ring-gray-500/20 dark:hover:bg-gray-700':
+              !isAllSelected,
             [allTagColorClasses]: isAllSelected,
           })}
         >
@@ -61,7 +69,8 @@ function GlobalTagsSelector(props: Props) {
             className={classNames({
               'inline-flex cursor-default items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset':
                 true,
-              'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100': !isSelected,
+              'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100 dark:text-slate-400 dark:bg-gray-800 dark:ring-gray-500/20 dark:hover:bg-gray-700':
+                !isSelected,
               [tagColorClasses]: isSelected,
             })}
           >

@@ -37,6 +37,7 @@ export async function loginWithGoogleCredential() {
     return userCredential
   } catch (err) {
     const error: AuthError = err as AuthError
+    authErrorMessage(error.code as FirebaseAuthErrorCode)
     throw new Error(authErrorMessage(error.code as FirebaseAuthErrorCode))
   }
 }

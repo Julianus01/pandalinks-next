@@ -87,13 +87,13 @@ function Navbar() {
   return (
     <div className="flex justify-center">
       <div className="w-full max-w-3xl h-20 pt-6 flex items-center px-5">
-        <Image priority src="/logo-side-text-md.svg" width={162.8} height={30} alt="logo" />
+        <Image className="dark:invert" priority src="/logo-side-text-md.svg" width={162.8} height={30} alt="logo" />
 
         <div className="flex items-center space-x-2 ml-auto">
           <div className="relative">
             <button
               onClick={() => importInputRef.current?.click()}
-              className="flex items-center bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm"
+              className="flex items-center bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +123,7 @@ function Navbar() {
 
           <button
             onClick={logout}
-            className="block bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm"
+            className="block bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
           >
             logout
           </button>
@@ -133,12 +133,12 @@ function Navbar() {
               <Image
                 width={38}
                 height={38}
-                className="inline-block rounded-full ring-2 ring-white"
+                className="inline-block rounded-full ring-2 ring-white dark:ring-gray-800"
                 src={`${user.photoURL}`}
                 alt="avatar"
               />
 
-              <span className="absolute bottom-0 right-0 inline-block w-3 h-3 bg-green-600 border-2 border-white rounded-full"></span>
+              <span className="absolute bottom-0 right-0 inline-block w-3 h-3 bg-green-600 border-2 border-white dark:border-slate-900 rounded-full"></span>
             </div>
           )}
         </div>

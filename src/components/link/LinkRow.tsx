@@ -150,9 +150,9 @@ function LinkRow(props: Props) {
       onDoubleClick={onDoubleClick}
       onContextMenu={openContextMenu}
       className={classNames({
-        'px-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group': true,
-        'border-slate-200 bg-white': !props.isSelected,
-        'hover:border-slate-200 z-10 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200':
+        'px-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group dark:hover:bg-slate-700': true,
+        'border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-800': !props.isSelected,
+        'hover:border-slate-200 z-10 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200 dark:ring-slate-600 dark:hover:border-slate-600 dark:border-slate-600 dark:bg-slate-700':
           props.isSelected || props.isEditMode,
         'rounded-t-lg': props.isFirst,
         'rounded-b-lg': props.isLast,
@@ -182,7 +182,7 @@ function LinkRow(props: Props) {
           {showCopied && <div className="flex-1 text-gray-800">Copied to clipboard</div>}
 
           {!showCopied && (
-            <p className="whitespace-normal text-gray-800">
+            <p className="whitespace-normal text-gray-800 dark:text-slate-300">
               {isPinned && (
                 <span>
                   <svg
@@ -218,7 +218,7 @@ function LinkRow(props: Props) {
             onFocus={(e) => e.target.select()}
             type="text"
             placeholder="Nike website"
-            className="flex-1 focus:outline-none bg-transparent w-full text-gray-800"
+            className="flex-1 focus:outline-none bg-transparent w-full text-gray-800 dark:text-slate-300"
           />
 
           <input
@@ -227,7 +227,7 @@ function LinkRow(props: Props) {
             onFocus={(e) => e.target.select()}
             type="text"
             placeholder="Nike.com"
-            className="flex-1 focus:outline-none text-sm text-gray-400 bg-transparent w-full"
+            className="flex-1 focus:outline-none text-sm text-gray-400 dark:text-slate-400 bg-transparent w-full"
           />
         </div>
       )}
@@ -250,7 +250,7 @@ function LinkRow(props: Props) {
             )
           })}
 
-          <p className="ml-auto text-xs text-gray-800">{createdAtText}</p>
+          <p className="ml-auto text-xs text-gray-800 dark:text-slate-400">{createdAtText}</p>
 
           <div onClick={openContextMenu} className="p-2 !ml-0 !-mr-2">
             <svg
@@ -259,7 +259,7 @@ function LinkRow(props: Props) {
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-gray-600 dark:text-slate-500"
             >
               <path
                 strokeLinecap="round"

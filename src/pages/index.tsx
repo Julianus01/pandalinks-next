@@ -399,16 +399,16 @@ function HomePage(props: Props) {
 
         <div ref={linksContainerRef} className="space-y-2">
           {!useLinksHook.isLoading && !useLinksHook.links.length && (
-            <div className="inline mt-2 text-gray-800">
+            <div className="inline mt-2 text-gray-800 dark:text-slate-300">
               Press{' '}
-              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg">Enter</kbd>{' '}
+              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">Enter</kbd>{' '}
               to add the link
             </div>
           )}
 
           {!!useLinksHook.links.length && (
             <div className="px-5 pb-1 flex items-center">
-              <p className="text-sm text-gray-500">Name - {useLinksHook.links?.length} Results</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">Name - {useLinksHook.links?.length} Results</p>
 
               <div className="ml-auto flex items-center space-x-1">
                 <svg
@@ -417,12 +417,12 @@ function HomePage(props: Props) {
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="w-4 h-4 text-gray-500"
+                  className="w-4 h-4 text-gray-500 dark:text-slate-400"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
                 </svg>
 
-                <p className="text-sm text-gray-500">created at</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">created at</p>
               </div>
             </div>
           )}
@@ -482,23 +482,23 @@ function HomePage(props: Props) {
           {showContextMenu && useLinksHook.selectedLink && (
             <div
               ref={contextMenuRef}
-              className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800"
+              className="fixed z-10 opacity-0 max-w-[17rem] w-full rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
               style={{ top: `${position.y}px`, left: `${position.x}px` }}
             >
               {[
                 ContentMenuUtils.getContextMenuGroupOne(useLinksHook.selectedLink),
                 ContentMenuUtils.getContextMenuGroupTwo(),
               ].map((group, i) => (
-                <ul className="px-2 py-2 border-t" role="menu" key={i}>
+                <ul className="px-2 py-2 [&:not(:first-child)]:border-t dark:border-slate-600" role="menu" key={i}>
                   {group.map((contextMenuRow, idx) => (
                     <li key={idx}>
                       <button
                         onClick={() => onContextMenuRowClick(contextMenuRow)}
-                        className="w-full flex items-center gap-x-2 px-2 py-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-default"
+                        className="w-full flex items-center gap-x-2 px-2 py-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg group cursor-default dark:hover:bg-slate-700"
                         role="menuitem"
                       >
                         {contextMenuRow.icon && contextMenuRow.icon} {contextMenuRow.name}
-                        <span className="text-gray-500 ml-auto">{contextMenuRow.command}</span>
+                        <span className="text-gray-500 dark:text-slate-400 ml-auto">{contextMenuRow.command}</span>
                       </button>
                     </li>
                   ))}
