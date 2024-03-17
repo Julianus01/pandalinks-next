@@ -175,7 +175,14 @@ function HomePage(props: Props) {
   )
 
   useKey(
-    'Enter',
+    (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'e') {
+        event.preventDefault()
+        return true
+      }
+
+      return false
+    },
     () => {
       if (linksSelection.selectedId && !linksSelection.editLinkId) {
         linksSelection.setSelectionParams({
@@ -190,7 +197,7 @@ function HomePage(props: Props) {
 
   useKey(
     (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'o') {
+      if (event.key === 'Enter' || ((event.ctrlKey || event.metaKey) && event.key === 'o')) {
         event.preventDefault()
         return true
       }
@@ -401,7 +408,9 @@ function HomePage(props: Props) {
           {!useLinksHook.isLoading && !useLinksHook.links.length && (
             <div className="inline mt-2 text-gray-800 dark:text-slate-300">
               Press{' '}
-              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">Enter</kbd>{' '}
+              <kbd className="px-2 py-1.5 text-xs text-gray-800 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                Enter
+              </kbd>{' '}
               to add the link
             </div>
           )}

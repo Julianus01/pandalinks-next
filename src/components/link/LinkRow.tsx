@@ -179,7 +179,7 @@ function LinkRow(props: Props) {
 
       {!props.isEditMode && (
         <div className="flex-1 truncate py-4 space-y-1 mr-4">
-          {showCopied && <div className="flex-1 text-gray-800">Copied to clipboard</div>}
+          {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-400">Copied to clipboard</div>}
 
           {!showCopied && (
             <p className="whitespace-normal text-gray-800 dark:text-slate-300">

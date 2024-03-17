@@ -115,7 +115,7 @@ const getContextMenuGroupOne = (link: Link): ContextMenuRow[] => {
     {
       action: ContextMenuAction.edit,
       name: 'Edit',
-      command: 'Enter',
+      command: 'CMD + E',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
