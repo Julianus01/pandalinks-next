@@ -519,7 +519,7 @@ function HomePage(props: Props) {
                 ContentMenuUtils.getContextMenuGroupOne(useLinksHook.selectedLink),
                 ContentMenuUtils.getContextMenuGroupTwo(),
               ].map((group, i) => (
-                <ul className="px-2 py-2 [&:not(:first-child)]:border-t dark:border-slate-600" role="menu" key={i}>
+                <ul className="px-2 py-2 [&:not(:first-child)]:border-t dark:border-slate-700" role="menu" key={i}>
                   {group.map((contextMenuRow, idx) => (
                     <li key={idx}>
                       <button

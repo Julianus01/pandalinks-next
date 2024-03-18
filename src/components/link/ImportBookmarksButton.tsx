@@ -16,7 +16,6 @@ import BraveSvg from '../shared/BraveSvg'
 function ImportBookmarksButton() {
   const queryClient = useQueryClient()
   const { user } = useContext(SupabaseAuthContext)
-  const importInputRef = useRef<HTMLInputElement>(null)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -109,14 +108,6 @@ function ImportBookmarksButton() {
           </svg>
           Import Bookmarks
         </button>
-
-        <input
-          ref={importInputRef}
-          className="absolute top-0 right-0 bottom-0 left-0 hidden"
-          onChange={onImportBookmarks}
-          type="file"
-          accept=".html"
-        />
       </div>
 
       <Transition appear show={isOpen} as={React.Fragment}>
@@ -181,7 +172,13 @@ function ImportBookmarksButton() {
                       <p className="text-xs text-gray-500 dark:text-gray-400">Bookmarks HTML file</p>
                     </div>
 
-                    <input onChange={onImportBookmarks} id="dropzone-file" type="file" className="hidden" />
+                    <input
+                      type="file"
+                      accept=".html"
+                      onChange={onImportBookmarks}
+                      id="dropzone-file"
+                      className="hidden"
+                    />
 
                     {isLoading && (
                       <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex flex-col space-y-2 items-center justify-center bg-opacity-95">
@@ -222,7 +219,7 @@ function ImportBookmarksButton() {
                   >
                     <SafariSvg />
 
-                    <p className="text-sm text-gray-500 dark:text-slate-300">Safari</p>
+                    <p className="text-sm text-gray-600 font-medium dark:text-slate-300">Safari</p>
                   </a>
 
                   <a
@@ -232,7 +229,7 @@ function ImportBookmarksButton() {
                   >
                     <ChromeSvg />
 
-                    <p className="text-sm text-gray-500 dark:text-slate-300">Chrome</p>
+                    <p className="text-sm text-gray-600 font-medium dark:text-slate-300">Chrome</p>
                   </a>
 
                   <a
@@ -242,7 +239,7 @@ function ImportBookmarksButton() {
                   >
                     <BraveSvg />
 
-                    <p className="text-sm text-gray-500 dark:text-slate-300">Brave</p>
+                    <p className="text-sm text-gray-600 font-medium dark:text-slate-300">Brave</p>
                   </a>
                 </div>
 

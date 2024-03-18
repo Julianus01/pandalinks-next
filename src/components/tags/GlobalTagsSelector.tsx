@@ -43,7 +43,7 @@ function GlobalTagsSelector(props: Props) {
   }
 
   return (
-    <div className="space-x-2 space-y-2 !mt-">
+    <div className="space-x-2 space-y-2">
       {props.tags.length > 0 && (
         <span
           onClick={onAllClick}

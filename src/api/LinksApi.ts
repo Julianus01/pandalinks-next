@@ -1,6 +1,6 @@
 import { LinkUtils } from '@/utils/link-utils'
 import { SupabaseTable, supabaseClient } from '@/utils/supabase-utils'
-import { getCurrentUser } from './api-utils'
+import { getCurrentUser, wait } from './api-utils'
 
 export interface Link {
   id: string
@@ -45,6 +45,8 @@ async function getLinks(): Promise<Link[]> {
   if (error) {
     return []
   }
+
+  await wait(1500)
 
   return LinkUtils.splitByPinned(data)
 }
