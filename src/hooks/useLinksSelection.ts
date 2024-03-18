@@ -19,8 +19,18 @@ export function useLinksSelection() {
   const editLinkId = router.query.editLinkId as string
 
   function setSelectionParams(params: SetSelectionParams) {
-    router.replace({ query: params as ParsedUrlQueryInput }, undefined, { shallow: true })
+    router.replace({ query: objectToQueryString(params) }, undefined, { shallow: true })
   }
 
   return { selectedId, editLinkId, setSelectionParams }
+}
+
+function objectToQueryString(obj: any) {
+  const keys = Object.keys(obj).filter(key => !!obj[key]);
+
+  const keyValuePairs = keys.map(key => {
+    return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
+  });
+
+  return keyValuePairs.join('&');
 }
