@@ -1,7 +1,7 @@
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
-import { withAuth } from '@/firebase/withAuth'
+import { withAuth } from '@/hocs/withAuth'
 import { useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
