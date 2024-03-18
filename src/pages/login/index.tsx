@@ -1,6 +1,6 @@
 import LoadingPage from '@/components/shared/LoadingPage'
-import { AuthContext } from '@/context/AuthContext'
-import { loginWithGoogleCredential } from '@/firebase/auth'
+import { SupabaseAuthContext } from '@/context/SupabaseAuthContext'
+import { supabaseClient } from '@/utils/supabase-utils'
 import { useRouter } from 'next/navigation'
 import React, { useContext } from 'react'
 
@@ -33,10 +33,10 @@ const features = [
 
 function LoginPage() {
   const router = useRouter()
-  const authData = useContext(AuthContext)
+  const authData = useContext(SupabaseAuthContext)
 
   async function login() {
-    await loginWithGoogleCredential()
+    await supabaseClient.auth.signInWithOAuth({ provider: 'google' })
     router.push('/login')
   }
 

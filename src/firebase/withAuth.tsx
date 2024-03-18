@@ -1,22 +1,22 @@
 /* eslint-disable react/display-name */
 import { ComponentType, useContext, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AuthContext } from '@/context/AuthContext'
 import LoadingPage from '@/components/shared/LoadingPage'
+import { SupabaseAuthContext } from '@/context/SupabaseAuthContext'
 
 export const withAuth =
   <P extends {}>(Component: ComponentType<P>): ComponentType<P> =>
   (props) => {
-    const { user, loading } = useContext(AuthContext)
+    const { authenticated, loading } = useContext(SupabaseAuthContext)
     const router = useRouter()
 
     useEffect(() => {
-      if (!loading && !user) {
+      if (!loading && !authenticated) {
         router.push('/login')
       }
-    }, [loading, router, user])
+    }, [authenticated, loading, router])
 
-    if (!user && loading) {
+    if (!authenticated && loading) {
       return <LoadingPage />
     }
 

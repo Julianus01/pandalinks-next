@@ -1,62 +1,48 @@
 import { Link } from './AdminLinksApi'
-import {
-  DocumentData,
-  QueryDocumentSnapshot,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  getFirestore,
-  orderBy,
-  query,
-  setDoc,
-  where,
-  writeBatch,
-} from 'firebase/firestore'
-import { FirestoreCollection } from './FirestoreCollection'
-import { getAuth } from 'firebase/auth'
 import { LinkUtils } from '@/utils/link-utils'
-import fp from 'lodash/fp'
-
-const auth = getAuth()
-const firestore = getFirestore()
+import { SupabaseTable, supabaseClient } from '@/utils/supabase-utils'
+import { getCurrentUser } from './api-utils'
 
 async function getLinks(): Promise<Link[]> {
-  const querySnapshot = await getDocs(
-    query(
-      collection(firestore, FirestoreCollection.links),
-      where('userId', '==', auth.currentUser?.uid),
-      orderBy('createdAt', 'desc')
-    )
-  )
+  const user = await getCurrentUser()
 
-  const links = fp.compose(
-    LinkUtils.splitByPinned,
+  const { data, error } = await supabaseClient
+    .from(SupabaseTable.Links)
+    .select()
+    .eq('user_id', user?.id)
+    .order('created_at', { ascending: false })
 
-    fp.map((doc: QueryDocumentSnapshot<DocumentData>) => {
-      const data = doc.data()
+  // TODO: Handle this
+  if (error) {
+    return []
+  }
 
-      return {
-        id: doc.id,
-        ...data,
-      }
-    })
-  )(querySnapshot.docs)
-
-  return links
+  return LinkUtils.splitByPinned(data)
 }
 
 export interface UpdateLinkRequestParams extends Partial<Link> {
-  id: string
+  uuid: string
 }
 
-async function updateLink({ id, ...updates }: UpdateLinkRequestParams): Promise<void> {
-  const updatedAt = Date.now()
+async function updateLink(updates: UpdateLinkRequestParams): Promise<void> {
+  const updated_at = new Date().toISOString();
 
-  const updatedLink: Partial<Link> = { ...updates, updatedAt }
+  const updatedLink: Partial<Link> = { ...updates, updated_at }
 
-  return setDoc(doc(firestore, FirestoreCollection.links, id), updatedLink, { merge: true })
+  console.log({ updatedLink })
+
+  const { data, error, status } = await supabaseClient
+    .from(SupabaseTable.Links)
+    .update(updatedLink)
+    .eq('uuid', updatedLink.uuid)
+    .select()
+    .single()
+
+  if (error && status !== 406) {
+    throw error
+  }
+
+  return data
 }
 
 export interface CreateLinkRequestParams {
@@ -65,39 +51,58 @@ export interface CreateLinkRequestParams {
 }
 
 async function createLink(params: CreateLinkRequestParams) {
-  const createdAt = Date.now()
-  const updatedAt = Date.now()
-  const visitedAt = Date.now()
+  const user = await getCurrentUser()
+
+  const created_at = new Date().toISOString();
+  const updated_at = new Date().toISOString();
+  const visited_at = new Date().toISOString();
 
   const newLink: Partial<Link> = {
     title: params.title,
     url: params.url,
-    userId: auth.currentUser?.uid,
+    user_id: user?.id,
     tags: [],
-    createdAt,
-    updatedAt,
-    visitedAt,
+    created_at,
+    updated_at,
+    visited_at,
   }
 
-  const newLinkDoc = await addDoc(collection(firestore, FirestoreCollection.links), newLink)
+  const { data, error, status } = await supabaseClient
+    .from(SupabaseTable.Links)
+    .insert(newLink)
+    .select()
 
-  return { ...newLink, id: newLinkDoc.id }
+  if (error && status !== 406) {
+    throw error
+  }
+
+  return data
 }
 
-async function batchCreateLinks(links: Partial<Link>[]) {
-  const batch = writeBatch(firestore)
+async function batchCreateLinks(newLinks: Partial<Link>[]) {
+  const { data, error, status } = await supabaseClient
+    .from(SupabaseTable.Links)
+    .insert(newLinks)
+    .select()
 
-  links.forEach((link) => {
-    const docRef = doc(firestore, FirestoreCollection.links, link.id as string)
+  if (error && status !== 406) {
+    throw error
+  }
 
-    batch.set(docRef, link)
-  })
-
-  return batch.commit()
+  return data
 }
 
-async function deleteLink(linkId: string) {
-  return deleteDoc(doc(firestore, FirestoreCollection.links, linkId))
+async function deleteLink(uuid: string) {
+  const { data, error, status } = await supabaseClient
+    .from(SupabaseTable.Links)
+    .delete()
+    .eq('uuid', uuid)
+
+  if (error && status !== 406) {
+    throw error
+  }
+
+  return data
 }
 
 export const LinksApi = {

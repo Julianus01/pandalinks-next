@@ -93,9 +93,9 @@ function HomePage(props: Props) {
       }
 
       if (!linksSelection.selectedId) {
-        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].id })
+        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].uuid })
 
-        const element = document.getElementById(useLinksHook.links[0].id)
+        const element = document.getElementById(useLinksHook.links[0].uuid)
 
         if (element) {
           element.scrollIntoView({
@@ -108,12 +108,12 @@ function HomePage(props: Props) {
         return
       }
 
-      const currentIndex = useLinksHook.links.findIndex((link) => link.id === linksSelection.selectedId)
+      const currentIndex = useLinksHook.links.findIndex((link) => link.uuid === linksSelection.selectedId)
 
       if (useLinksHook.links[currentIndex - 1]) {
-        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[currentIndex - 1].id })
+        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[currentIndex - 1].uuid })
 
-        const element = document.getElementById(useLinksHook.links[currentIndex - 1].id)
+        const element = document.getElementById(useLinksHook.links[currentIndex - 1].uuid)
 
         if (element) {
           element.scrollIntoView({
@@ -139,9 +139,9 @@ function HomePage(props: Props) {
       }
 
       if (!linksSelection.selectedId) {
-        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].id })
+        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].uuid })
 
-        const element = document.getElementById(useLinksHook.links[0].id)
+        const element = document.getElementById(useLinksHook.links[0].uuid)
 
         if (element) {
           element.scrollIntoView({
@@ -154,12 +154,12 @@ function HomePage(props: Props) {
         return
       }
 
-      const currentIndex = useLinksHook.links.findIndex((link) => link.id === linksSelection.selectedId)
+      const currentIndex = useLinksHook.links.findIndex((link) => link.uuid === linksSelection.selectedId)
 
       if (useLinksHook.links[currentIndex + 1]) {
-        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[currentIndex + 1].id })
+        linksSelection.setSelectionParams({ selectedId: useLinksHook.links[currentIndex + 1].uuid })
 
-        const element = document.getElementById(useLinksHook.links[currentIndex + 1].id)
+        const element = document.getElementById(useLinksHook.links[currentIndex + 1].uuid)
 
         if (element) {
           element.scrollIntoView({
@@ -197,7 +197,10 @@ function HomePage(props: Props) {
 
   useKey(
     (event) => {
-      if (event.key === 'Enter' || ((event.ctrlKey || event.metaKey) && event.key === 'o')) {
+      if (
+        !linksSelection.editLinkId &&
+        (event.key === 'Enter' || ((event.ctrlKey || event.metaKey) && event.key === 'o'))
+      ) {
         event.preventDefault()
         return true
       }
@@ -210,7 +213,7 @@ function HomePage(props: Props) {
       }
     },
     {},
-    [linksSelection.selectedId]
+    [linksSelection]
   )
 
   useKey(
@@ -227,9 +230,9 @@ function HomePage(props: Props) {
         const isPinned = useLinksHook.selectedLink?.tags?.includes('pinned')
 
         if (!isPinned) {
-          useLinksHook.actions.pinLink(useLinksHook.selectedLink.id)
+          useLinksHook.actions.pinLink(useLinksHook.selectedLink.uuid)
         } else {
-          useLinksHook.actions.unpinLink(useLinksHook.selectedLink.id)
+          useLinksHook.actions.unpinLink(useLinksHook.selectedLink.uuid)
         }
       }
     },
@@ -255,7 +258,7 @@ function HomePage(props: Props) {
   })
 
   function handleContextMenu(e: React.MouseEvent<HTMLDivElement>, link: Link) {
-    linksSelection.setSelectionParams({ selectedId: link.id })
+    linksSelection.setSelectionParams({ selectedId: link.uuid })
     e.preventDefault()
     const { pageX, pageY } = e
     setShowContextMenu(true)
@@ -283,7 +286,7 @@ function HomePage(props: Props) {
   }
 
   function onContextMenuRowClick(contextMenuRow: ContextMenuRow) {
-    const link = useLinksHook.links.find((link) => link.id === linksSelection.selectedId)
+    const link = useLinksHook.links.find((link) => link.uuid === linksSelection.selectedId)
 
     if (!link) {
       resetContextMenu()
@@ -368,7 +371,7 @@ function HomePage(props: Props) {
   }
 
   function navigateToLink(link: Link) {
-    const updatedLink: Link = { ...link, visitedAt: Date.now() }
+    const updatedLink: Link = { ...link, visited_at: new Date().toISOString() }
     useLinksHook.mutations.updateLinkMutation.mutate(updatedLink)
 
     if (!link.url.match(/^https?:\/\//i)) {
@@ -379,8 +382,8 @@ function HomePage(props: Props) {
   }
 
   function onClickLink(link: Link) {
-    if (linksSelection.selectedId !== link.id) {
-      linksSelection.setSelectionParams({ selectedId: link.id })
+    if (linksSelection.selectedId !== link.uuid) {
+      linksSelection.setSelectionParams({ selectedId: link.uuid })
     }
   }
 
@@ -438,7 +441,7 @@ function HomePage(props: Props) {
           {!!pinnedLinks.length && (
             <div className="-space-y-0.5 pb-4">
               {pinnedLinks.map((link: Link, index: number) => {
-                const isSelected = linksSelection.selectedId === link.id
+                const isSelected = linksSelection.selectedId === link.uuid
 
                 return (
                   <LinkRow
@@ -448,10 +451,10 @@ function HomePage(props: Props) {
                     onExitEditMode={() => {
                       linksSelection.setSelectionParams({ editLinkId: null })
                     }}
-                    isEditMode={linksSelection.editLinkId === link.id}
+                    isEditMode={linksSelection.editLinkId === link.uuid}
                     onContextMenu={(event) => handleContextMenu(event, link)}
                     link={link}
-                    key={link.id}
+                    key={link.uuid}
                     onClick={() => onClickLink(link)}
                     onDoubleClick={() => navigateToLink(link)}
                     isSelected={isSelected}
@@ -464,7 +467,7 @@ function HomePage(props: Props) {
           {!!unpinnedLinks.length && (
             <div className="-space-y-0.5">
               {unpinnedLinks.map((link: Link, index: number) => {
-                const isSelected = linksSelection.selectedId === link.id
+                const isSelected = linksSelection.selectedId === link.uuid
 
                 return (
                   <LinkRow
@@ -474,10 +477,10 @@ function HomePage(props: Props) {
                     onExitEditMode={() => {
                       linksSelection.setSelectionParams({ editLinkId: null })
                     }}
-                    isEditMode={linksSelection.editLinkId === link.id}
+                    isEditMode={linksSelection.editLinkId === link.uuid}
                     onContextMenu={(event) => handleContextMenu(event, link)}
                     link={link}
-                    key={link.id}
+                    key={link.uuid}
                     onClick={() => onClickLink(link)}
                     onDoubleClick={() => navigateToLink(link)}
                     isSelected={isSelected}

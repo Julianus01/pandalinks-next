@@ -1,10 +1,10 @@
-import { AuthContextProvider } from '@/context/AuthContext'
 import '../globals.css'
 import { Inter } from 'next/font/google'
 import { AppProps } from 'next/app'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { ThemeProvider } from 'next-themes'
+import { SupabaseAuthContextProvider } from '@/context/SupabaseAuthContext'
 
 const inter = Inter({ display: 'swap', subsets: ['latin'] })
 
@@ -17,9 +17,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <ThemeProvider defaultTheme="dark" attribute="class">
         <QueryClientProvider client={queryClient}>
-          <AuthContextProvider>
+          <SupabaseAuthContextProvider>
             <Component {...pageProps} />
-          </AuthContextProvider>
+          </SupabaseAuthContextProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </main>

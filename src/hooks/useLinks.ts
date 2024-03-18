@@ -1,13 +1,13 @@
 import { Link } from '@/api/AdminLinksApi'
 import { CreateLinkRequestParams, LinksApi, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { ReactQueryKey } from '@/api/ReactQueryKey'
-import { AuthContext } from '@/context/AuthContext'
 import { LinkUtils } from '@/utils/link-utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import fp from 'lodash/fp'
 import { useContext, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useLinksSelection } from './useLinksSelection'
+import { SupabaseAuthContext } from '@/context/SupabaseAuthContext'
 
 interface UseLinksParams {
   initialData?: Link[]
@@ -15,14 +15,14 @@ interface UseLinksParams {
 
 export function useLinks(params: UseLinksParams) {
   const queryClient = useQueryClient()
-  const { user } = useContext(AuthContext)
+  const { user } = useContext(SupabaseAuthContext)
   const linksSelection = useLinksSelection()
 
   const [searchQ, setSearchQ] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
 
   const linksQuery = useQuery({
-    queryKey: [ReactQueryKey.getLinks, user?.uid],
+    queryKey: [ReactQueryKey.getLinks, user?.id],
     queryFn: LinksApi.getLinks,
     initialData: params.initialData,
   })
@@ -64,7 +64,7 @@ export function useLinks(params: UseLinksParams) {
   }, [links])
 
   const selectedLink = useMemo(() => {
-    return filteredLinks.find((link) => link.id === linksSelection.selectedId)
+    return filteredLinks.find((link) => link.uuid === linksSelection.selectedId)
   }, [filteredLinks, linksSelection.selectedId])
 
   const updateLinkMutation = useMutation({
@@ -88,12 +88,12 @@ export function useLinks(params: UseLinksParams) {
       { url, title: 'My name needs an update 👈' },
       {
         onSuccess: (newLink) => {
-          queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+          queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
             const oldLinks = data as Link[]
 
             const updatedLinks: Link[] = [newLink, ...oldLinks] as Link[]
 
-            return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+            return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
           })
         },
       }
@@ -111,18 +111,18 @@ export function useLinks(params: UseLinksParams) {
   function updateLink(updatedLink: UpdateLinkRequestParams) {
     const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
       onSuccess: () => {
-        queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+        queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
           const oldLinks = data as Link[]
 
           const updatedLinks = oldLinks.map((oldLink) => {
-            if (oldLink.id === updatedLink.id) {
+            if (oldLink.uuid === updatedLink.uuid) {
               return { ...oldLink, ...updatedLink }
             }
 
             return oldLink
           })
 
-          return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+          return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
         })
       },
     })
@@ -137,16 +137,16 @@ export function useLinks(params: UseLinksParams) {
   }
 
   function deleteLink(linkId: string) {
-    queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+    queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
       const oldLinks = data as Link[]
 
-      const updatedLinks = oldLinks.filter((oldLink) => oldLink.id !== linksSelection.selectedId)
+      const updatedLinks = oldLinks.filter((oldLink) => oldLink.uuid !== linksSelection.selectedId)
 
-      return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+      return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
     })
 
     if (linksSelection.selectedId) {
-      const index = links.map((link) => link.id).indexOf(linksSelection.selectedId)
+      const index = links.map((link) => link.uuid).indexOf(linksSelection.selectedId)
 
       if (links[index + 1]) {
         linksSelection.setSelectionParams({ selectedId: links[index + 1].id, editLinkId: null })
@@ -169,18 +169,18 @@ export function useLinks(params: UseLinksParams) {
   }
 
   function pinLink(linkId: string) {
-    const linkToPin = links.find((link) => link.id === linkId)
+    const linkToPin = links.find((link) => link.uuid === linkId)
 
     toast('Pinned')
 
     if (linkToPin) {
       updateLinkMutation.mutate({ ...linkToPin, tags: [...new Set(linkToPin.tags), 'pinned'] })
 
-      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+      queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
         const oldLinks = data as Link[]
 
         const updatedLinks = oldLinks.map((link) => {
-          if (link.id === linkId) {
+          if (link.uuid === linkId) {
             return {
               ...link,
               tags: [...new Set(linkToPin.tags), 'pinned'],
@@ -190,13 +190,13 @@ export function useLinks(params: UseLinksParams) {
           return link
         })
 
-        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+        return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
       })
     }
   }
 
   function unpinLink(linkId: string) {
-    const linkToUnpin = links.find((link) => link.id === linkId)
+    const linkToUnpin = links.find((link) => link.uuid === linkId)
 
     toast('Unpinned')
 
@@ -205,11 +205,11 @@ export function useLinks(params: UseLinksParams) {
 
       updateLinkMutation.mutate({ ...linkToUnpin, tags: newTags })
 
-      queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+      queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
         const oldLinks = data as Link[]
 
         const updatedLinks = oldLinks.map((link) => {
-          if (link.id === linkId) {
+          if (link.uuid === linkId) {
             return {
               ...link,
               tags: newTags,
@@ -219,7 +219,7 @@ export function useLinks(params: UseLinksParams) {
           return link
         })
 
-        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+        return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
       })
     }
   }

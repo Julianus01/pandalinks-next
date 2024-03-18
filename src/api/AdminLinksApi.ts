@@ -8,13 +8,14 @@ const db = firebaseAdmin.firestore()
 
 export interface Link {
   id: string
+  uuid: string
   title: string
   url: string
-  userId: string
+  user_id: string
   tags: string[]
-  createdAt: number
-  updatedAt: number
-  visitedAt: number
+  created_at: string
+  updated_at: string
+  visited_at: string
 }
 
 export interface Bookmark {
@@ -35,11 +36,11 @@ export interface HTMLBookmark {
   children: HTMLBookmark[]
 }
 
-async function getLinks(userId: string): Promise<Link[]> {
+async function getLinks(user_id: string): Promise<Link[]> {
   const querySnapshot = await db
     .collection(FirestoreCollection.links)
-    .where('userId', '==', userId)
-    .orderBy('createdAt', 'desc')
+    .where('user_id', '==', user_id)
+    .orderBy('created_at', 'desc')
     .get()
 
   const links = fp.compose(

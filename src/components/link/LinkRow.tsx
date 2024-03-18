@@ -29,9 +29,9 @@ function LinkRow(props: Props) {
   const [url, setUrl] = useState<string>(props.link.url)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
 
-  const createdAtText = useMemo(() => {
-    return DateUtils.timeSince(new Date(props.link.createdAt))
-  }, [props.link.createdAt])
+  const created_atText = useMemo(() => {
+    return DateUtils.timeSince(new Date(props.link.created_at))
+  }, [props.link.created_at])
 
   const isPinned = useMemo(() => {
     return props.link.tags.includes('pinned')
@@ -99,7 +99,7 @@ function LinkRow(props: Props) {
       }
 
       if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
-        props.onUpdate({ id: props.link.id, url: trimmedUrl, title: trimmedTitle })
+        props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle })
         props.onExitEditMode()
 
         return
@@ -144,13 +144,14 @@ function LinkRow(props: Props) {
   return (
     <div
       onKeyDown={onKeyDown}
-      id={props.link.id}
+      id={props.link.uuid}
       ref={ref}
       onClick={props.onClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={openContextMenu}
       className={classNames({
-        'px-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group dark:hover:bg-slate-700': true,
+        'pl-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group dark:hover:bg-slate-700':
+          true,
         'border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-800': !props.isSelected,
         'hover:border-slate-200 z-10 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200 dark:ring-slate-600 dark:hover:border-slate-600 dark:border-slate-600 dark:bg-slate-700':
           props.isSelected || props.isEditMode,
@@ -250,9 +251,9 @@ function LinkRow(props: Props) {
             )
           })}
 
-          {/* <p className="ml-auto text-xs text-gray-800 dark:text-slate-400">{createdAtText}</p> */}
+          {/* <p className="ml-auto text-xs text-gray-800 dark:text-slate-400">{created_atText}</p> */}
 
-          <div onClick={openContextMenu} className="p-2 !ml-0 !-mr-2">
+          <div onClick={openContextMenu} className="h-full flex pr-5 pl-3 items-center !ml-0 !-mr-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

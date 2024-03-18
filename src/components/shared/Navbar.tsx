@@ -1,7 +1,5 @@
 import React, { ChangeEvent, useContext, useRef } from 'react'
 import Image from 'next/image'
-import { logout } from '@/firebase/auth'
-import { AuthContext } from '@/context/AuthContext'
 // @ts-ignore
 import { bookmarksToJSON } from 'bookmarks-to-json'
 import { Bookmark, Link } from '@/api/AdminLinksApi'
@@ -13,11 +11,13 @@ import { ReactQueryKey } from '@/api/ReactQueryKey'
 import fp from 'lodash/fp'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
+import { SupabaseAuthContext } from '@/context/SupabaseAuthContext'
+import { supabaseClient } from '@/utils/supabase-utils'
 
 function Navbar() {
   const queryClient = useQueryClient()
   const importInputRef = useRef<HTMLInputElement>(null)
-  const { user } = useContext(AuthContext)
+  const { user } = useContext(SupabaseAuthContext)
 
   const { theme, setTheme } = useTheme()
 
@@ -38,17 +38,15 @@ function Navbar() {
         })
 
         const newLinks = fp.compose(
-          LinkUtils.applyPinAndSortByCreatedAt,
+          LinkUtils.applyPinAndSortBycreated_at,
           fp.map((bookmark: Bookmark) => ({
-            // Generate id to use it for batch write
-            id: uuidv4(),
             title: bookmark.title,
             url: bookmark.url,
-            userId: user?.uid,
+            user_id: user?.id,
             tags: bookmark.tags || [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            visitedAt: Date.now(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            visited_at: new Date().toISOString(),
           })),
           LinkUtils.getBookmarksFromImportedJson,
           (content: string) => JSON.parse(content)
@@ -61,15 +59,14 @@ function Navbar() {
           return
         }
 
-        // TODO: Remove slice
         const createPromise = batchCreateLinksMutation.mutateAsync(newLinks, {
-          onSuccess: () => {
-            queryClient.setQueryData([ReactQueryKey.getLinks, user?.uid], (data) => {
+          onSuccess: (responseLinks) => {
+            queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
               const oldLinks = data as Link[]
 
-              const updatedLinks: Link[] = [...newLinks, ...oldLinks] as Link[]
+              const updatedLinks: Link[] = [...(responseLinks as Link[]), ...oldLinks] as Link[]
 
-              return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
+              return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
             })
 
             event.target.value = ''
@@ -85,6 +82,10 @@ function Navbar() {
         })
       }
     }
+  }
+
+  function logout() {
+    supabaseClient.auth.signOut()
   }
 
   return (
@@ -104,9 +105,9 @@ function Navbar() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
               </svg>
@@ -117,9 +118,9 @@ function Navbar() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <circle cx="12" cy="12" r="5"></circle>
                 <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -172,7 +173,8 @@ function Navbar() {
             logout
           </button>
 
-          {user?.photoURL && (
+          {/* TODO: Fix this */}
+          {/* {user?.photoURL && (
             <div className="relative inline-block">
               <Image
                 width={38}
@@ -184,7 +186,7 @@ function Navbar() {
 
               <span className="absolute bottom-0 right-0 inline-block w-3 h-3 bg-green-600 border-2 border-white dark:border-slate-900 rounded-full"></span>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>
