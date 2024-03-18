@@ -162,7 +162,7 @@ function SearchAndCreateLinksInput(props: Props) {
 
             <Popover.Panel
               ref={popoverPanelRef}
-              className="absolute z-20 space-y-2 right-0 mt-2 w-[340px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 p-4"
+              className="absolute z-20 space-y-2 -right-8 mt-2 w-[340px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 p-4"
             >
               <input
                 onKeyDown={onKeyDown}
@@ -186,7 +186,7 @@ function SearchAndCreateLinksInput(props: Props) {
               <button
                 onClick={onCreate}
                 disabled={!title.length || !url.length}
-                className="btn-default dark:bg-gray-700 dark:border-gray-700 dark:hover:bg-gray-600 dark:hover:border-gray-600 ml-auto"
+                className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600 dark:hover:border-slate-600 ml-auto"
               >
                 Create link
               </button>
