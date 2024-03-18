@@ -1,4 +1,3 @@
-import { AdminLinksApi, Link } from '@/api/LinksApi'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
