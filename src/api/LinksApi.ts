@@ -55,10 +55,7 @@ export interface UpdateLinkRequestParams extends Partial<Link> {
 
 async function updateLink(updates: UpdateLinkRequestParams): Promise<void> {
   const updated_at = new Date().toISOString();
-
   const updatedLink: Partial<Link> = { ...updates, updated_at }
-
-  console.log({ updatedLink })
 
   const { data, error, status } = await supabaseClient
     .from(SupabaseTable.Links)

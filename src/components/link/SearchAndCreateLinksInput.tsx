@@ -1,7 +1,6 @@
 import { UseLinksSelection, useLinksSelection } from '@/hooks/useLinksSelection'
 import { useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
-import { toast } from 'sonner'
 import { Popover } from '@headlessui/react'
 
 interface Props {
@@ -139,8 +138,7 @@ function SearchAndCreateLinksInput(props: Props) {
 
               {props.isLoading && (
                 <svg
-                  className="animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
+                  className="animate-spin text-gray-500 dark:text-slate-300"
                   width="16"
                   height="16"
                   viewBox="0 0 24 24"

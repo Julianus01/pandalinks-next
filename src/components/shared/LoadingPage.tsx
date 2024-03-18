@@ -4,10 +4,11 @@ export default function LoadingPage() {
   return (
     <>
       <NavbarLogoOnly />
-      {/* <div className="flex mt-20 justify-center">Loading...</div> */}
       <div className="flex flex-col w-full animate-pulse max-w-3xl px-5 mx-auto pt-20">
-        <div className="flex items-center w-full">
-          <div className="h-10 bg-gray-200 dark:bg-slate-800 rounded w-full"></div>
+        <div className="flex items-center w-full space-x-2">
+          <div className="h-10 bg-gray-200 dark:bg-slate-800 rounded w-full" />
+
+          <div className="h-10 bg-gray-200 dark:bg-slate-800 rounded w-11" />
         </div>
 
         <div className="w-full mx-auto py-6 space-y-4">

@@ -1,6 +1,5 @@
-import { Dialog } from '@headlessui/react'
+import { Dialog, Transition } from '@headlessui/react'
 import React, { ChangeEvent, useContext, useRef, useState } from 'react'
-import Image from 'next/image'
 // @ts-ignore
 import { bookmarksToJSON } from 'bookmarks-to-json'
 import { Bookmark, Link, LinksApi } from '@/api/LinksApi'
@@ -10,12 +9,16 @@ import { ReactQueryKey } from '@/api/ReactQueryKey'
 import fp from 'lodash/fp'
 import { SupabaseAuthContext } from '@/context/SupabaseAuthContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import SafariSvg from '../shared/SafariSvg'
+import ChromeSvg from '../shared/ChromeSvg'
+import BraveSvg from '../shared/BraveSvg'
 
 function ImportBookmarksButton() {
   const queryClient = useQueryClient()
   const { user } = useContext(SupabaseAuthContext)
   const importInputRef = useRef<HTMLInputElement>(null)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const batchCreateLinksMutation = useMutation({
     mutationFn: (newLinks: Partial<Link>[]) => LinksApi.batchCreateLinks(newLinks),
@@ -66,15 +69,21 @@ function ImportBookmarksButton() {
             })
 
             event.target.value = ''
+            setIsOpen(false)
           },
         })
 
+        setIsLoading(true)
         toast.promise(createPromise, {
           loading: 'Importing bookmarks...',
           success: () => {
+            setIsLoading(false)
             return `Imported Bookmarks`
           },
-          error: 'Something went wrong',
+          error: () => {
+            setIsLoading(false)
+            return 'Something went wrong'
+          },
         })
       }
     }
@@ -83,7 +92,7 @@ function ImportBookmarksButton() {
   return (
     <>
       <div className="relative">
-        <button onClick={() => importInputRef.current?.click()} className="btn-default">
+        <button onClick={() => setIsOpen(true)} className="btn-default outline-none">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -110,20 +119,148 @@ function ImportBookmarksButton() {
         />
       </div>
 
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-        <Dialog.Panel>
-          <Dialog.Title>Deactivate account</Dialog.Title>
-          <Dialog.Description>This will permanently deactivate your account</Dialog.Description>
+      <Transition appear show={isOpen} as={React.Fragment}>
+        <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={() => setIsOpen(false)}>
+          <div className="min-h-screen px-4 text-center">
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="fixed inset-0 bg-gray-300/70 dark:bg-slate-900/75" />
+            </Transition.Child>
 
-          <p>
-            Are you sure you want to deactivate your account? All of your data will be permanently removed. This action
-            cannot be undone.
-          </p>
+            {/* This element is to trick the browser into centering the modal contents. */}
+            <span className="inline-block h-screen align-middle" aria-hidden="true">
+              &#8203;
+            </span>
 
-          <button onClick={() => setIsOpen(false)}>Deactivate</button>
-          <button onClick={() => setIsOpen(false)}>Cancel</button>
-        </Dialog.Panel>
-      </Dialog>
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
+                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-slate-300 mb-4">
+                  Modal
+                </Dialog.Title>
+
+                <div className="flex items-center justify-center w-full mb-6">
+                  <label
+                    aria-disabled={isLoading}
+                    className="flex aria-disabled:pointer-events-none flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700 relative"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg
+                        className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 20 16"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                        />
+                      </svg>
+
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Bookmarks HTML file</p>
+                    </div>
+
+                    <input onChange={onImportBookmarks} id="dropzone-file" type="file" className="hidden" />
+
+                    {isLoading && (
+                      <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex flex-col space-y-2 items-center justify-center bg-opacity-95">
+                        <svg
+                          className="animate-spin text-gray-500 dark:text-slate-300"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <line x1="12" y1="2" x2="12" y2="6"></line>
+                          <line x1="12" y1="18" x2="12" y2="22"></line>
+                          <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                          <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                          <line x1="2" y1="12" x2="6" y2="12"></line>
+                          <line x1="18" y1="12" x2="22" y2="12"></line>
+                          <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                          <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                        </svg>
+
+                        <p className="text-gray-500 dark:text-slate-400">Loading them right up</p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+
+                <p className="mb-4 text-gray-500">How do I generate HTML file for my bookmarks? 🤔</p>
+
+                <div className="flex space-x-3">
+                  <a
+                    target="_blank"
+                    href="https://www.youtube.com/watch?v=i1dz0q2Y71Y"
+                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200 hover:-translate-y-1 duration-150 p-4 justify-center"
+                  >
+                    <SafariSvg />
+
+                    <p className="text-sm text-gray-500 dark:text-slate-300">Safari</p>
+                  </a>
+
+                  <a
+                    target="_blank"
+                    href="https://www.youtube.com/watch?v=tImar3ojigE?t=67s"
+                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200 hover:-translate-y-1 duration-150 p-4 justify-center"
+                  >
+                    <ChromeSvg />
+
+                    <p className="text-sm text-gray-500 dark:text-slate-300">Chrome</p>
+                  </a>
+
+                  <a
+                    target="_blank"
+                    href="https://www.youtube.com/watch?v=tImar3ojigE?t=67s"
+                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200 hover:-translate-y-1 duration-150 p-4 justify-center"
+                  >
+                    <BraveSvg />
+
+                    <p className="text-sm text-gray-500 dark:text-slate-300">Brave</p>
+                  </a>
+                </div>
+
+                <div className="mt-4">
+                  <button
+                    disabled={isLoading}
+                    type="button"
+                    className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600 dark:hover:border-slate-600 w-full outline-none py-3"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition>
     </>
   )
 }
