@@ -2,7 +2,7 @@ import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/hocs/withAuth'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LoadingPage from '@/components/shared/LoadingPage'
@@ -403,6 +403,19 @@ function HomePage(props: Props) {
       linksSelection.setSelectionParams({ selectedId: link.uuid })
     }
   }
+
+  useEffect(() => {
+    // chrome.bookmarks.getTree(function (bookmarks) {
+    //   printBookmarks(bookmarks)
+    // })
+
+    // function printBookmarks(bookmarks) {
+    //   bookmarks.forEach(function (bookmark) {
+    //     console.debug(bookmark.id + ' - ' + bookmark.title + ' - ' + bookmark.url)
+    //     if (bookmark.children) printBookmark(bookmark.children)
+    //   })
+    // }
+  })
 
   if (useLinksHook.isLoading) {
     return <LoadingPage />

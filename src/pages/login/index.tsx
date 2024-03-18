@@ -36,7 +36,10 @@ function LoginPage() {
   const authData = useContext(SupabaseAuthContext)
 
   async function login() {
-    await supabaseClient.auth.signInWithOAuth({ provider: 'google' })
+    await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.href },
+    })
     router.push('/login')
   }
 
