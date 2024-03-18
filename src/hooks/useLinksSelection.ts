@@ -6,6 +6,12 @@ export interface SetSelectionParams {
   editLinkId?: string | undefined | null
 }
 
+export interface UseLinksSelection {
+  selectedId: string
+  editLinkId: string
+  setSelectionParams: (params: SetSelectionParams) => void
+}
+
 export function useLinksSelection() {
   const router = useRouter()
 

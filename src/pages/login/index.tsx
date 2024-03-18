@@ -75,7 +75,7 @@ function LoginPage() {
         <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0">
           <button
             onClick={login}
-            className="flex items-center justify-center gap-x-2 py-2 px-4 text-white font-medium bg-gray-800 duration-150 hover:bg-gray-700 active:bg-gray-900 rounded-lg md:inline-flex"
+            className="flex items-center justify-center gap-x-2 py-2 px-4 text-white font-medium bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-lg md:inline-flex"
           >
             <svg className="w-5 h-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_17_40)">

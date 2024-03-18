@@ -38,7 +38,7 @@ function Navbar() {
         })
 
         const newLinks = fp.compose(
-          LinkUtils.applyPinAndSortBycreated_at,
+          LinkUtils.applyPinAndSortByCreatedAt,
           fp.map((bookmark: Bookmark) => ({
             title: bookmark.title,
             url: bookmark.url,
@@ -66,7 +66,7 @@ function Navbar() {
 
               const updatedLinks: Link[] = [...(responseLinks as Link[]), ...oldLinks] as Link[]
 
-              return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
+              return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
             })
 
             event.target.value = ''
@@ -94,10 +94,7 @@ function Navbar() {
         <Image className="dark:invert" priority src="/logo-side-text-md.svg" width={162.8} height={30} alt="logo" />
 
         <div className="flex items-center space-x-2 ml-auto">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="flex items-center justify-center bg-white px-2.5 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
-          >
+          <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-default px-2.5">
             {theme === 'light' ? (
               <svg
                 width="20"
@@ -136,10 +133,7 @@ function Navbar() {
           </button>
 
           <div className="relative">
-            <button
-              onClick={() => importInputRef.current?.click()}
-              className="flex items-center bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
-            >
+            <button onClick={() => importInputRef.current?.click()} className="btn-default">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -166,10 +160,7 @@ function Navbar() {
             />
           </div>
 
-          <button
-            onClick={logout}
-            className="block bg-white px-4 py-2 mt-3 text-center text-gray-700 duration-150 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700"
-          >
+          <button onClick={logout} className="btn-default">
             logout
           </button>
 

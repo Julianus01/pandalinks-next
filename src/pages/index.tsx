@@ -412,6 +412,8 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-3xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
+          linksSelection={linksSelection}
+          isLoading={useLinksHook.mutations.createLinkMutation.isPending}
           onCreate={useLinksHook.actions.createLink}
           value={useLinksHook.searchQ}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

@@ -80,22 +80,21 @@ export function useLinks(params: UseLinksParams) {
     mutationFn: (linkId: string) => LinksApi.deleteLink(linkId),
   })
 
-  function createLink(url: string) {
+  function createLink(url: string, title: string) {
     setSearchQ('')
 
     const createPromise = createLinkMutation.mutateAsync(
-      // TODO: Consider having it different
-      // from the UI instead of mocked here? 🤔
-      { url, title: 'My name needs an update 👈' },
+      { url, title: title },
       {
         onSuccess: (newLink) => {
           queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
             const oldLinks = data as Link[]
-
             const updatedLinks: Link[] = [newLink, ...oldLinks] as Link[]
 
-            return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
+            return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
           })
+
+          linksSelection.setSelectionParams({ selectedId: newLink.uuid, editLinkId: null })
         },
       }
     )
@@ -123,7 +122,7 @@ export function useLinks(params: UseLinksParams) {
             return oldLink
           })
 
-          return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
+          return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
         })
       },
     })
@@ -143,16 +142,16 @@ export function useLinks(params: UseLinksParams) {
 
       const updatedLinks = oldLinks.filter((oldLink) => oldLink.uuid !== linksSelection.selectedId)
 
-      return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
+      return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
     })
 
     if (linksSelection.selectedId) {
       const index = links.map((link) => link.uuid).indexOf(linksSelection.selectedId)
 
       if (links[index + 1]) {
-        linksSelection.setSelectionParams({ selectedId: links[index + 1].id, editLinkId: null })
+        linksSelection.setSelectionParams({ selectedId: links[index + 1].uuid, editLinkId: null })
       } else if (links[index - 1]) {
-        linksSelection.setSelectionParams({ selectedId: links[index - 1].id, editLinkId: null })
+        linksSelection.setSelectionParams({ selectedId: links[index - 1].uuid, editLinkId: null })
       }
     } else {
       linksSelection.setSelectionParams({ selectedId: null, editLinkId: null })
@@ -191,7 +190,7 @@ export function useLinks(params: UseLinksParams) {
           return link
         })
 
-        return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
+        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
       })
     }
   }
@@ -220,7 +219,7 @@ export function useLinks(params: UseLinksParams) {
           return link
         })
 
-        return LinkUtils.applyPinAndSortBycreated_at(updatedLinks)
+        return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
       })
     }
   }

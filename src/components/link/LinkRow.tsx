@@ -210,7 +210,7 @@ function LinkRow(props: Props) {
       )}
 
       {props.isEditMode && (
-        <div className="flex-1 py-2">
+        <div className="flex-1 py-2 pr-4">
           <input
             onChange={(event) => setTitle(event.target.value)}
             value={title}

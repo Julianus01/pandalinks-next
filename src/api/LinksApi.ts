@@ -100,6 +100,7 @@ async function createLink(params: CreateLinkRequestParams) {
     .from(SupabaseTable.Links)
     .insert(newLink)
     .select()
+    .single()
 
   if (error && status !== 406) {
     throw error
