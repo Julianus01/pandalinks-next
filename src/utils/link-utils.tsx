@@ -1,4 +1,4 @@
-import { Bookmark, HTMLBookmark, Link } from '@/api/AdminLinksApi'
+import { Bookmark, HTMLBookmark, Link } from '@/api/LinksApi'
 import fp from 'lodash/fp'
 
 function splitByPinned(links: Link[]) {

@@ -2,7 +2,7 @@ import React, { ChangeEvent, useContext, useRef } from 'react'
 import Image from 'next/image'
 // @ts-ignore
 import { bookmarksToJSON } from 'bookmarks-to-json'
-import { Bookmark, Link } from '@/api/AdminLinksApi'
+import { Bookmark, Link } from '@/api/LinksApi'
 import { LinkUtils } from '@/utils/link-utils'
 import { LinksApi } from '@/api/LinksApi'
 import { toast } from 'sonner'

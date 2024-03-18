@@ -1,4 +1,4 @@
-import { Link } from '@/api/AdminLinksApi'
+import { Link } from '@/api/LinksApi'
 
 export enum ContextMenuAction {
   visit = 'visit',

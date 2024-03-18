@@ -1,5 +1,4 @@
-import { Link } from '@/api/AdminLinksApi'
-import { UpdateLinkRequestParams } from '@/api/LinksApi'
+import { Link, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
 import { DateUtils } from '@/utils/date-utils'
 import { LinkUtils } from '@/utils/link-utils'

@@ -1,7 +1,36 @@
-import { Link } from './AdminLinksApi'
 import { LinkUtils } from '@/utils/link-utils'
 import { SupabaseTable, supabaseClient } from '@/utils/supabase-utils'
 import { getCurrentUser } from './api-utils'
+
+export interface Link {
+  id: string
+  uuid: string
+  title: string
+  url: string
+  user_id: string
+  tags: string[]
+  created_at: string
+  updated_at: string
+  visited_at: string
+}
+
+export interface Bookmark {
+  type: string
+  tags: string[]
+  addDate: number
+  title: string
+  icon: string
+  url: string
+}
+
+export interface HTMLBookmark {
+  type: string
+  addDate: number
+  title: string
+  icon: string
+  url: string
+  children: HTMLBookmark[]
+}
 
 async function getLinks(): Promise<Link[]> {
   const user = await getCurrentUser()

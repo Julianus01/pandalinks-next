@@ -3,6 +3,7 @@ import LoadingPage from '@/components/shared/LoadingPage'
 import { useRouter } from 'next/router'
 import { Session, User } from '@supabase/supabase-js'
 import { supabaseClient } from '@/utils/supabase-utils'
+import nookies from 'nookies'
 
 export interface SupabaseAuthContextState {
   user: User | undefined
@@ -37,6 +38,7 @@ export const SupabaseAuthContextProvider = ({ children }: AuthContextProps) => {
       if (!session) {
         setSession(null)
         setIsLoadingSession(false)
+        nookies.set(undefined, 'sb_access_token', '', { path: '/' })
 
         return
       }
@@ -49,6 +51,7 @@ export const SupabaseAuthContextProvider = ({ children }: AuthContextProps) => {
 
       setSession(session)
       setIsLoadingSession(false)
+      nookies.set(undefined, 'sb_access_token', session.access_token as string, { path: '/' })
     })
   }, [])
 

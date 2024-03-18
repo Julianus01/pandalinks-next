@@ -1,4 +1,4 @@
-import { AdminLinksApi, Link } from '@/api/AdminLinksApi'
+import { AdminLinksApi, Link } from '@/api/LinksApi'
 import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
@@ -9,26 +9,35 @@ import { toast } from 'sonner'
 import LoadingPage from '@/components/shared/LoadingPage'
 import { GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
-import firebaseAdmin from '@/utils/firebaseAdmin'
 import GlobalTagsSelector from '@/components/tags/GlobalTagsSelector'
 import { useLinks } from '@/hooks/useLinks'
 import { ContentMenuUtils, ContextMenuAction, ContextMenuRow } from '@/utils/context-menu-utils'
 import { useLinksSelection } from '@/hooks/useLinksSelection'
 import fp from 'lodash/fp'
 import { createSSRClient } from '@/utils/supabase-server-utils'
+import { SupabaseTable } from '@/utils/supabase-utils'
+import { LinkUtils } from '@/utils/link-utils'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const supabase = createSSRClient(ctx)
-
-  const { data, error } = await supabase.auth.getUser()
-
-  console.log("supabase user from SSR")
-  console.log({ data })
+  const supabaseSSR = createSSRClient(ctx)
 
   try {
     const cookies = nookies.get(ctx)
-    const token = await firebaseAdmin.auth().verifyIdToken(cookies.token)
-    const links = await AdminLinksApi.getLinks(token.uid)
+    const sb_access_token = cookies.sb_access_token
+
+    const {
+      data: { user },
+    } = await supabaseSSR.auth.getUser(sb_access_token)
+
+    // TODO: Investigate why this returns empty array and then
+    // fix in useLinks hook to have initialData
+    const { data } = await supabaseSSR
+      .from(SupabaseTable.Links)
+      .select()
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false })
+
+    const links = LinkUtils.splitByPinned(data as Link[])
 
     return {
       props: { links },
