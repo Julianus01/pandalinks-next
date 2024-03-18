@@ -40,7 +40,6 @@ function LoginPage() {
       provider: 'google',
       options: { redirectTo: window.location.href },
     })
-    router.push('/login')
   }
 
   if (authData.loading) {
