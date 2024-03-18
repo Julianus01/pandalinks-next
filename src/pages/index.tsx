@@ -16,6 +16,7 @@ import fp from 'lodash/fp'
 import { createSSRClient } from '@/utils/supabase-server-utils'
 import { SupabaseTable } from '@/utils/supabase-utils'
 import { LinkUtils } from '@/utils/link-utils'
+import { Link } from '@/api/LinksApi'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const supabaseSSR = createSSRClient(ctx)
