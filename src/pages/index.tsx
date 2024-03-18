@@ -15,8 +15,16 @@ import { useLinks } from '@/hooks/useLinks'
 import { ContentMenuUtils, ContextMenuAction, ContextMenuRow } from '@/utils/context-menu-utils'
 import { useLinksSelection } from '@/hooks/useLinksSelection'
 import fp from 'lodash/fp'
+import { createSSRClient } from '@/utils/supabase-server-utils'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const supabase = createSSRClient(ctx)
+
+  const { data, error } = await supabase.auth.getUser()
+
+  console.log("supabase user from SSR")
+  console.log({ data })
+
   try {
     const cookies = nookies.get(ctx)
     const token = await firebaseAdmin.auth().verifyIdToken(cookies.token)

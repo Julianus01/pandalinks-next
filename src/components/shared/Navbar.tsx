@@ -173,20 +173,19 @@ function Navbar() {
             logout
           </button>
 
-          {/* TODO: Fix this */}
-          {/* {user?.photoURL && (
+          {user?.user_metadata?.avatar_url && (
             <div className="relative inline-block">
               <Image
                 width={38}
                 height={38}
                 className="inline-block rounded-full ring-2 ring-white dark:ring-gray-800"
-                src={`${user.photoURL}`}
+                src={user?.user_metadata?.avatar_url}
                 alt="avatar"
               />
 
               <span className="absolute bottom-0 right-0 inline-block w-3 h-3 bg-green-600 border-2 border-white dark:border-slate-900 rounded-full"></span>
             </div>
-          )} */}
+          )}
         </div>
       </div>
     </div>
