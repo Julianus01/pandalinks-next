@@ -81,8 +81,6 @@ export function useLinks(params: UseLinksParams) {
   })
 
   function createLink(url: string, title: string) {
-    setSearchQ('')
-
     const createPromise = createLinkMutation.mutateAsync(
       { url, title: title },
       {
