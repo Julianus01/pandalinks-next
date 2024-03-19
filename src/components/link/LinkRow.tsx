@@ -177,97 +177,100 @@ function LinkRow(props: Props) {
         </svg>
       </div>
 
-      {!props.isEditMode && (
-        <div className="flex-1 truncate py-4 space-y-1 mr-4">
-          {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-400">Copied to clipboard</div>}
+      <div className={classNames({ 'flex flex-1 py-4 gap-2': true, 'flex-wrap': props.link.tags.length > 1 })}>
+        {props.isEditMode && (
+          <div className="flex-1 pr-4">
+            <input
+              onChange={(event) => setTitle(event.target.value)}
+              value={title}
+              autoFocus
+              onFocus={(e) => e.target.select()}
+              type="text"
+              placeholder="Nike website"
+              className="flex-1 focus:outline-none bg-transparent w-full text-gray-800 dark:text-slate-300"
+            />
 
-          {!showCopied && (
-            <p className="whitespace-normal text-gray-800 dark:text-slate-300">
-              {isPinned && (
-                <span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 text-yellow-500 inline-flex"
-                  >
-                    <line x1="12" x2="12" y1="17" y2="22" />
-                    <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
-                  </svg>
-                </span>
-              )}
-              {'  '}
-              {title}
-            </p>
-          )}
-        </div>
-      )}
-
-      {props.isEditMode && (
-        <div className="flex-1 py-2 pr-4">
-          <input
-            onChange={(event) => setTitle(event.target.value)}
-            value={title}
-            autoFocus
-            onFocus={(e) => e.target.select()}
-            type="text"
-            placeholder="Nike website"
-            className="flex-1 focus:outline-none bg-transparent w-full text-gray-800 dark:text-slate-300"
-          />
-
-          <input
-            onChange={(event) => setUrl(event.target.value)}
-            value={url}
-            onFocus={(e) => e.target.select()}
-            type="text"
-            placeholder="Nike.com"
-            className="flex-1 focus:outline-none text-sm text-gray-400 dark:text-slate-400 bg-transparent w-full"
-          />
-        </div>
-      )}
-
-      {!props.isEditMode && (
-        <div className="flex items-center space-x-2 ml-auto">
-          {props.link.tags.map((tag) => {
-            const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
-
-            return (
-              <span
-                key={tag}
-                className={classNames({
-                  'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
-                  [tagColorClasses]: true,
-                })}
-              >
-                #{tag}
-              </span>
-            )
-          })}
-
-          {/* <p className="ml-auto text-xs text-gray-800 dark:text-slate-400">{created_atText}</p> */}
-
-          <div onClick={openContextMenu} className="h-full flex pr-5 pl-3 items-center !ml-0 !-mr-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-5 h-5 text-gray-600 dark:text-slate-500"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-              />
-            </svg>
+            <input
+              onChange={(event) => setUrl(event.target.value)}
+              value={url}
+              onFocus={(e) => e.target.select()}
+              type="text"
+              placeholder="Nike.com"
+              className="flex-1 focus:outline-none text-sm text-gray-400 dark:text-slate-400 bg-transparent w-full"
+            />
           </div>
+        )}
+
+        {!props.isEditMode && (
+          <div className="truncate space-y-1 mr-4">
+            {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-400">Copied to clipboard</div>}
+
+            {!showCopied && (
+              <p className="whitespace-normal text-gray-800 dark:text-slate-300">
+                {isPinned && (
+                  <span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-4 h-4 text-yellow-500 inline-flex"
+                    >
+                      <line x1="12" x2="12" y1="17" y2="22" />
+                      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+                    </svg>
+                  </span>
+                )}
+                {'  '}
+                {title}
+              </p>
+            )}
+          </div>
+        )}
+
+        {!props.isEditMode && (
+          <div className="flex items-center space-x-2 ml-auto">
+            {props.link.tags.map((tag) => {
+              const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
+
+              return (
+                <span
+                  key={tag}
+                  className={classNames({
+                    'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap':
+                      true,
+                    [tagColorClasses]: true,
+                  })}
+                >
+                  #{tag}
+                </span>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {!props.isEditMode && (
+        <div onClick={openContextMenu} className="h-full flex pr-5 pl-3 items-center min-h-[56px]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-5 h-5 text-gray-600 dark:text-slate-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+            />
+          </svg>
         </div>
       )}
     </div>

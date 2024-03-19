@@ -2,7 +2,7 @@ import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/hocs/withAuth'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import LoadingPage from '@/components/shared/LoadingPage'
@@ -109,7 +109,7 @@ function HomePage(props: Props) {
         return
       }
 
-      if (!linksSelection.selectedId) {
+      if (!linksSelection.selectedId && useLinksHook.links?.[0]) {
         linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].uuid })
 
         const element = document.getElementById(useLinksHook.links[0].uuid)
@@ -155,7 +155,7 @@ function HomePage(props: Props) {
         return
       }
 
-      if (!linksSelection.selectedId) {
+      if (!linksSelection.selectedId && useLinksHook.links?.[0]) {
         linksSelection.setSelectionParams({ selectedId: useLinksHook.links[0].uuid })
 
         const element = document.getElementById(useLinksHook.links[0].uuid)
@@ -259,7 +259,12 @@ function HomePage(props: Props) {
 
   useKey(
     (event) => {
-      return (event.ctrlKey || event.metaKey) && (event.keyCode === 46 || event.key === 'Backspace')
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && (event.keyCode === 46 || event.key === 'Backspace')) {
+        event.preventDefault()
+        return true
+      }
+
+      return false
     },
     () => {
       if (linksSelection.selectedId) {

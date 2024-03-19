@@ -142,7 +142,7 @@ const getContextMenuGroupTwo = (): ContextMenuRow[] => [
   {
     action: ContextMenuAction.delete,
     name: 'Delete',
-    command: 'Cmd + Delete',
+    command: 'Cmd + Shift + Delete',
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

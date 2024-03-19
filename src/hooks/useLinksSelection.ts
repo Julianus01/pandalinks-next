@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import { ParsedUrlQueryInput } from 'querystring'
 
 export interface SetSelectionParams {
   selectedId?: string | undefined | null
@@ -12,7 +11,7 @@ export interface UseLinksSelection {
   setSelectionParams: (params: SetSelectionParams) => void
 }
 
-export function useLinksSelection() {
+export function useLinksSelection(): UseLinksSelection {
   const router = useRouter()
 
   const selectedId = router.query.selectedId as string
