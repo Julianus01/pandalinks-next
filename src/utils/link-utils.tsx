@@ -10,15 +10,16 @@ function splitByPinned(links: Link[]) {
   return [...pinnedLinks, ...unpinnedLinks] as Link[]
 }
 
-function sortBycreated_at(links: Link[]) {
+function sortByCreatedAt(links: Link[]) {
   return links.sort((first: Link, second: Link) => {
     return new Date(second.created_at).valueOf() - new Date(first.created_at).valueOf()
   })
 }
 
 function applyPinAndSortByCreatedAt(links: Link[]) {
-  const sorted = sortBycreated_at(links)
-  const sortedAndSplitByPinned = splitByPinned(sorted)
+  // TODO: They come in sorted from the backend directly
+  // const sorted = sortByCreatedAt(links)
+  const sortedAndSplitByPinned = splitByPinned(links)
 
   return sortedAndSplitByPinned
 }
@@ -90,7 +91,7 @@ const getRandomTagColorClasses = (tag: string) => {
 
 export const LinkUtils = {
   splitByPinned,
-  sortBycreated_at,
+  sortByCreatedAt,
   applyPinAndSortByCreatedAt,
   getBookmarksFromImportedJson,
   getRandomTagColorClasses,
