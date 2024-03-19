@@ -1,7 +1,8 @@
 import { Link, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
-import { DateUtils } from '@/utils/date-utils'
+import { ContentMenuUtils, ContextMenuAction, ContextMenuRow } from '@/utils/context-menu-utils'
 import { LinkUtils } from '@/utils/link-utils'
+import { Popover } from '@headlessui/react'
 import classNames from 'classnames'
 import Image from 'next/image'
 import React, { useCallback } from 'react'
@@ -13,124 +14,128 @@ interface Props {
   link: Link
   isFirst: boolean
   isLast: boolean
-  isSelected: boolean
-  isEditMode: boolean
   onClick: () => void
-  onDoubleClick: () => void
-  onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void
-  onExitEditMode: () => void
   onUpdate: (updatedLink: UpdateLinkRequestParams) => void
+  useLinksHook: any
+  navigateToLink: (link: Link) => void
 }
 
 function LinkRow(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const popoverPanelRef = useRef<HTMLDivElement>(null)
+
   const [title, setTitle] = useState<string>(props.link.title)
   const [url, setUrl] = useState<string>(props.link.url)
+  const [isEditMode, setIsEditMode] = useState<boolean>(false)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
-
-  const created_atText = useMemo(() => {
-    return DateUtils.timeSince(new Date(props.link.created_at))
-  }, [props.link.created_at])
 
   const isPinned = useMemo(() => {
     return props.link.tags.includes('pinned')
   }, [props.link.tags])
 
-  // const displayUrl = useMemo(() => {
-  //   return fp.compose(
-  //     (url: string) => url.replace('www.', ''),
-  //     (url: string) => url.replace('https://', ''),
-  //     (url: string) => url.replace('http://', '')
-  //   )(url)
-  // }, [url])
-
   useEffect(() => {
-    if (!props.isEditMode && !url.length) {
+    if (!isEditMode && !url.length) {
       setUrl(props.link.url)
     }
-  }, [props.isEditMode, props.link.url, url])
+  }, [isEditMode, props.link.url, url])
 
-  // TODO: Make this work
-  // useEffect(() => {
-  //   let url = props.link.url
-
-  //   if (!url.match(/^https?:\/\//i)) {
-  //     url = `https://${url}`
-  //   }
-
-  //   axios
-  //     .get('/api/url-metadata', { params: { url: url } })
-  //     .then((response) => {
-  //       console.log('Response')
-  //       console.log(response.data)
-  //     })
-  //     .catch((error) => {
-  //       console.log('Error here')
-  //       console.log(error)
-  //     })
-  // }, [props.link.url])
-
-  // CMD + C
   useKey(
-    (event) => {
-      return (event.ctrlKey || event.metaKey) && event.key === 'c'
-    },
+    'Escape',
     () => {
-      if (props.isSelected) {
-        navigator.clipboard.writeText(url)
-        showCopiedMessage()
+      if (isEditMode) {
+        setUrl(props.link.url)
+        setTitle(props.link.title)
       }
-    }
+    },
+    {},
+    [isEditMode, props.link.url]
   )
 
   const onSaveEdit = useCallback(() => {
     const trimmedUrl = url.trim()
     const trimmedTitle = title.trim()
 
-    if (props.isEditMode) {
+    if (isEditMode) {
       if (!trimmedUrl?.length || !trimmedTitle?.length) {
         setUrl(props.link.url)
         setTitle(props.link.title)
         toast('Title or url cannot be empty')
-        props.onExitEditMode()
+        setIsEditMode(false)
 
         return
       }
 
       if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
         props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle })
-        props.onExitEditMode()
+        setIsEditMode(false)
 
         return
       }
 
-      props.onExitEditMode()
+      setIsEditMode(false)
     }
-  }, [url, title, props])
+  }, [url, title, isEditMode, props])
 
   useClickAway(ref, onSaveEdit)
 
-  useKey(
-    'Escape',
-    () => {
-      if (props.isEditMode) {
-        setUrl(props.link.url)
-        setTitle(props.link.title)
+  function onOptionClicked(contextMenuRow: ContextMenuRow) {
+    switch (contextMenuRow.action) {
+      case ContextMenuAction.visit: {
+        props.navigateToLink(props.link)
+
+        break
       }
-    },
-    {},
-    [props.isEditMode, props.link.url]
-  )
 
-  function openContextMenu(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (!props.isEditMode) {
-      props.onContextMenu(event)
-    }
-  }
+      case ContextMenuAction.copyLink: {
+        showCopiedMessage()
+        navigator.clipboard.writeText(props.link.url)
+        toast(
+          <>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"
+              />
+            </svg>
+            Copied to clipboard{' '}
+          </>
+        )
 
-  function onDoubleClick() {
-    if (!props.isEditMode) {
-      props.onDoubleClick()
+        break
+      }
+
+      case ContextMenuAction.pin: {
+        props.useLinksHook.actions.pinLink(props.link.uuid)
+
+        break
+      }
+
+      case ContextMenuAction.unpin: {
+        props.useLinksHook.actions.unpinLink(props.link.uuid)
+
+        break
+      }
+
+      // TODO: This scrolls the page to top in Safari
+      case ContextMenuAction.edit: {
+        setIsEditMode(true)
+
+        break
+      }
+
+      case ContextMenuAction.delete: {
+        props.useLinksHook.actions.deleteLink(props.link.uuid)
+
+        break
+      }
     }
   }
 
@@ -146,21 +151,16 @@ function LinkRow(props: Props) {
       id={props.link.uuid}
       ref={ref}
       onClick={props.onClick}
-      onDoubleClick={onDoubleClick}
-      onContextMenu={openContextMenu}
       className={classNames({
-        'pl-5 relative hover:bg-slate-100 cursor-default select-none flex border border-solid group dark:hover:bg-slate-700':
+        'pl-5 hover:bg-slate-100 cursor-pointer select-none flex border border-solid group dark:hover:bg-slate-700 border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-800':
           true,
-        'border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-800': !props.isSelected,
-        'hover:border-slate-200 z-10 bg-slate-100 border border-solid border-slate-200 ring-offset-0 ring-2 ring-slate-200 dark:ring-slate-600 dark:hover:border-slate-600 dark:border-slate-600 dark:bg-slate-700':
-          props.isSelected || props.isEditMode,
         'rounded-t-lg': props.isFirst,
         'rounded-b-lg': props.isLast,
       })}
     >
       <div className="relative pt-5 flex flex-col items-center mr-2">
-        <div className="absolute top-5 right-0 bottom-0 left-0 z-1">
-          <MemoLinkRowImage url={url} isEditMode={props.isEditMode} />
+        <div className="absolute top-5 right-0 bottom-0 left-0">
+          <MemoLinkRowImage url={url} isEditMode={isEditMode} />
         </div>
 
         <svg
@@ -178,7 +178,7 @@ function LinkRow(props: Props) {
       </div>
 
       <div className={classNames({ 'flex flex-1 py-4 gap-2': true, 'flex-wrap': props.link.tags.length > 1 })}>
-        {props.isEditMode && (
+        {isEditMode && (
           <div className="flex-1 pr-4">
             <input
               onChange={(event) => setTitle(event.target.value)}
@@ -201,7 +201,7 @@ function LinkRow(props: Props) {
           </div>
         )}
 
-        {!props.isEditMode && (
+        {!isEditMode && (
           <div className="truncate space-y-1 mr-4">
             {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-400">Copied to clipboard</div>}
 
@@ -233,7 +233,7 @@ function LinkRow(props: Props) {
           </div>
         )}
 
-        {!props.isEditMode && (
+        {!isEditMode && (
           <div className="flex items-center space-x-2 ml-auto">
             {props.link.tags.map((tag) => {
               const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
@@ -255,23 +255,57 @@ function LinkRow(props: Props) {
         )}
       </div>
 
-      {!props.isEditMode && (
-        <div onClick={openContextMenu} className="h-full flex pr-5 pl-3 items-center min-h-[56px]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-5 h-5 text-gray-600 dark:text-slate-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-            />
-          </svg>
-        </div>
+      {!isEditMode && (
+        <>
+          <Popover className="relative">
+            <Popover.Button onClick={(event) => event.stopPropagation()} className="outline-none">
+              <div className="h-full flex pr-5 pl-3 items-center min-h-[56px]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-5 h-5 text-gray-600 dark:text-slate-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                  />
+                </svg>
+              </div>
+            </Popover.Button>
+
+            <Popover.Overlay className="fixed inset-0 z-20" />
+
+            <Popover.Panel
+              ref={popoverPanelRef}
+              onClick={(event) => event.stopPropagation()}
+              onDoubleClick={(event) => event.stopPropagation()}
+              className="absolute z-30 space-y-2 -right-8 mt-2 w-[270px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+            >
+              {[ContentMenuUtils.getContextMenuGroupOne(props.link), ContentMenuUtils.getContextMenuGroupTwo()].map(
+                (group, i) => (
+                  <ul className="px-2 py-2 [&:not(:first-child)]:border-t dark:border-slate-700" role="menu" key={i}>
+                    {group.map((contextMenuRow, idx) => (
+                      <li key={idx}>
+                        <button
+                          onClick={() => onOptionClicked(contextMenuRow)}
+                          className="w-full cursor-pointer flex items-center gap-x-2 px-2 py-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg group dark:hover:bg-slate-700"
+                          role="menuitem"
+                        >
+                          {contextMenuRow.icon && contextMenuRow.icon} {contextMenuRow.name}
+                          <span className="text-gray-500 dark:text-slate-400 ml-auto">{contextMenuRow.command}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              )}
+            </Popover.Panel>
+          </Popover>
+        </>
       )}
     </div>
   )

@@ -6,7 +6,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import fp from 'lodash/fp'
 import { useContext, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { useLinksSelection } from './useLinksSelection'
 import { SupabaseAuthContext } from '@/context/SupabaseAuthContext'
 
 interface UseLinksParams {
@@ -16,7 +15,6 @@ interface UseLinksParams {
 export function useLinks(params: UseLinksParams) {
   const queryClient = useQueryClient()
   const { user } = useContext(SupabaseAuthContext)
-  const linksSelection = useLinksSelection()
 
   const [searchQ, setSearchQ] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -64,10 +62,6 @@ export function useLinks(params: UseLinksParams) {
     )(links)
   }, [links])
 
-  const selectedLink = useMemo(() => {
-    return filteredLinks.find((link) => link.uuid === linksSelection.selectedId)
-  }, [filteredLinks, linksSelection.selectedId])
-
   const updateLinkMutation = useMutation({
     mutationFn: (updatedLink: UpdateLinkRequestParams) => LinksApi.updateLink(updatedLink),
   })
@@ -91,8 +85,6 @@ export function useLinks(params: UseLinksParams) {
 
             return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
           })
-
-          linksSelection.setSelectionParams({ selectedId: newLink.uuid, editLinkId: null })
         },
       }
     )
@@ -137,23 +129,10 @@ export function useLinks(params: UseLinksParams) {
   function deleteLink(linkId: string) {
     queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
       const oldLinks = data as Link[]
-
-      const updatedLinks = oldLinks.filter((oldLink) => oldLink.uuid !== linksSelection.selectedId)
+      const updatedLinks = oldLinks.filter((oldLink) => oldLink.uuid !== linkId)
 
       return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
     })
-
-    if (linksSelection.selectedId) {
-      const index = links.map((link) => link.uuid).indexOf(linksSelection.selectedId)
-
-      if (links[index + 1]) {
-        linksSelection.setSelectionParams({ selectedId: links[index + 1].uuid, editLinkId: null })
-      } else if (links[index - 1]) {
-        linksSelection.setSelectionParams({ selectedId: links[index - 1].uuid, editLinkId: null })
-      }
-    } else {
-      linksSelection.setSelectionParams({ selectedId: null, editLinkId: null })
-    }
 
     const deletePromise = deleteLinkMutation.mutateAsync(linkId)
 
@@ -229,7 +208,6 @@ export function useLinks(params: UseLinksParams) {
     searchQ: searchQ,
     allTags: allTags,
     selectedTags: selectedTags,
-    selectedLink: selectedLink,
 
     actions: {
       setSearchQ: setSearchQ,
