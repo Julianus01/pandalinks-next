@@ -144,13 +144,13 @@ function SearchAndCreateLinksInput(props: Props) {
           )}
         </Popover.Button>
 
-        <Popover.Overlay className="fixed inset-0 z-20 bg-gray-300/70 dark:bg-slate-900/70" />
+        <Popover.Overlay className="fixed inset-0 z-10 bg-gray-300/30 dark:bg-slate-900/50" />
 
         <Popover.Panel
           onClick={(event) => event.stopPropagation()}
           onDoubleClick={(event) => event.stopPropagation()}
           ref={popoverPanelRef}
-          className="absolute z-20 space-y-2 -right-8 mt-2 w-[340px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700 p-4"
+          className="absolute z-20 space-y-2 -right-8 mt-2 w-[340px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 p-4"
         >
           <input
             onKeyDown={onKeyDown}

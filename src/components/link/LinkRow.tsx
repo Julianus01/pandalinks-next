@@ -277,13 +277,13 @@ function LinkRow(props: Props) {
               </div>
             </Popover.Button>
 
-            <Popover.Overlay className="fixed inset-0 z-20" />
+            <Popover.Overlay className="fixed inset-0 z-10" />
 
             <Popover.Panel
               ref={popoverPanelRef}
               onClick={(event) => event.stopPropagation()}
               onDoubleClick={(event) => event.stopPropagation()}
-              className="absolute z-30 space-y-2 -right-8 mt-2 w-[270px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+              className="absolute z-20 space-y-2 -right-8 mt-2 w-[270px] rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
             >
               {[ContentMenuUtils.getContextMenuGroupOne(props.link), ContentMenuUtils.getContextMenuGroupTwo()].map(
                 (group, i) => (
