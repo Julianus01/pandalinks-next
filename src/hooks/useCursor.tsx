@@ -2,7 +2,12 @@ import { Link } from '@/api/LinksApi'
 import { useState } from 'react'
 import { useKey } from 'react-use'
 
-export function useListCursor(links: Link[]) {
+interface UseListCursorParams {
+  links: Link[]
+  disableArrowListeners?: boolean
+}
+
+export function useListCursor(params: UseListCursorParams) {
   const [cursor, setCursor] = useState<number | null>(null)
 
   function increment() {
@@ -11,8 +16,8 @@ export function useListCursor(links: Link[]) {
         return 0
       }
 
-      if (prev === links.length - 1) {
-        return links.length - 1
+      if (prev === params.links.length - 1) {
+        return params.links.length - 1
       }
 
       return prev + 1
@@ -36,21 +41,25 @@ export function useListCursor(links: Link[]) {
   useKey(
     (event) => !event.ctrlKey && !event.metaKey && event.key === 'ArrowUp',
     (event) => {
-      event.preventDefault()
-      decrement()
+      if (!params.disableArrowListeners) {
+        event.preventDefault()
+        decrement()
+      }
     },
     {},
-    [cursor, links]
+    [cursor, params.links, params.disableArrowListeners]
   )
 
   useKey(
     (event) => !event.ctrlKey && !event.metaKey && event.key === 'ArrowDown',
     (event) => {
-      event.preventDefault()
-      increment()
+      if (!params.disableArrowListeners) {
+        event.preventDefault()
+        increment()
+      }
     },
     {},
-    [cursor, links]
+    [cursor, params.links, params.disableArrowListeners]
   )
 
   return { cursor, setCursor, increment, decrement }

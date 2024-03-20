@@ -2,7 +2,7 @@ import AuthLayout from '@/components/shared/AuthLayout'
 import LinkRow from '@/components/link/LinkRow'
 import SearchAndCreateLinksInput from '@/components/link/SearchAndCreateLinksInput'
 import { withAuth } from '@/hocs/withAuth'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import LoadingPage from '@/components/shared/LoadingPage'
 import { GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
@@ -61,8 +61,10 @@ interface Props {
 
 function HomePage(props: Props) {
   const linksContainerRef = useRef(null)
+  const [linkInEdit, setLinkInEdit] = useState<string | null>(null)
+
   const useLinksHook = useLinks({ initialData: props.links })
-  const listCursorHook = useListCursor(useLinksHook.links)
+  const listCursorHook = useListCursor({ links: useLinksHook.links, disableArrowListeners: !!linkInEdit })
 
   useClickAway(linksContainerRef, () => listCursorHook.setCursor(null))
 
@@ -140,6 +142,15 @@ function HomePage(props: Props) {
               {useLinksHook.links.map((link, index) => (
                 <div key={link.uuid} className={classNames({ 'pb-4': index === numberOfPinnedLinks - 1 })}>
                   <LinkRow
+                    blurMode={Boolean(linkInEdit && linkInEdit !== link.uuid)}
+                    onChangeEditMode={(val) => {
+                      if (val) {
+                        return setLinkInEdit(link.uuid)
+                      }
+
+                      setLinkInEdit(null)
+                    }}
+                    isEditMode={linkInEdit === link.uuid}
                     isSelected={listCursorHook.cursor === index}
                     useLinksHook={useLinksHook}
                     navigateToLink={navigateToLink}

@@ -21,6 +21,9 @@ interface Props {
   onUpdate: (updatedLink: UpdateLinkRequestParams) => Promise<void>
   useLinksHook: any
   navigateToLink: (link: Link) => void
+  isEditMode: boolean
+  onChangeEditMode: (value: boolean) => void
+  blurMode: boolean
 }
 
 function LinkRow(props: Props) {
@@ -30,7 +33,6 @@ function LinkRow(props: Props) {
   const [tags, setTags] = usePropState<string[]>(props.link.tags)
   const [title, setTitle] = usePropState<string>(props.link.title)
   const [url, setUrl] = usePropState<string>(props.link.url)
-  const [isEditMode, setIsEditMode] = useState<boolean>(false)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
   const [isContextOpen, setIsContextOpen] = useState<boolean>(false)
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
@@ -43,46 +45,48 @@ function LinkRow(props: Props) {
   }, [props.isSelected])
 
   useEffect(() => {
-    if (!isEditMode && !url.length) {
+    if (!props.isEditMode && !url.length) {
       setUrl(props.link.url)
     }
-  }, [isEditMode, props.link.url, setUrl, url])
+  }, [props.isEditMode, props.link.url, setUrl, url])
 
   // AutoFocus prop doesn't work for input because of tabIndex in the root div
   // Have to do it manually with a setTimeout for it to take effect
+  // Try and get rid of This Context Menu without controlled state, or replace
+  // with Popover
   useEffect(() => {
-    if (isEditMode) {
+    if (props.isEditMode) {
       setTimeout(() => {
         urlRef.current?.focus()
-      }, 0)
+      }, 10)
     }
-  }, [isEditMode])
+  }, [props.isEditMode])
 
   useKey(
     'Escape',
     () => {
-      if (isEditMode) {
+      if (props.isEditMode) {
         setUrl(props.link.url)
         setTitle(props.link.title)
         setTags(props.link.tags)
-      }
 
-      setIsEditMode(false)
+        props.onChangeEditMode(false)
+      }
     },
     {},
-    [isEditMode, props.link.url]
+    [props.isEditMode, props.link.url]
   )
 
   const onSaveEdit = useCallback(async () => {
     const trimmedUrl = url.trim()
     const trimmedTitle = title.trim()
 
-    if (isEditMode) {
+    if (props.isEditMode) {
       if (!trimmedUrl?.length || !trimmedTitle?.length) {
         setUrl(props.link.url)
         setTitle(props.link.title)
         toast('Title or url cannot be empty')
-        setIsEditMode(false)
+        props.onChangeEditMode(false)
 
         return
       }
@@ -91,14 +95,14 @@ function LinkRow(props: Props) {
         setIsUpdating(true)
         await props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle, tags })
         setIsUpdating(false)
-        setIsEditMode(false)
+        props.onChangeEditMode(false)
 
         return
       }
 
-      setIsEditMode(false)
+      props.onChangeEditMode(false)
     }
-  }, [url, title, isEditMode, props, setUrl, setTitle, tags])
+  }, [url, title, props, setUrl, setTitle, tags])
 
   useClickAway(ref, onSaveEdit)
 
@@ -142,12 +146,10 @@ function LinkRow(props: Props) {
       }
 
       case ContextMenuAction.edit: {
+        props.onChangeEditMode(true)
+
         // Close context menu hack
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
-
-        setTimeout(() => {
-          setIsEditMode(true)
-        }, 0)
 
         break
       }
@@ -178,22 +180,24 @@ function LinkRow(props: Props) {
           onKeyDown={onKeyDown}
           id={props.link.uuid}
           ref={ref}
-          onClick={() => !isEditMode && props.onClick()}
+          onClick={() => !props.isEditMode && props.onClick()}
           className={classNames({
             'px-5  cursor-pointer select-none flex border border-solid group  border-slate-200 dark:border-slate-900 outline-none':
               true,
             'bg-white hover:bg-gray-50 dark:bg-slate-800 dark:hover:bg-slate-700':
-              !isContextOpen && !isEditMode && !props.isSelected,
-            'bg-gray-50 dark:bg-slate-700': isContextOpen || isEditMode || props.isSelected,
+              !isContextOpen && !props.isEditMode && !props.isSelected,
+            'bg-gray-50 dark:bg-slate-700': isContextOpen || props.isEditMode || props.isSelected,
             'rounded-t-lg': props.isFirst,
             'rounded-b-lg': props.isLast,
             'pointer-events-none opacity-80': isUpdating,
+            'opacity-30 pointer-events-none': props.blurMode,
+            'rounded-md cursor-default': props.isEditMode,
           })}
         >
           <div className="relative pt-4 flex flex-col items-center mr-2">
             <div className={classNames({ hidden: isUpdating })}>
               <div className="absolute top-4 right-0 bottom-0 left-0">
-                <MemoLinkRowImage url={url} isEditMode={isEditMode} />
+                <MemoLinkRowImage url={url} isEditMode={props.isEditMode} />
               </div>
 
               <svg
@@ -239,7 +243,7 @@ function LinkRow(props: Props) {
           </div>
 
           <div className={classNames({ 'flex flex-1 py-3 gap-2': true, 'flex-wrap': props.link.tags.length > 1 })}>
-            {isEditMode && (
+            {props.isEditMode && (
               <div className="flex-1">
                 <input
                   ref={urlRef}
@@ -266,7 +270,7 @@ function LinkRow(props: Props) {
               </div>
             )}
 
-            {!isEditMode && (
+            {!props.isEditMode && (
               <div className="truncate space-y-1 mr-4">
                 {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-200">Copied to clipboard</div>}
 
@@ -274,7 +278,7 @@ function LinkRow(props: Props) {
               </div>
             )}
 
-            {!isEditMode && <LinkTags tags={props.link.tags} />}
+            {!props.isEditMode && <LinkTags tags={props.link.tags} />}
           </div>
         </div>
       </ContextMenu.Trigger>
