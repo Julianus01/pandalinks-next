@@ -151,7 +151,7 @@ function LinkTags(props: Props) {
               </svg>
 
               <input
-                onBlur={addTag}
+                onBlur={() => setShowInput(false)}
                 onKeyDown={onKeyDown}
                 autoFocus
                 value={tag}

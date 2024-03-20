@@ -31,7 +31,6 @@ function LinkRow(props: Props) {
   const [isEditMode, setIsEditMode] = useState<boolean>(false)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
   const [isContextOpen, setIsContextOpen] = useState<boolean>(false)
-  const [showTagsDialog, setShowTagsDialog] = useState<boolean>(false)
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
   useEffect(() => {

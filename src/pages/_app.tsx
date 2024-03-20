@@ -10,7 +10,7 @@ const inter = Inter({ display: 'swap', subsets: ['latin'] })
 
 const queryClient = new QueryClient()
 
-function MyApp({ Component, pageProps }: AppProps) {
+function Providers({ Component, pageProps }: AppProps) {
   const { theme } = useTheme()
 
   return (
@@ -23,6 +23,16 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </SupabaseAuthContextProvider>
         </QueryClientProvider>
+      </ThemeProvider>
+    </main>
+  )
+}
+
+function MyApp(props: AppProps) {
+  return (
+    <main className={inter.className}>
+      <ThemeProvider defaultTheme="dark" attribute="class">
+        <Providers {...props} />
       </ThemeProvider>
     </main>
   )
