@@ -4,7 +4,7 @@ import { LinkUtils } from '@/utils/link-utils'
 import classNames from 'classnames'
 import Image from 'next/image'
 import React, { useCallback } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import * as ContextMenu from '@radix-ui/react-context-menu'
@@ -12,6 +12,7 @@ import LinkContextMenuContent, { ContextMenuAction } from './LinkContextMenuCont
 
 interface Props {
   link: Link
+  isSelected: boolean
   isFirst: boolean
   isLast: boolean
   onClick: () => void
@@ -88,25 +89,6 @@ function LinkRow(props: Props) {
       case ContextMenuAction.copyLink: {
         showCopiedMessage()
         navigator.clipboard.writeText(props.link.url)
-        toast(
-          <>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"
-              />
-            </svg>
-            Copied to clipboard{' '}
-          </>
-        )
 
         // Close context menu hack
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
@@ -171,8 +153,9 @@ function LinkRow(props: Props) {
           className={classNames({
             'px-5  cursor-pointer select-none flex border border-solid group  border-slate-200 dark:border-slate-900':
               true,
-            'bg-white hover:bg-gray-50 dark:bg-slate-800 dark:hover:bg-slate-700': !isContextOpen && !isEditMode,
-            'bg-gray-50 dark:bg-slate-700': isContextOpen || isEditMode,
+            'bg-white hover:bg-gray-50 dark:bg-slate-800 dark:hover:bg-slate-700':
+              !isContextOpen && !isEditMode && !props.isSelected,
+            'bg-gray-50 dark:bg-slate-700': isContextOpen || isEditMode || props.isSelected,
             'rounded-t-lg': props.isFirst,
             'rounded-b-lg': props.isLast,
           })}
@@ -226,14 +209,9 @@ function LinkRow(props: Props) {
 
             {!isEditMode && (
               <div className="truncate space-y-1 mr-4">
-                {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-400">Copied to clipboard</div>}
+                {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-200">Copied to clipboard</div>}
 
-                {!showCopied && (
-                  <p className="whitespace-normal text-gray-800 dark:text-slate-300">
-                    {'  '}
-                    {title}
-                  </p>
-                )}
+                {!showCopied && <p className="whitespace-normal text-gray-800 dark:text-slate-300">{title}</p>}
               </div>
             )}
 

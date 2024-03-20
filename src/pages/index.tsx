@@ -8,11 +8,11 @@ import { GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
 import GlobalTagsSelector from '@/components/tags/GlobalTagsSelector'
 import { useLinks } from '@/hooks/useLinks'
-import fp from 'lodash/fp'
 import { createSSRClient } from '@/utils/supabase-server-utils'
 import { SupabaseTable } from '@/utils/supabase-utils'
 import { LinkUtils } from '@/utils/link-utils'
 import { Link } from '@/api/LinksApi'
+import classNames from 'classnames'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const supabaseSSR = createSSRClient(ctx)
@@ -61,14 +61,10 @@ function HomePage(props: Props) {
   const linksContainerRef = useRef(null)
   const useLinksHook = useLinks({ initialData: props.links })
 
-  const [pinnedLinks, unpinnedLinks] = useMemo(() => {
-    const numberOfPinnedLinks = useLinksHook.links.filter((link) => link.tags.includes('pinned')).length
-
-    return [
-      fp.slice(0, numberOfPinnedLinks)(useLinksHook.links),
-      fp.slice(numberOfPinnedLinks, Infinity)(useLinksHook.links),
-    ]
-  }, [useLinksHook.links])
+  const numberOfPinnedLinks = useMemo(
+    () => useLinksHook.links.filter((link) => link.tags.includes('pinned')).length,
+    [useLinksHook.links]
+  )
 
   function navigateToLink(link: Link) {
     const updatedLink: Link = { ...link, visited_at: new Date().toISOString() }
@@ -129,26 +125,23 @@ function HomePage(props: Props) {
             </div>
           )}
 
-          {!!useLinksHook.links.length &&
-            [pinnedLinks, unpinnedLinks].map((groupLinks, groupIndex) => (
-              <div className="-space-y-0.5 pb-4" key={groupIndex}>
-                {groupLinks.map((link: Link, index: number) => {
-                  return (
-                    <LinkRow
-                      // Remove these two below and make the callback upward
-                      useLinksHook={useLinksHook}
-                      navigateToLink={navigateToLink}
-                      isFirst={index === 0}
-                      isLast={index === groupLinks.length - 1}
-                      onUpdate={useLinksHook.actions.updateLink}
-                      link={link}
-                      key={link.uuid}
-                      onClick={() => navigateToLink(link)}
-                    />
-                  )
-                })}
-              </div>
-            ))}
+          {!!useLinksHook.links.length && (
+            <div className="-space-y-0.5 pb-4">
+              {useLinksHook.links.map((link, index) => (
+                <div key={link.uuid} className={classNames({ 'pb-4': index === numberOfPinnedLinks - 1 })}>
+                  <LinkRow
+                    useLinksHook={useLinksHook}
+                    navigateToLink={navigateToLink}
+                    isFirst={index === 0 || index === numberOfPinnedLinks}
+                    isLast={index === numberOfPinnedLinks - 1 || index === useLinksHook.links.length - 1}
+                    onUpdate={useLinksHook.actions.updateLink}
+                    link={link}
+                    onClick={() => navigateToLink(link)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </AuthLayout>
