@@ -1,4 +1,5 @@
 import { Link } from '@/api/LinksApi'
+import { useKey } from 'react-use'
 
 export enum ContextMenuAction {
   visit = 'visit',
@@ -16,6 +17,67 @@ interface Props {
 
 function LinkContextMenuContent(props: Props) {
   const isPinned = props.link.tags.includes('pinned')
+
+  useKey(
+    (event) => {
+      event.preventDefault()
+
+      return (event.ctrlKey || event.metaKey) && event.key === 'c'
+    },
+    () => {
+      props.onClick(ContextMenuAction.copyLink)
+    }
+  )
+
+  useKey(
+    (event) => {
+      event.preventDefault()
+
+      return (event.ctrlKey || event.metaKey) && event.key === 'e'
+    },
+    () => {
+      props.onClick(ContextMenuAction.edit)
+    }
+  )
+
+  useKey(
+    (event) => {
+      event.preventDefault()
+
+      return event.key === 'Enter' || ((event.ctrlKey || event.metaKey) && event.key === 'o')
+    },
+    () => {
+      props.onClick(ContextMenuAction.visit)
+    }
+  )
+
+  useKey(
+    (event) => {
+      event.preventDefault()
+
+      return (event.ctrlKey || event.metaKey) && event.key === 'p'
+    },
+    () => {
+      if (isPinned) {
+        props.onClick(ContextMenuAction.unpin)
+      } else {
+        props.onClick(ContextMenuAction.pin)
+      }
+    },
+    {},
+    [isPinned]
+  )
+
+  useKey(
+    (event) => {
+      event.preventDefault()
+
+      return event.keyCode === 46 || event.key === 'Backspace'
+    },
+    () => {
+      props.onClick(ContextMenuAction.delete)
+    }
+  )
 
   return (
     <div className="space-y-2 -right-8 mt-2 w-60 rounded-lg bg-white shadow-md border text-sm text-gray-800 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600">
@@ -202,11 +264,7 @@ function LinkContextMenuContent(props: Props) {
             <span className="text-gray-500 dark:text-slate-400 ml-auto">
               <div className="space-x-1">
                 <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                  ⌘
-                </kbd>
-
-                <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                  O
+                  enter
                 </kbd>
               </div>
             </span>
