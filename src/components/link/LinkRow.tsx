@@ -10,6 +10,7 @@ import * as ContextMenu from '@radix-ui/react-context-menu'
 import LinkContextMenuContent, { ContextMenuAction } from './LinkContextMenuContext'
 import LinkTags from './LinkTags'
 import { usePropState } from '@/hooks/usePropState'
+import fp from 'lodash/fp'
 
 interface Props {
   link: Link
@@ -24,6 +25,7 @@ interface Props {
 
 function LinkRow(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const urlRef = useRef<HTMLInputElement>(null)
 
   const [tags, setTags] = usePropState<string[]>(props.link.tags)
   const [title, setTitle] = usePropState<string>(props.link.title)
@@ -33,11 +35,28 @@ function LinkRow(props: Props) {
   const [isContextOpen, setIsContextOpen] = useState<boolean>(false)
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
+  // Focus root div ref containing tabIndex prop so that onKeydown listener works
+  useEffect(() => {
+    if (props.isSelected) {
+      ref.current?.focus()
+    }
+  }, [props.isSelected])
+
   useEffect(() => {
     if (!isEditMode && !url.length) {
       setUrl(props.link.url)
     }
   }, [isEditMode, props.link.url, setUrl, url])
+
+  // AutoFocus prop doesn't work for input because of tabIndex in the root div
+  // Have to do it manually with a setTimeout for it to take effect
+  useEffect(() => {
+    if (isEditMode) {
+      setTimeout(() => {
+        urlRef.current?.focus()
+      }, 0)
+    }
+  }, [isEditMode])
 
   useKey(
     'Escape',
@@ -68,12 +87,16 @@ function LinkRow(props: Props) {
         return
       }
 
-      setIsUpdating(true)
-      await props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle, tags })
-      setIsUpdating(false)
-      setIsEditMode(false)
+      if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title || !fp.isEqual(tags, props.link.tags)) {
+        setIsUpdating(true)
+        await props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle, tags })
+        setIsUpdating(false)
+        setIsEditMode(false)
 
-      return
+        return
+      }
+
+      setIsEditMode(false)
     }
   }, [url, title, isEditMode, props, setUrl, setTitle, tags])
 
@@ -140,15 +163,24 @@ function LinkRow(props: Props) {
     }
   }
 
+  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Enter' && props.isSelected) {
+      event.stopPropagation()
+      props.navigateToLink(props.link)
+    }
+  }
+
   return (
     <ContextMenu.Root onOpenChange={setIsContextOpen}>
       <ContextMenu.Trigger asChild>
         <div
+          tabIndex={0}
+          onKeyDown={onKeyDown}
           id={props.link.uuid}
           ref={ref}
           onClick={() => !isEditMode && props.onClick()}
           className={classNames({
-            'px-5  cursor-pointer select-none flex border border-solid group  border-slate-200 dark:border-slate-900':
+            'px-5  cursor-pointer select-none flex border border-solid group  border-slate-200 dark:border-slate-900 outline-none':
               true,
             'bg-white hover:bg-gray-50 dark:bg-slate-800 dark:hover:bg-slate-700':
               !isContextOpen && !isEditMode && !props.isSelected,
@@ -210,9 +242,9 @@ function LinkRow(props: Props) {
             {isEditMode && (
               <div className="flex-1">
                 <input
+                  ref={urlRef}
                   onChange={(event) => setTitle(event.target.value)}
                   value={title}
-                  autoFocus
                   onFocus={(e) => e.target.select()}
                   type="text"
                   placeholder="Nike website"

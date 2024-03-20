@@ -7,6 +7,7 @@ interface Props {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onCreate: (url: string, title: string) => void
   isLoading: boolean
+  onFocus?: () => void
 }
 
 function SearchAndCreateLinksInput(props: Props) {
@@ -79,7 +80,10 @@ function SearchAndCreateLinksInput(props: Props) {
           value={props.value}
           onChange={props.onChange}
           type="text"
-          onFocus={(e) => e.target.select()}
+          onFocus={(e) => {
+            e.target.select()
+            props.onFocus?.()
+          }}
           placeholder="Search your links..."
           className="w-full font-light pl-10 pr-20 py-2 text-gray-700 bg-white outline-none border focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:ring-slate-700"
         />

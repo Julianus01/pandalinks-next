@@ -1,7 +1,6 @@
 import { Link } from '@/api/LinksApi'
 import { useState } from 'react'
 import { useKey } from 'react-use'
-import fp from 'lodash/fp'
 
 export function useListCursor(links: Link[]) {
   const [cursor, setCursor] = useState<number | null>(null)
@@ -39,18 +38,6 @@ export function useListCursor(links: Link[]) {
     (event) => {
       event.preventDefault()
       decrement()
-
-      if (fp.isNumber(cursor) && fp.isNumber(cursor - 1)) {
-        const element = document.getElementById(links[cursor - 1]?.uuid)
-
-        if (element) {
-          element.scrollIntoView({
-            behavior: 'instant',
-            inline: 'nearest',
-            block: 'nearest',
-          })
-        }
-      }
     },
     {},
     [cursor, links]
@@ -61,18 +48,6 @@ export function useListCursor(links: Link[]) {
     (event) => {
       event.preventDefault()
       increment()
-
-      if (fp.isNumber(cursor) && fp.isNumber(cursor + 1)) {
-        const element = document.getElementById(links[cursor + 1]?.uuid)
-
-        if (element) {
-          element.scrollIntoView({
-            behavior: 'instant',
-            inline: 'nearest',
-            block: 'nearest',
-          })
-        }
-      }
     },
     {},
     [cursor, links]

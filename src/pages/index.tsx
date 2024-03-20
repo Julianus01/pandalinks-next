@@ -13,6 +13,8 @@ import { SupabaseTable } from '@/utils/supabase-utils'
 import { LinkUtils } from '@/utils/link-utils'
 import { Link } from '@/api/LinksApi'
 import classNames from 'classnames'
+import { useListCursor } from '@/hooks/useCursor'
+import { useClickAway, useKey } from 'react-use'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const supabaseSSR = createSSRClient(ctx)
@@ -60,6 +62,13 @@ interface Props {
 function HomePage(props: Props) {
   const linksContainerRef = useRef(null)
   const useLinksHook = useLinks({ initialData: props.links })
+  const listCursorHook = useListCursor(useLinksHook.links)
+
+  useClickAway(linksContainerRef, () => listCursorHook.setCursor(null))
+
+  useKey('Escape', () => {
+    listCursorHook.setCursor(null)
+  })
 
   const numberOfPinnedLinks = useMemo(
     () => useLinksHook.links.filter((link) => link.tags.includes('pinned')).length,
@@ -85,6 +94,7 @@ function HomePage(props: Props) {
     <AuthLayout>
       <div className="w-full max-w-3xl mx-auto pt-20 space-y-6 px-5 pb-40">
         <SearchAndCreateLinksInput
+          onFocus={() => listCursorHook.setCursor(null)}
           isLoading={useLinksHook.mutations.createLinkMutation.isPending}
           onCreate={useLinksHook.actions.createLink}
           value={useLinksHook.searchQ}
@@ -99,7 +109,7 @@ function HomePage(props: Props) {
           onChange={useLinksHook.actions.setSelectedTags}
         />
 
-        <div ref={linksContainerRef} className="space-y-2">
+        <div className="space-y-2">
           {!useLinksHook.isLoading && !useLinksHook.links.length && (
             <div className="inline mt-2 text-gray-800 dark:text-slate-300 text-sm">No links found</div>
           )}
@@ -126,10 +136,11 @@ function HomePage(props: Props) {
           )}
 
           {!!useLinksHook.links.length && (
-            <div className="-space-y-0.5 pb-4">
+            <div ref={linksContainerRef} className="-space-y-0.5 pb-4">
               {useLinksHook.links.map((link, index) => (
                 <div key={link.uuid} className={classNames({ 'pb-4': index === numberOfPinnedLinks - 1 })}>
                   <LinkRow
+                    isSelected={listCursorHook.cursor === index}
                     useLinksHook={useLinksHook}
                     navigateToLink={navigateToLink}
                     isFirst={index === 0 || index === numberOfPinnedLinks}
