@@ -29,10 +29,6 @@ function LinkRow(props: Props) {
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
   const [isContextOpen, setIsContextOpen] = useState<boolean>(false)
 
-  const isPinned = useMemo(() => {
-    return props.link.tags.includes('pinned')
-  }, [props.link.tags])
-
   useEffect(() => {
     if (!isEditMode && !url.length) {
       setUrl(props.link.url)

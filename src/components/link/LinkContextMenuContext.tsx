@@ -22,7 +22,7 @@ function LinkContextMenuContent(props: Props) {
     (event) => {
       event.preventDefault()
 
-      return (event.ctrlKey || event.metaKey) && event.key === 'c'
+      return event.key === 'c'
     },
     () => {
       props.onClick(ContextMenuAction.copyLink)
@@ -33,7 +33,7 @@ function LinkContextMenuContent(props: Props) {
     (event) => {
       event.preventDefault()
 
-      return (event.ctrlKey || event.metaKey) && event.key === 'e'
+      return event.key === 'e'
     },
     () => {
       props.onClick(ContextMenuAction.edit)
@@ -44,7 +44,7 @@ function LinkContextMenuContent(props: Props) {
     (event) => {
       event.preventDefault()
 
-      return event.key === 'Enter' || ((event.ctrlKey || event.metaKey) && event.key === 'o')
+      return event.key === 'Enter' || event.key === 'o'
     },
     () => {
       props.onClick(ContextMenuAction.visit)
@@ -55,7 +55,7 @@ function LinkContextMenuContent(props: Props) {
     (event) => {
       event.preventDefault()
 
-      return (event.ctrlKey || event.metaKey) && event.key === 'p'
+      return event.key === 'p'
     },
     () => {
       if (isPinned) {
@@ -109,10 +109,6 @@ function LinkContextMenuContent(props: Props) {
             <span className="text-gray-500 dark:text-slate-400 ml-auto">
               <div className="space-x-1">
                 <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                  ⌘
-                </kbd>
-
-                <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
                   C
                 </kbd>
               </div>
@@ -146,10 +142,6 @@ function LinkContextMenuContent(props: Props) {
 
               <span className="text-gray-500 dark:text-slate-400 ml-auto">
                 <div className="space-x-1">
-                  <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                    ⌘
-                  </kbd>
-
                   <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
                     P
                   </kbd>
@@ -188,10 +180,6 @@ function LinkContextMenuContent(props: Props) {
               <span className="text-gray-500 dark:text-slate-400 ml-auto">
                 <div className="space-x-1">
                   <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                    ⌘
-                  </kbd>
-
-                  <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
                     P
                   </kbd>
                 </div>
@@ -224,10 +212,6 @@ function LinkContextMenuContent(props: Props) {
 
             <span className="text-gray-500 dark:text-slate-400 ml-auto">
               <div className="space-x-1">
-                <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                  ⌘
-                </kbd>
-
                 <kbd className="px-2 py-1 text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
                   E
                 </kbd>
