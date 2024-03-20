@@ -4,7 +4,7 @@
 
 @layer components {
   .btn-default {
-    @apply flex items-center justify-center bg-white px-4 py-2 mt-3 text-center text-gray-700 font-medium rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700 disabled:pointer-events-none disabled:opacity-50 dark:disabled:opacity-30 dark:disabled:pointer-events-none;
+    @apply flex items-center justify-center bg-white px-4 py-2 mt-3 text-center text-gray-700 rounded-lg border hover:bg-gray-50 active:bg-gray-100 sm:mt-0 md:text-sm dark:text-white dark:bg-gray-800 dark:border-gray-800 dark:hover:bg-gray-700 dark:hover:border-gray-700 disabled:pointer-events-none disabled:opacity-50 dark:disabled:opacity-30 dark:disabled:pointer-events-none;
   }
 }
 

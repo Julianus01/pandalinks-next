@@ -30,12 +30,12 @@ export default function LoadingPage() {
           </div>
 
           <div className="flex flex-col space-y-0.5">
-            <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded" />
-            <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded" />
-            <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded" />
+            <div className="h-12 bg-gray-200 dark:bg-slate-800 rounded" />
+            <div className="h-12 bg-gray-200 dark:bg-slate-800 rounded" />
+            <div className="h-12 bg-gray-200 dark:bg-slate-800 rounded" />
+            <div className="h-16 bg-gray-200 dark:bg-slate-800 rounded" />
+            <div className="h-12 bg-gray-200 dark:bg-slate-800 rounded" />
             <div className="h-20 bg-gray-200 dark:bg-slate-800 rounded" />
-            <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded" />
-            <div className="h-24 bg-gray-200 dark:bg-slate-800 rounded" />
           </div>
         </div>
       </div>

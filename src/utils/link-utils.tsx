@@ -17,9 +17,8 @@ function sortByCreatedAt(links: Link[]) {
 }
 
 function applyPinAndSortByCreatedAt(links: Link[]) {
-  // TODO: They come in sorted from the backend directly
-  // const sorted = sortByCreatedAt(links)
-  const sortedAndSplitByPinned = splitByPinned(links)
+  const sorted = sortByCreatedAt(links)
+  const sortedAndSplitByPinned = splitByPinned(sorted)
 
   return sortedAndSplitByPinned
 }
@@ -63,7 +62,6 @@ const TAG_COLOR_CLASSES = [
   'bg-red-50 text-red-800 ring-red-600/20 dark:bg-red-100 dark:opacity-90',
   'bg-orange-50 text-orange-800 ring-orange-600/20 dark:bg-orange-100 dark:opacity-90',
   'bg-amber-50 text-amber-800 ring-amber-600/20 dark:bg-amber-100 dark:opacity-90',
-  'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-100 dark:opacity-90',
   'bg-lime-50 text-lime-800 ring-lime-600/20 dark:bg-lime-100 dark:opacity-90',
   'bg-green-50 text-green-800 ring-green-600/20 dark:bg-green-100 dark:opacity-90',
   'bg-emerald-50 text-emerald-800 ring-emerald-600/20 dark:bg-emerald-100 dark:opacity-90',
@@ -77,6 +75,9 @@ const TAG_COLOR_CLASSES = [
   'bg-fuchsia-50 text-fuchsia-800 ring-fuchsia-600/20 dark:bg-fuchsia-100 dark:opacity-90',
   'bg-pink-50 text-pink-800 ring-pink-600/20 dark:bg-pink-100 dark:opacity-90',
   'bg-rose-50 text-rose-800 ring-rose-600/20 dark:bg-rose-100 dark:opacity-90',
+
+  // Only for Pinned
+  // 'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-100 dark:opacity-90',
 ]
 
 const getRandomTagColorClasses = (tag: string) => {

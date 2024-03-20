@@ -48,7 +48,7 @@ function GlobalTagsSelector(props: Props) {
         <span
           onClick={onAllClick}
           className={classNames({
-            'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset': true,
+            'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs ring-1 ring-inset': true,
             'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100 dark:text-slate-400 dark:bg-gray-800 dark:ring-gray-500/20 dark:hover:bg-gray-700':
               !isAllSelected,
             [allTagColorClasses]: isAllSelected,
@@ -67,7 +67,7 @@ function GlobalTagsSelector(props: Props) {
             onClick={() => onClick(tag, !isSelected)}
             key={tag}
             className={classNames({
-              'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset':
+              'inline-flex cursor-pointer items-center rounded-md px-2 py-1 text-xs ring-1 ring-inset':
                 true,
               'bg-gray-50 text-gray-800 ring-gray-600/20 hover:bg-gray-100 dark:text-slate-400 dark:bg-gray-800 dark:ring-gray-500/20 dark:hover:bg-gray-700':
                 !isSelected,

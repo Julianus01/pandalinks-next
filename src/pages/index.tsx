@@ -105,7 +105,7 @@ function HomePage(props: Props) {
 
         <div ref={linksContainerRef} className="space-y-2">
           {!useLinksHook.isLoading && !useLinksHook.links.length && (
-            <div className="inline mt-2 text-gray-800 dark:text-slate-300">No links found</div>
+            <div className="inline mt-2 text-gray-800 dark:text-slate-300 text-sm">No links found</div>
           )}
 
           {!!useLinksHook.links.length && (

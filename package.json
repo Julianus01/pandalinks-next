@@ -12,6 +12,8 @@
     "@headlessui-float/react": "^0.13.2",
     "@headlessui/react": "^1.7.18",
     "@headlessui/tailwindcss": "^0.2.0",
+    "@radix-ui/react-context-menu": "^2.1.5",
+    "@radix-ui/react-popover": "^1.0.7",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.39.8",
     "@tanstack/react-query": "^5.0.0-alpha.63",
