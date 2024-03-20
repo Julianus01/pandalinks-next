@@ -98,9 +98,11 @@ export function useLinks(params: UseLinksParams) {
     })
   }
 
-  function updateLink(updatedLink: UpdateLinkRequestParams) {
-    const updatePromise = updateLinkMutation.mutateAsync(updatedLink, {
+  async function updateLink(updatedLink: UpdateLinkRequestParams) {
+    return updateLinkMutation.mutateAsync(updatedLink, {
       onSuccess: () => {
+        toast('Link has been updated')
+
         queryClient.setQueryData([ReactQueryKey.getLinks, user?.id], (data) => {
           const oldLinks = data as Link[]
 
@@ -115,14 +117,9 @@ export function useLinks(params: UseLinksParams) {
           return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
         })
       },
-    })
-
-    toast.promise(updatePromise, {
-      loading: 'Updating link...',
-      success: () => {
-        return `Link has been updated`
-      },
-      error: 'Something went wrong',
+      onError: () => {
+        toast('Something went wrong')
+      }
     })
   }
 

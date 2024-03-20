@@ -1,6 +1,5 @@
 import { Link, UpdateLinkRequestParams } from '@/api/LinksApi'
 import { useTemporaryTrue } from '@/hooks/useTemporaryTrue'
-import { LinkUtils } from '@/utils/link-utils'
 import classNames from 'classnames'
 import Image from 'next/image'
 import React, { useCallback } from 'react'
@@ -9,14 +8,16 @@ import { useClickAway, useKey } from 'react-use'
 import { toast } from 'sonner'
 import * as ContextMenu from '@radix-ui/react-context-menu'
 import LinkContextMenuContent, { ContextMenuAction } from './LinkContextMenuContext'
+import LinkTags from './LinkTags'
+import { usePropState } from '@/hooks/usePropState'
 
 interface Props {
   link: Link
-  isSelected: boolean
+  isSelected?: boolean
   isFirst: boolean
   isLast: boolean
   onClick: () => void
-  onUpdate: (updatedLink: UpdateLinkRequestParams) => void
+  onUpdate: (updatedLink: UpdateLinkRequestParams) => Promise<void>
   useLinksHook: any
   navigateToLink: (link: Link) => void
 }
@@ -24,17 +25,20 @@ interface Props {
 function LinkRow(props: Props) {
   const ref = useRef<HTMLDivElement>(null)
 
-  const [title, setTitle] = useState<string>(props.link.title)
-  const [url, setUrl] = useState<string>(props.link.url)
+  const [tags, setTags] = usePropState<string[]>(props.link.tags)
+  const [title, setTitle] = usePropState<string>(props.link.title)
+  const [url, setUrl] = usePropState<string>(props.link.url)
   const [isEditMode, setIsEditMode] = useState<boolean>(false)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
   const [isContextOpen, setIsContextOpen] = useState<boolean>(false)
+  const [showTagsDialog, setShowTagsDialog] = useState<boolean>(false)
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
   useEffect(() => {
     if (!isEditMode && !url.length) {
       setUrl(props.link.url)
     }
-  }, [isEditMode, props.link.url, url])
+  }, [isEditMode, props.link.url, setUrl, url])
 
   useKey(
     'Escape',
@@ -42,13 +46,16 @@ function LinkRow(props: Props) {
       if (isEditMode) {
         setUrl(props.link.url)
         setTitle(props.link.title)
+        setTags(props.link.tags)
       }
+
+      setIsEditMode(false)
     },
     {},
     [isEditMode, props.link.url]
   )
 
-  const onSaveEdit = useCallback(() => {
+  const onSaveEdit = useCallback(async () => {
     const trimmedUrl = url.trim()
     const trimmedTitle = title.trim()
 
@@ -62,16 +69,14 @@ function LinkRow(props: Props) {
         return
       }
 
-      if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title) {
-        props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle })
-        setIsEditMode(false)
-
-        return
-      }
-
+      setIsUpdating(true)
+      await props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle, tags })
+      setIsUpdating(false)
       setIsEditMode(false)
+
+      return
     }
-  }, [url, title, isEditMode, props])
+  }, [url, title, isEditMode, props, setUrl, setTitle, tags])
 
   useClickAway(ref, onSaveEdit)
 
@@ -136,17 +141,10 @@ function LinkRow(props: Props) {
     }
   }
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'Enter') {
-      onSaveEdit()
-    }
-  }
-
   return (
     <ContextMenu.Root onOpenChange={setIsContextOpen}>
       <ContextMenu.Trigger asChild>
         <div
-          onKeyDown={onKeyDown}
           id={props.link.uuid}
           ref={ref}
           onClick={() => !isEditMode && props.onClick()}
@@ -158,34 +156,60 @@ function LinkRow(props: Props) {
             'bg-gray-50 dark:bg-slate-700': isContextOpen || isEditMode || props.isSelected,
             'rounded-t-lg': props.isFirst,
             'rounded-b-lg': props.isLast,
+            'pointer-events-none opacity-80': isUpdating,
           })}
         >
           <div className="relative pt-4 flex flex-col items-center mr-2">
-            <div className="absolute top-4 right-0 bottom-0 left-0">
-              <MemoLinkRowImage url={url} isEditMode={isEditMode} />
+            <div className={classNames({ hidden: isUpdating })}>
+              <div className="absolute top-4 right-0 bottom-0 left-0">
+                <MemoLinkRowImage url={url} isEditMode={isEditMode} />
+              </div>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-gray-800 dark:text-slate-400"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
             </div>
 
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-gray-800 dark:text-slate-400"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
+            <div className={classNames({ hidden: !isUpdating })}>
+              <svg
+                className="animate-spin text-gray-500 dark:text-slate-300"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                <line x1="2" y1="12" x2="6" y2="12"></line>
+                <line x1="18" y1="12" x2="22" y2="12"></line>
+                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+              </svg>
+            </div>
           </div>
 
           <div className={classNames({ 'flex flex-1 py-3 gap-2': true, 'flex-wrap': props.link.tags.length > 1 })}>
             {isEditMode && (
-              <div className="flex-1 pr-4">
+              <div className="flex-1">
                 <input
                   onChange={(event) => setTitle(event.target.value)}
                   value={title}
@@ -204,6 +228,10 @@ function LinkRow(props: Props) {
                   placeholder="Nike.com"
                   className="flex-1 focus:outline-none text-sm text-gray-400 dark:text-slate-400 bg-transparent w-full"
                 />
+
+                <div className="mt-3 flex justify-end">
+                  <LinkTags onChange={setTags} tags={tags} isEditMode />
+                </div>
               </div>
             )}
 
@@ -215,26 +243,7 @@ function LinkRow(props: Props) {
               </div>
             )}
 
-            {!isEditMode && (
-              <div className="flex items-center space-x-2 ml-auto">
-                {props.link.tags.map((tag) => {
-                  const tagColorClasses = LinkUtils.getRandomTagColorClasses(tag)
-
-                  return (
-                    <span
-                      key={tag}
-                      className={classNames({
-                        'inline-flex items-center rounded-md px-2 py-1 text-xs ring-1 ring-inset whitespace-nowrap':
-                          true,
-                        [tagColorClasses]: true,
-                      })}
-                    >
-                      #{tag}
-                    </span>
-                  )
-                })}
-              </div>
-            )}
+            {!isEditMode && <LinkTags tags={props.link.tags} />}
           </div>
         </div>
       </ContextMenu.Trigger>
