@@ -129,45 +129,26 @@ function HomePage(props: Props) {
             </div>
           )}
 
-          {!!pinnedLinks.length && (
-            <div className="-space-y-0.5 pb-4">
-              {pinnedLinks.map((link: Link, index: number) => {
-                return (
-                  <LinkRow
-                    // Remove these two below and make the callback upward
-                    useLinksHook={useLinksHook}
-                    navigateToLink={navigateToLink}
-                    isFirst={index === 0}
-                    isLast={index === pinnedLinks.length - 1}
-                    onUpdate={useLinksHook.actions.updateLink}
-                    link={link}
-                    key={link.uuid}
-                    onClick={() => navigateToLink(link)}
-                  />
-                )
-              })}
-            </div>
-          )}
-
-          {!!unpinnedLinks.length && (
-            <div className="-space-y-0.5">
-              {unpinnedLinks.map((link: Link, index: number) => {
-                return (
-                  <LinkRow
-                    // Remove these two below and make the callback upward
-                    useLinksHook={useLinksHook}
-                    navigateToLink={navigateToLink}
-                    isFirst={index === 0}
-                    isLast={index === unpinnedLinks.length - 1}
-                    onUpdate={useLinksHook.actions.updateLink}
-                    link={link}
-                    key={link.uuid}
-                    onClick={() => navigateToLink(link)}
-                  />
-                )
-              })}
-            </div>
-          )}
+          {!!useLinksHook.links.length &&
+            [pinnedLinks, unpinnedLinks].map((groupLinks, groupIndex) => (
+              <div className="-space-y-0.5 pb-4" key={groupIndex}>
+                {groupLinks.map((link: Link, index: number) => {
+                  return (
+                    <LinkRow
+                      // Remove these two below and make the callback upward
+                      useLinksHook={useLinksHook}
+                      navigateToLink={navigateToLink}
+                      isFirst={index === 0}
+                      isLast={index === groupLinks.length - 1}
+                      onUpdate={useLinksHook.actions.updateLink}
+                      link={link}
+                      key={link.uuid}
+                      onClick={() => navigateToLink(link)}
+                    />
+                  )
+                })}
+              </div>
+            ))}
         </div>
       </div>
     </AuthLayout>
