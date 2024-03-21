@@ -79,7 +79,8 @@ function LinkTags(props: Props) {
             onClick={() => props.isEditMode && removeTag(tag)}
             key={tag}
             className={classNames({
-              'inline-flex items-center rounded-md px-2 py-0.5 text-xs ring-1 ring-inset whitespace-nowrap': true,
+              'inline-flex items-center rounded-md px-2 py-0.5 text-xs ring-1 ring-inset whitespace-nowrap':
+                true,
               [tagColorClasses]: true,
               'hover:opacity-70 dark:hover:opacity-70 cursor-pointer': props.isEditMode,
             })}
@@ -159,7 +160,9 @@ function LinkTags(props: Props) {
                 type="text"
                 onFocus={(e) => e.target.select()}
                 placeholder="research"
-                className="w-28 font-light pl-6 pr-2 py-1 text-xs text-gray-700 bg-white outline-none border focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:ring-slate-700"
+                className="w-28 font-light pl-6 pr-2 py-1 text-xs text-gray-700 bg-white outline-none border
+                  focus:ring-offset-0 focus:ring-2 focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg
+                  dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:focus:ring-slate-700"
               />
             </div>
           )}

@@ -11,6 +11,7 @@ import LinkContextMenuContent, { ContextMenuAction } from './LinkContextMenuCont
 import LinkTags from './LinkTags'
 import { usePropState } from '@/hooks/usePropState'
 import fp from 'lodash/fp'
+import axios from 'axios'
 
 interface Props {
   link: Link
@@ -91,7 +92,11 @@ function LinkRow(props: Props) {
         return
       }
 
-      if (trimmedUrl !== props.link.url || trimmedTitle !== props.link.title || !fp.isEqual(tags, props.link.tags)) {
+      if (
+        trimmedUrl !== props.link.url ||
+        trimmedTitle !== props.link.title ||
+        !fp.isEqual(tags, props.link.tags)
+      ) {
         setIsUpdating(true)
         await props.onUpdate({ uuid: props.link.uuid, url: trimmedUrl, title: trimmedTitle, tags })
         setIsUpdating(false)
@@ -182,8 +187,8 @@ function LinkRow(props: Props) {
           ref={ref}
           onClick={() => !props.isEditMode && props.onClick()}
           className={classNames({
-            'px-5  cursor-pointer select-none flex border border-solid group  border-slate-200 dark:border-slate-900 outline-none':
-              true,
+            [`px-5 cursor-pointer select-none flex border border-solid group border-slate-200
+            dark:border-slate-900 outline-none`]: true,
             'bg-white hover:bg-gray-50 dark:bg-slate-800 dark:hover:bg-slate-700':
               !isContextOpen && !props.isEditMode && !props.isSelected,
             'bg-gray-50 dark:bg-slate-700': isContextOpen || props.isEditMode || props.isSelected,
@@ -242,7 +247,12 @@ function LinkRow(props: Props) {
             </div>
           </div>
 
-          <div className={classNames({ 'flex flex-1 py-3 gap-2': true, 'flex-wrap': props.link.tags.length > 1 })}>
+          <div
+            className={classNames({
+              'flex flex-1 py-3 gap-2': true,
+              'flex-wrap': props.link.tags.length > 1,
+            })}
+          >
             {props.isEditMode && (
               <div className="flex-1">
                 <input
@@ -272,9 +282,15 @@ function LinkRow(props: Props) {
 
             {!props.isEditMode && (
               <div className="truncate space-y-1 mr-4">
-                {showCopied && <div className="flex-1 text-gray-800 dark:text-slate-200">Copied to clipboard</div>}
+                {showCopied && (
+                  <div className="flex-1 text-gray-800 dark:text-slate-200">
+                    Copied to clipboard
+                  </div>
+                )}
 
-                {!showCopied && <p className="whitespace-normal text-gray-800 dark:text-slate-300">{title}</p>}
+                {!showCopied && (
+                  <p className="whitespace-normal text-gray-800 dark:text-slate-300">{title}</p>
+                )}
               </div>
             )}
 
@@ -284,7 +300,10 @@ function LinkRow(props: Props) {
       </ContextMenu.Trigger>
 
       <ContextMenu.Portal>
-        <ContextMenu.Content data-state={isContextOpen ? 'open' : 'closed'} className="ContextMenuContent">
+        <ContextMenu.Content
+          data-state={isContextOpen ? 'open' : 'closed'}
+          className="ContextMenuContent"
+        >
           <LinkContextMenuContent link={props.link} onClick={onContextMenuAction} />
         </ContextMenu.Content>
       </ContextMenu.Portal>
