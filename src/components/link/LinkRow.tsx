@@ -11,7 +11,6 @@ import LinkContextMenuContent, { ContextMenuAction } from './LinkContextMenuCont
 import LinkTags from './LinkTags'
 import { usePropState } from '@/hooks/usePropState'
 import fp from 'lodash/fp'
-import axios from 'axios'
 
 interface Props {
   link: Link
