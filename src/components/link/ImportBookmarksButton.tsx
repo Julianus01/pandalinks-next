@@ -111,7 +111,11 @@ function ImportBookmarksButton() {
       </div>
 
       <Transition appear show={isOpen} as={React.Fragment}>
-        <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={() => setIsOpen(false)}>
+        <Dialog
+          as="div"
+          className="fixed inset-0 z-10 overflow-y-auto"
+          onClose={() => setIsOpen(false)}
+        >
           <div className="min-h-screen px-4 text-center">
             <Transition.Child
               as={React.Fragment}
@@ -139,15 +143,24 @@ function ImportBookmarksButton() {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
-                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-slate-300 mb-4">
+              <div
+                className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all
+                  transform bg-white dark:bg-slate-800 shadow-xl rounded-2xl"
+              >
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg font-medium leading-6 text-gray-900 dark:text-slate-300 mb-4"
+                >
                   Import Bookmarks
                 </Dialog.Title>
 
                 <div className="flex items-center justify-center w-full mb-6">
                   <label
                     aria-disabled={isLoading}
-                    className="flex aria-disabled:pointer-events-none flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700 relative"
+                    className="flex aria-disabled:pointer-events-none flex-col items-center justify-center w-full h-64 border-2
+                      border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800
+                      dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500
+                      dark:hover:bg-gray-700 relative"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <svg
@@ -166,10 +179,12 @@ function ImportBookmarksButton() {
                       </svg>
 
                       <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
+                        <span className="font-semibold">Click to upload</span>
                       </p>
 
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Bookmarks HTML file</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Bookmarks HTML file
+                      </p>
                     </div>
 
                     <input
@@ -181,7 +196,10 @@ function ImportBookmarksButton() {
                     />
 
                     {isLoading && (
-                      <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex flex-col space-y-2 items-center justify-center bg-opacity-95">
+                      <div
+                        className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex flex-col space-y-2 items-center justify-center
+                          bg-opacity-95"
+                      >
                         <svg
                           className="animate-spin text-gray-500 dark:text-slate-300"
                           width="24"
@@ -209,13 +227,17 @@ function ImportBookmarksButton() {
                   </label>
                 </div>
 
-                <p className="mb-4 text-gray-500">How do I generate HTML file for my bookmarks? 🤔</p>
+                <p className="mb-4 text-gray-500">
+                  How do I generate HTML file for my bookmarks? 🤔
+                </p>
 
                 <div className="flex space-x-3">
                   <a
                     target="_blank"
                     href="https://www.youtube.com/watch?v=i1dz0q2Y71Y"
-                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200 hover:-translate-y-1 duration-150 p-4 justify-center"
+                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700
+                      dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200
+                      hover:-translate-y-1 duration-150 p-4 justify-center"
                   >
                     <SafariSvg />
 
@@ -225,7 +247,9 @@ function ImportBookmarksButton() {
                   <a
                     target="_blank"
                     href="https://www.youtube.com/watch?v=tImar3ojigE?t=67s"
-                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200 hover:-translate-y-1 duration-150 p-4 justify-center"
+                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700
+                      dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200
+                      hover:-translate-y-1 duration-150 p-4 justify-center"
                   >
                     <ChromeSvg />
 
@@ -235,7 +259,9 @@ function ImportBookmarksButton() {
                   <a
                     target="_blank"
                     href="https://www.youtube.com/watch?v=tImar3ojigE?t=67s"
-                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200 hover:-translate-y-1 duration-150 p-4 justify-center"
+                    className="flex-1 flex flex-col cursor-pointer space-y-3 items-center rounded-lg bg-gray-100 dark:bg-slate-700
+                      dark:hover:bg-slate-600 hover:bg-gray-200 transition-transform hover:ring-blue-200
+                      hover:-translate-y-1 duration-150 p-4 justify-center"
                   >
                     <BraveSvg />
 
@@ -247,7 +273,8 @@ function ImportBookmarksButton() {
                   <button
                     disabled={isLoading}
                     type="button"
-                    className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600 dark:hover:border-slate-600 w-full outline-none py-3"
+                    className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600
+                      dark:hover:border-slate-600 w-full outline-none py-3"
                     onClick={() => setIsOpen(false)}
                   >
                     Close

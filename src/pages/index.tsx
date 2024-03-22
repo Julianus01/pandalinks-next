@@ -15,6 +15,7 @@ import { Link } from '@/api/LinksApi'
 import classNames from 'classnames'
 import { useListCursor } from '@/hooks/useCursor'
 import { useClickAway, useKey } from 'react-use'
+import NoLinksButton from '@/components/link/NoLinksButton'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const supabaseSSR = createSSRClient(ctx)
@@ -64,7 +65,10 @@ function HomePage(props: Props) {
   const [linkInEdit, setLinkInEdit] = useState<string | null>(null)
 
   const useLinksHook = useLinks({ initialData: props.links })
-  const listCursorHook = useListCursor({ links: useLinksHook.links, disableArrowListeners: !!linkInEdit })
+  const listCursorHook = useListCursor({
+    links: useLinksHook.links,
+    disableArrowListeners: !!linkInEdit,
+  })
 
   useClickAway(linksContainerRef, () => listCursorHook.setCursor(null))
 
@@ -105,20 +109,32 @@ function HomePage(props: Props) {
           }}
         />
 
-        <GlobalTagsSelector
-          tags={useLinksHook.allTags}
-          selectedTags={useLinksHook.selectedTags}
-          onChange={useLinksHook.actions.setSelectedTags}
-        />
+        {!!useLinksHook.allTags.length && (
+          <GlobalTagsSelector
+            tags={useLinksHook.allTags}
+            selectedTags={useLinksHook.selectedTags}
+            onChange={useLinksHook.actions.setSelectedTags}
+          />
+        )}
 
         <div className="space-y-2">
           {!useLinksHook.isLoading && !useLinksHook.links.length && (
-            <div className="inline mt-2 text-gray-800 dark:text-slate-300 text-sm">No links found</div>
+            <>
+              {useLinksHook.searchQ && (
+                <div className="inline mt-2 text-gray-800 dark:text-slate-300 text-sm">
+                  No links found
+                </div>
+              )}
+
+              {!useLinksHook.searchQ && <NoLinksButton />}
+            </>
           )}
 
           {!!useLinksHook.links.length && (
             <div className="px-5 pb-1 flex items-center">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Name - {useLinksHook.links?.length} Results</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">
+                Name - {useLinksHook.links?.length} Results
+              </p>
 
               <div className="ml-auto flex items-center space-x-1">
                 <svg
@@ -129,7 +145,11 @@ function HomePage(props: Props) {
                   stroke="currentColor"
                   className="w-4 h-4 text-gray-500 dark:text-slate-400"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3"
+                  />
                 </svg>
 
                 <p className="text-sm text-gray-500 dark:text-slate-400">created at</p>
@@ -140,7 +160,10 @@ function HomePage(props: Props) {
           {!!useLinksHook.links.length && (
             <div ref={linksContainerRef} className="-space-y-0.5 pb-4">
               {useLinksHook.links.map((link, index) => (
-                <div key={link.uuid} className={classNames({ 'pb-4': index === numberOfPinnedLinks - 1 })}>
+                <div
+                  key={link.uuid}
+                  className={classNames({ 'pb-4': index === numberOfPinnedLinks - 1 })}
+                >
                   <LinkRow
                     blurMode={Boolean(linkInEdit && linkInEdit !== link.uuid)}
                     onChangeEditMode={(val) => {
@@ -155,7 +178,9 @@ function HomePage(props: Props) {
                     useLinksHook={useLinksHook}
                     navigateToLink={navigateToLink}
                     isFirst={index === 0 || index === numberOfPinnedLinks}
-                    isLast={index === numberOfPinnedLinks - 1 || index === useLinksHook.links.length - 1}
+                    isLast={
+                      index === numberOfPinnedLinks - 1 || index === useLinksHook.links.length - 1
+                    }
                     onUpdate={useLinksHook.actions.updateLink}
                     link={link}
                     onClick={() => navigateToLink(link)}

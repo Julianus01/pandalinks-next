@@ -55,7 +55,7 @@ export function useLinks(params: UseLinksParams) {
     )(links)
   }, [links, searchQ, selectedTags])
 
-  const allTags = useMemo(() => {
+  const allTags: string[] = useMemo(() => {
     return fp.compose(
       fp.uniq,
       fp.flatMap((link: Link) => link.tags)
@@ -131,7 +131,11 @@ export function useLinks(params: UseLinksParams) {
       return LinkUtils.applyPinAndSortByCreatedAt(updatedLinks)
     })
 
-    const deletePromise = deleteLinkMutation.mutateAsync(linkId)
+    const deletePromise = deleteLinkMutation.mutateAsync(linkId, {
+      onSuccess: () => {
+
+      }
+    })
 
     toast.promise(deletePromise, {
       loading: 'Removing link...',
