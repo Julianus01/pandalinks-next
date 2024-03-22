@@ -39,16 +39,13 @@ async function getLinks(): Promise<Link[]> {
     .from(SupabaseTable.Links)
     .select()
     .eq('user_id', user?.id)
-    .order('created_at', { ascending: false })
 
   // TODO: Handle this
   if (error) {
     return []
   }
 
-  await wait(1500)
-
-  return LinkUtils.splitByPinned(data)
+  return LinkUtils.applyPinAndSortByCreatedAt(data)
 }
 
 export interface UpdateLinkRequestParams extends Partial<Link> {

@@ -12,7 +12,14 @@ function splitByPinned(links: Link[]) {
 
 function sortByCreatedAt(links: Link[]) {
   return links.sort((first: Link, second: Link) => {
-    return new Date(second.created_at).valueOf() - new Date(first.created_at).valueOf()
+    const firstTimestamp = new Date(first.created_at).valueOf()
+    const secondTimestamp = new Date(second.created_at).valueOf()
+
+    if (firstTimestamp === secondTimestamp) {
+      return first.title > second.title ? 1 : -1
+    }
+
+    return secondTimestamp - firstTimestamp
   })
 }
 

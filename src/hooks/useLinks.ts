@@ -55,6 +55,8 @@ export function useLinks(params: UseLinksParams) {
     )(links)
   }, [links, searchQ, selectedTags])
 
+  console.log({ filteredLinks })
+
   const allTags: string[] = useMemo(() => {
     return fp.compose(
       fp.uniq,
