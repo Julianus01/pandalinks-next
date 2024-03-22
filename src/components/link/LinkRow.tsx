@@ -62,21 +62,6 @@ function LinkRow(props: Props) {
     }
   }, [props.isEditMode])
 
-  useKey(
-    'Escape',
-    () => {
-      if (props.isEditMode) {
-        setUrl(props.link.url)
-        setTitle(props.link.title)
-        setTags(props.link.tags)
-
-        props.onChangeEditMode(false)
-      }
-    },
-    {},
-    [props.isEditMode, props.link.url]
-  )
-
   const onSaveEdit = useCallback(async () => {
     const trimmedUrl = url.trim()
     const trimmedTitle = title.trim()
@@ -109,6 +94,17 @@ function LinkRow(props: Props) {
   }, [url, title, props, setUrl, setTitle, tags])
 
   useClickAway(ref, onSaveEdit)
+
+  useKey(
+    'Escape',
+    () => {
+      if (props.isEditMode) {
+        onSaveEdit()
+      }
+    },
+    {},
+    [props.isEditMode, props.link.url, onSaveEdit]
+  )
 
   function onContextMenuAction(action: ContextMenuAction) {
     switch (action) {
