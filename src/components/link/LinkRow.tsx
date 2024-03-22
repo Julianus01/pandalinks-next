@@ -194,8 +194,8 @@ function LinkRow(props: Props) {
             'rounded-t-lg': props.isFirst,
             'rounded-b-lg': props.isLast,
             'pointer-events-none opacity-80': isUpdating,
-            'opacity-30 pointer-events-none': props.blurMode,
-            'rounded-md cursor-default': props.isEditMode,
+            'opacity-30 pointer-events-none blur-[1px]': props.blurMode,
+            'rounded-md cursor-default bg-white': props.isEditMode,
           })}
         >
           <div className="relative pt-4 flex flex-col items-center mr-2">

@@ -17,6 +17,29 @@ function SearchAndCreateLinksInput(props: Props) {
   const [url, setUrl] = useState<string>('')
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
+  // useEffect(() => {
+  //   let url = props.link.url
+
+  //   if (!url.match(/^https?:\/\//i)) {
+  //     url = `https://${url}`
+  //   }
+
+  //   fetch(`/api/url-metadata?url=${url}`)
+  //     .then((response) => {
+  //       response.json().then((json) => {
+  //         console.log('Response')
+  //         console.log(json)
+
+  //         const title = json['og:title']
+  //         console.log({ title })
+  //       })
+  //     })
+  //     .catch((error) => {
+  //       console.log('Error here')
+  //       console.log(error)
+  //     })
+  // }, [props.link.url])
+
   useEffect(() => {
     if (!isOpen) {
       setUrl('')

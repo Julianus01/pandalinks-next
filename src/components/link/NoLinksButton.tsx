@@ -12,26 +12,31 @@ function getNewLinks(userId: string): Partial<Link>[] {
       title: 'This shoe is iconic 👟',
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       user_id: userId,
+      tags: ['friday'],
     },
     {
       title: 'This is magic 🪄',
       url: 'https://www.youtube.com/watch?v=Y8F-s23myIM',
       user_id: userId,
+      tags: [],
     },
     {
       title: '10x Software Engineer testing strategy 🧪',
       url: 'https://9gag.com/gag/avQg8jd',
       user_id: userId,
+      tags: [],
     },
     {
       title: 'Zuck pretends to be human with his human fellows 👽',
       url: 'https://www.youtube.com/watch?v=eBxTEoseZak',
       user_id: userId,
+      tags: ['totally-human'],
     },
     {
       title: 'TGIF 🎉',
       url: 'https://9gag.com/gag/aP38QqR',
       user_id: userId,
+      tags: ['friday', 'pinned'],
     },
   ]
 }
