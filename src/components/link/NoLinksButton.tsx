@@ -14,22 +14,22 @@ function getNewLinks(userId: string): Partial<Link>[] {
       user_id: userId,
     },
     {
-      title: 'Having fun with friends 🕺',
+      title: 'This is magic 🪄',
       url: 'https://www.youtube.com/watch?v=Y8F-s23myIM',
       user_id: userId,
     },
     {
-      title: '10x Software Engineer testing strategy',
+      title: '10x Software Engineer testing strategy 🧪',
       url: 'https://9gag.com/gag/avQg8jd',
       user_id: userId,
     },
     {
-      title: 'Zuck pretends to be human with his human fellows',
+      title: 'Zuck pretends to be human with his human fellows 👽',
       url: 'https://www.youtube.com/watch?v=eBxTEoseZak',
       user_id: userId,
     },
     {
-      title: 'TGIF',
+      title: 'TGIF 🎉',
       url: 'https://9gag.com/gag/aP38QqR',
       user_id: userId,
     },
