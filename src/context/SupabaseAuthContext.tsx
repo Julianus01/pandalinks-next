@@ -26,13 +26,6 @@ export const SupabaseAuthContextProvider = ({ children }: AuthContextProps) => {
   const [session, setSession] = useState<Session | null>(null)
   const [isLoadingSession, setIsLoadingSession] = useState(true)
 
-  // TODO: Remove this?
-  // const profileQuery = useQuery({
-  //   queryKey: [ReactQueryKey.getProfile, session?.user?.id],
-  //   queryFn: () => UserApi.getProfile(session as Session),
-  //   enabled: !!session?.user?.id,
-  // })
-
   useEffect(() => {
     supabaseClient.auth.onAuthStateChange(async (_event, session) => {
       if (!session) {

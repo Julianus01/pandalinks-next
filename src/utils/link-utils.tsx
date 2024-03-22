@@ -97,10 +97,24 @@ const getRandomTagColorClasses = (tag: string) => {
   return TAG_COLOR_CLASSES[rand ? rand % TAG_COLOR_CLASSES.length : 0]
 }
 
+function isValidUrl(url: string) {
+  var pattern = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i'
+  ) // fragment locator
+  return !!pattern.test(url)
+}
+
 export const LinkUtils = {
   splitByPinned,
   sortByCreatedAt,
   applyPinAndSortByCreatedAt,
   getBookmarksFromImportedJson,
   getRandomTagColorClasses,
+  isValidUrl,
 }

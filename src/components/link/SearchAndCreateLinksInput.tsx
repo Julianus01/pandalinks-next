@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { useKey } from 'react-use'
+import { useDebounce, useKey } from 'react-use'
 import * as Popover from '@radix-ui/react-popover'
+import { useQuery } from '@tanstack/react-query'
+import { ReactQueryKey } from '@/api/ReactQueryKey'
+import { LinksApi } from '@/api/LinksApi'
+import { LinkUtils } from '@/utils/link-utils'
+import classNames from 'classnames'
 
 interface Props {
   value: string
@@ -13,36 +18,44 @@ interface Props {
 function SearchAndCreateLinksInput(props: Props) {
   const ref = useRef<HTMLInputElement>(null)
 
+  const [isOpen, setIsOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>('')
   const [url, setUrl] = useState<string>('')
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [debouncedUrl, setDebouncedUrl] = useState<string>('')
 
-  // useEffect(() => {
-  //   let url = props.link.url
+  useDebounce(
+    () => {
+      setDebouncedUrl(url)
+    },
+    250,
+    [url]
+  )
 
-  //   if (!url.match(/^https?:\/\//i)) {
-  //     url = `https://${url}`
-  //   }
+  const isQueryEnabled = isOpen && !!debouncedUrl.length && LinkUtils.isValidUrl(debouncedUrl)
 
-  //   fetch(`/api/url-metadata?url=${url}`)
-  //     .then((response) => {
-  //       response.json().then((json) => {
-  //         console.log('Response')
-  //         console.log(json)
+  const metadataQuery = useQuery({
+    queryKey: [ReactQueryKey.getUrlMetadata, debouncedUrl],
+    queryFn: () => LinksApi.getUrlMetadata(debouncedUrl),
+    enabled: isQueryEnabled,
+    retry: false,
+  })
 
-  //         const title = json['og:title']
-  //         console.log({ title })
-  //       })
-  //     })
-  //     .catch((error) => {
-  //       console.log('Error here')
-  //       console.log(error)
-  //     })
-  // }, [props.link.url])
+  const isMetadataLoading = isQueryEnabled && metadataQuery.isPending
+
+  useEffect(() => {
+    if (isQueryEnabled && metadataQuery.isSuccess && metadataQuery.data) {
+      const title = metadataQuery.data.ogTitle || metadataQuery.data.ogSiteName || ''
+
+      if (title) {
+        setTitle(title)
+      }
+    }
+  }, [metadataQuery, isQueryEnabled])
 
   useEffect(() => {
     if (!isOpen) {
       setUrl('')
+      setDebouncedUrl('')
       setTitle('')
     }
   }, [isOpen])
@@ -193,20 +206,50 @@ function SearchAndCreateLinksInput(props: Props) {
                 dark:border-slate-700 dark:text-white dark:focus:ring-slate-700"
             />
 
-            <input
-              onKeyDown={onKeyDown}
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              type="text"
-              placeholder="Title: Coolest page"
-              className="w-full px-2 py-2 text-gray-700 bg-gray-50 outline-none border focus:ring-offset-0 focus:ring-1
-                focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-gray-800
-                dark:border-slate-700 dark:text-white dark:focus:ring-slate-700"
-            />
+            <div className="relative">
+              <input
+                disabled={isMetadataLoading}
+                onKeyDown={onKeyDown}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                type="text"
+                placeholder="Title: Coolest page"
+                className={classNames(
+                  `w-full px-2 py-2 text-gray-700 bg-gray-50 outline-none border focus:ring-offset-0 focus:ring-1
+                  focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-gray-800
+                  dark:border-slate-700 dark:text-white dark:focus:ring-slate-700 dark:disabled:pointer-events-none
+                  dark:disabled:opacity-50`,
+                  { 'pr-9': isMetadataLoading }
+                )}
+              />
+
+              {isMetadataLoading && (
+                <svg
+                  className="animate-spin text-gray-500 dark:text-slate-300 absolute right-3 inset-y-0 my-auto"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" y1="2" x2="12" y2="6"></line>
+                  <line x1="12" y1="18" x2="12" y2="22"></line>
+                  <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                  <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                  <line x1="2" y1="12" x2="6" y2="12"></line>
+                  <line x1="18" y1="12" x2="22" y2="12"></line>
+                  <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                  <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                </svg>
+              )}
+            </div>
 
             <button
               onClick={createLink}
-              disabled={!title.length || !url.length}
+              disabled={isMetadataLoading || !title.length || !url.length}
               className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600
                 dark:hover:border-slate-600 ml-auto"
             >

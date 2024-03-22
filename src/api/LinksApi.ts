@@ -131,10 +131,24 @@ async function deleteLink(uuid: string) {
   return data
 }
 
+async function getUrlMetadata(url: string) {
+  let formattedUrl = url
+
+  if (!formattedUrl.match(/^https?:\/\//i)) {
+    formattedUrl = `https://${formattedUrl}`
+  }
+
+  const response = await fetch(`/api/url-metadata?url=${formattedUrl}`)
+  const metadata = await response.json()
+
+  return metadata
+}
+
 export const LinksApi = {
   getLinks,
   updateLink,
   createLink,
   batchCreateLinks,
   deleteLink,
+  getUrlMetadata
 }

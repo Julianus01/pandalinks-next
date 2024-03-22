@@ -1,4 +1,5 @@
 export enum ReactQueryKey {
   getLinks = 'getLinks',
-  getProfile = 'getProfile'
+  getProfile = 'getProfile',
+  getUrlMetadata = 'getUrlMetadata'
 }
