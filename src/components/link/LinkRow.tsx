@@ -165,10 +165,16 @@ function LinkRow(props: Props) {
     }
   }
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function onRootKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'Enter' && props.isSelected) {
       event.stopPropagation()
       props.navigateToLink(props.link)
+    }
+  }
+
+  function onInputKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Enter') {
+      onSaveEdit()
     }
   }
 
@@ -177,7 +183,7 @@ function LinkRow(props: Props) {
       <ContextMenu.Trigger asChild>
         <div
           tabIndex={0}
-          onKeyDown={onKeyDown}
+          onKeyDown={onRootKeyDown}
           id={props.link.uuid}
           ref={ref}
           onClick={() => !props.isEditMode && props.onClick()}
@@ -251,6 +257,7 @@ function LinkRow(props: Props) {
             {props.isEditMode && (
               <div className="flex-1">
                 <input
+                  onKeyDown={onInputKeyDown}
                   ref={urlRef}
                   onChange={(event) => setTitle(event.target.value)}
                   value={title}
@@ -261,6 +268,7 @@ function LinkRow(props: Props) {
                 />
 
                 <input
+                  onKeyDown={onInputKeyDown}
                   onChange={(event) => setUrl(event.target.value)}
                   value={url}
                   onFocus={(e) => e.target.select()}
