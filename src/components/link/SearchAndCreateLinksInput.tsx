@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useDebounce, useKey } from 'react-use'
 import * as Popover from '@radix-ui/react-popover'
-import { useQuery } from '@tanstack/react-query'
-import { ReactQueryKey } from '@/api/ReactQueryKey'
 import { LinksApi } from '@/api/LinksApi'
 import { LinkUtils } from '@/utils/link-utils'
 import classNames from 'classnames'
@@ -22,6 +20,7 @@ function SearchAndCreateLinksInput(props: Props) {
   const [title, setTitle] = useState<string>('')
   const [url, setUrl] = useState<string>('')
   const [debouncedUrl, setDebouncedUrl] = useState<string>('')
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
 
   useDebounce(
     () => {
@@ -31,26 +30,28 @@ function SearchAndCreateLinksInput(props: Props) {
     [url]
   )
 
-  const isQueryEnabled = isOpen && !!debouncedUrl.length && LinkUtils.isValidUrl(debouncedUrl)
-
-  const metadataQuery = useQuery({
-    queryKey: [ReactQueryKey.getUrlMetadata, debouncedUrl],
-    queryFn: () => LinksApi.getUrlMetadata(debouncedUrl),
-    enabled: isQueryEnabled,
-    retry: false,
-  })
-
-  const isMetadataLoading = isQueryEnabled && metadataQuery.isPending
-
+  // Fetch metadata and update title based on debouncedUrl
   useEffect(() => {
-    if (isQueryEnabled && metadataQuery.isSuccess && metadataQuery.data) {
-      const title = metadataQuery.data.ogTitle || metadataQuery.data.ogSiteName || ''
+    async function getMetadataAndUpdateTitle() {
+      try {
+        setIsLoadingMetadata(true)
+        const metadata = await LinksApi.getUrlMetadata(debouncedUrl)
+        const title = metadata.ogTitle || metadata.ogSiteName || ''
 
-      if (title) {
-        setTitle(title)
+        if (title) {
+          setTitle(title)
+        }
+
+        setIsLoadingMetadata(false)
+      } catch {
+        setIsLoadingMetadata(false)
       }
     }
-  }, [metadataQuery, isQueryEnabled])
+
+    if (isOpen && !!debouncedUrl.length && LinkUtils.isValidUrl(debouncedUrl)) {
+      getMetadataAndUpdateTitle()
+    }
+  }, [debouncedUrl, isOpen])
 
   useEffect(() => {
     if (!isOpen) {
@@ -208,7 +209,7 @@ function SearchAndCreateLinksInput(props: Props) {
 
             <div className="relative">
               <input
-                disabled={isMetadataLoading}
+                disabled={isLoadingMetadata}
                 onKeyDown={onKeyDown}
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
@@ -219,11 +220,11 @@ function SearchAndCreateLinksInput(props: Props) {
                   focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-gray-800
                   dark:border-slate-700 dark:text-white dark:focus:ring-slate-700 dark:disabled:pointer-events-none
                   dark:disabled:opacity-50`,
-                  { 'pr-9': isMetadataLoading }
+                  { 'pr-9': isLoadingMetadata }
                 )}
               />
 
-              {isMetadataLoading && (
+              {isLoadingMetadata && (
                 <svg
                   className="animate-spin text-gray-500 dark:text-slate-300 absolute right-3 inset-y-0 my-auto"
                   width="16"
@@ -249,7 +250,7 @@ function SearchAndCreateLinksInput(props: Props) {
 
             <button
               onClick={createLink}
-              disabled={isMetadataLoading || !title.length || !url.length}
+              disabled={isLoadingMetadata || !title.length || !url.length}
               className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600
                 dark:hover:border-slate-600 ml-auto"
             >
