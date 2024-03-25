@@ -85,7 +85,7 @@ function LinkContextMenuContent(props: Props) {
         <li>
           <button
             onClick={() => props.onClick(ContextMenuAction.copyLink)}
-            className="w-full cursor-pointer flex items-center gap-x-2 px-2 py-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg group dark:hover:bg-slate-700"
+            className="w-full cursor-pointer flex items-center gap-x-2 px-2 py-2 hover:bg-gray-50 active:bg-gray-100 rounded-lg group dark:hover:bg-slate-700 outline-none"
             role="menuitem"
           >
             <svg

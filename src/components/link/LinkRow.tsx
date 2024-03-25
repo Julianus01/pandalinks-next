@@ -307,7 +307,7 @@ function LinkRow(props: Props) {
             <Popover.Root modal open={isOptionsOpen} onOpenChange={setIsOptionsOpen}>
               <Popover.Trigger
                 onClick={(event) => event.stopPropagation()}
-                className="h-auto px-5 flex items-center group/options outline-none"
+                className="h-auto px-4 flex items-center group/options outline-none"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

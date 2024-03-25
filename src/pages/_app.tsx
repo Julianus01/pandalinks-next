@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { ThemeProvider, useTheme } from 'next-themes'
 import { SupabaseAuthContextProvider } from '@/context/SupabaseAuthContext'
+import { Analytics } from '@vercel/analytics/react'
 
 const inter = Inter({ display: 'swap', subsets: ['latin'] })
 
@@ -21,6 +22,7 @@ function Providers({ Component, pageProps }: AppProps) {
         <QueryClientProvider client={queryClient}>
           <SupabaseAuthContextProvider>
             <Component {...pageProps} />
+            <Analytics />
           </SupabaseAuthContextProvider>
         </QueryClientProvider>
       </ThemeProvider>
