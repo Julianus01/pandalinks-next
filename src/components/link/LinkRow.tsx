@@ -11,6 +11,7 @@ import LinkContextMenuContent, { ContextMenuAction } from './LinkContextMenuCont
 import LinkTags from './LinkTags'
 import { usePropState } from '@/hooks/usePropState'
 import fp from 'lodash/fp'
+import * as Popover from '@radix-ui/react-popover'
 
 interface Props {
   link: Link
@@ -35,6 +36,7 @@ function LinkRow(props: Props) {
   const [url, setUrl] = usePropState<string>(props.link.url)
   const [showCopied, showCopiedMessage] = useTemporaryTrue(1300)
   const [isContextOpen, setIsContextOpen] = useState<boolean>(false)
+  const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false)
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
   // Focus root div ref containing tabIndex prop so that onKeydown listener works
@@ -188,16 +190,17 @@ function LinkRow(props: Props) {
           ref={ref}
           onClick={() => !props.isEditMode && props.onClick()}
           className={classNames({
-            [`px-5 cursor-pointer select-none flex border border-solid group border-slate-200
-            dark:border-slate-900 outline-none`]: true,
+            [`pl-5 cursor-pointer select-none flex border border-solid group border-slate-200
+            dark:border-slate-900 outline-none flex-1`]: true,
             'bg-white hover:bg-gray-50 dark:bg-slate-800 dark:hover:bg-slate-700':
-              !isContextOpen && !props.isEditMode && !props.isSelected,
-            'bg-gray-50 dark:bg-slate-700': isContextOpen || props.isEditMode || props.isSelected,
+              !isContextOpen && !isOptionsOpen && !props.isEditMode && !props.isSelected,
+            'bg-gray-50 dark:bg-slate-700':
+              isContextOpen || isOptionsOpen || props.isEditMode || props.isSelected,
             'rounded-t-lg': props.isFirst,
             'rounded-b-lg': props.isLast,
             'pointer-events-none opacity-80': isUpdating,
             'opacity-30 pointer-events-none blur-[1px]': props.blurMode,
-            'rounded-md cursor-default bg-white': props.isEditMode,
+            'rounded-lg cursor-default bg-white pr-5': props.isEditMode,
           })}
         >
           <div className="relative pt-4 flex flex-col items-center mr-2">
@@ -299,6 +302,47 @@ function LinkRow(props: Props) {
 
             {!props.isEditMode && <LinkTags tags={props.link.tags} />}
           </div>
+
+          {!props.isEditMode && (
+            <Popover.Root modal open={isOptionsOpen} onOpenChange={setIsOptionsOpen}>
+              <Popover.Trigger
+                onClick={(event) => event.stopPropagation()}
+                className="h-auto px-5 flex items-center group/options outline-none"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={classNames({
+                    'group-hover/options:scale-110 duration-150': true,
+                    [`text-gray-400 group-hover/options:text-gray-800 dark:text-slate-400
+                    dark:group-hover/options:text-slate-200`]: !isOptionsOpen,
+                    'text-gray-800 dark:text-slate-200 scale-110': isOptionsOpen,
+                  })}
+                >
+                  <circle cx="12" cy="12" r="1"></circle>
+                  <circle cx="19" cy="12" r="1"></circle>
+                  <circle cx="5" cy="12" r="1"></circle>
+                </svg>
+              </Popover.Trigger>
+
+              <Popover.Portal>
+                <Popover.Content
+                  onClick={(event) => event.stopPropagation()}
+                  align="start"
+                  sideOffset={-16}
+                >
+                  <LinkContextMenuContent link={props.link} onClick={onContextMenuAction} />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+          )}
         </div>
       </ContextMenu.Trigger>
 
