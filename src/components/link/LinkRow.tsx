@@ -336,6 +336,7 @@ function LinkRow(props: Props) {
                 <Popover.Content
                   onClick={(event) => event.stopPropagation()}
                   align="start"
+                  alignOffset={8}
                   sideOffset={-16}
                 >
                   <LinkContextMenuContent link={props.link} onClick={onContextMenuAction} />
