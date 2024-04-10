@@ -32,6 +32,7 @@ export const SupabaseAuthContextProvider = ({ children }: AuthContextProps) => {
         setSession(null)
         setIsLoadingSession(false)
         nookies.set(undefined, 'sb_access_token', '', { path: '/' })
+        nookies.set(undefined, 'sb_refresh_token', '', { path: '/' })
 
         return
       }
@@ -45,6 +46,7 @@ export const SupabaseAuthContextProvider = ({ children }: AuthContextProps) => {
       setSession(session)
       setIsLoadingSession(false)
       nookies.set(undefined, 'sb_access_token', session.access_token as string, { path: '/' })
+      nookies.set(undefined, 'sb_refresh_token', session.refresh_token as string, { path: '/' })
     })
   }, [])
 

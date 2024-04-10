@@ -19,11 +19,10 @@ export function useLinks(params: UseLinksParams) {
   const [searchQ, setSearchQ] = useState<string>('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
 
-  // TODO: Fix this by fetching ssr and passing it
   const linksQuery = useQuery({
     queryKey: [ReactQueryKey.getLinks, user?.id],
     queryFn: LinksApi.getLinks,
-    // initialData: params.initialData,
+    initialData: params.initialData,
   })
 
   const links = useMemo(() => {

@@ -8,8 +8,7 @@ import { GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
 import GlobalTagsSelector from '@/components/tags/GlobalTagsSelector'
 import { useLinks } from '@/hooks/useLinks'
-import { createSSRClient } from '@/utils/supabase-server-utils'
-import { SupabaseTable } from '@/utils/supabase-utils'
+import { SupabaseTable, supabaseClient } from '@/utils/supabase-utils'
 import { LinkUtils } from '@/utils/link-utils'
 import { Link } from '@/api/LinksApi'
 import classNames from 'classnames'
@@ -18,25 +17,20 @@ import { useClickAway, useKey } from 'react-use'
 import NoLinksButton from '@/components/link/NoLinksButton'
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const supabaseSSR = createSSRClient(ctx)
-
   try {
     const cookies = nookies.get(ctx)
     const sb_access_token = cookies.sb_access_token
+    const sb_refresh_token = cookies.sb_refresh_token
 
-    const {
-      data: { user },
-    } = await supabaseSSR.auth.getUser(sb_access_token)
+    const response = await supabaseClient.auth.getUser(sb_access_token)
+    supabaseClient.auth.setSession({ access_token: cookies.sb_access_token, refresh_token: sb_refresh_token })
 
-    // TODO: Investigate why this returns empty array and then
-    // fix in useLinks hook to have initialData
-    const { data } = await supabaseSSR
-      .from(SupabaseTable.Links)
-      .select()
-      .eq('user_id', user?.id)
-      .order('created_at', { ascending: false })
+    const { data } = await supabaseClient
+    .from(SupabaseTable.Links)
+    .select()
+    .eq('user_id', response.data.user?.id)
 
-    const links = LinkUtils.splitByPinned(data as Link[])
+    const links = LinkUtils.applyPinAndSortByCreatedAt(data as Link[])
 
     return {
       props: { links },
