@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useDebounce, useKey } from 'react-use'
+import { useKey } from 'react-use'
 import * as Popover from '@radix-ui/react-popover'
-import { LinksApi } from '@/api/LinksApi'
-import { LinkUtils } from '@/utils/link-utils'
 import classNames from 'classnames'
 
 interface Props {
@@ -19,44 +17,10 @@ function SearchAndCreateLinksInput(props: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>('')
   const [url, setUrl] = useState<string>('')
-  const [debouncedUrl, setDebouncedUrl] = useState<string>('')
-  const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
-
-  useDebounce(
-    () => {
-      setDebouncedUrl(url)
-    },
-    250,
-    [url]
-  )
-
-  // Fetch metadata and update title based on debouncedUrl
-  useEffect(() => {
-    async function getMetadataAndUpdateTitle() {
-      try {
-        setIsLoadingMetadata(true)
-        const metadata = await LinksApi.getUrlMetadata(debouncedUrl)
-        const title = metadata.ogTitle || metadata.ogSiteName || ''
-
-        if (title) {
-          setTitle(title)
-        }
-
-        setIsLoadingMetadata(false)
-      } catch {
-        setIsLoadingMetadata(false)
-      }
-    }
-
-    if (isOpen && !!debouncedUrl.length && LinkUtils.isValidUrl(debouncedUrl)) {
-      getMetadataAndUpdateTitle()
-    }
-  }, [debouncedUrl, isOpen])
 
   useEffect(() => {
     if (!isOpen) {
       setUrl('')
-      setDebouncedUrl('')
       setTitle('')
     }
   }, [isOpen])
@@ -209,7 +173,6 @@ function SearchAndCreateLinksInput(props: Props) {
 
             <div className="relative">
               <input
-                disabled={isLoadingMetadata}
                 onKeyDown={onKeyDown}
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
@@ -219,38 +182,14 @@ function SearchAndCreateLinksInput(props: Props) {
                   `w-full px-2 py-2 text-gray-700 bg-gray-50 outline-none border focus:ring-offset-0 focus:ring-1
                   focus:ring-slate-200 focus:border-slate-300 shadow-sm rounded-lg dark:bg-gray-800
                   dark:border-slate-700 dark:text-white dark:focus:ring-slate-700 dark:disabled:pointer-events-none
-                  dark:disabled:opacity-50`,
-                  { 'pr-9': isLoadingMetadata }
+                  dark:disabled:opacity-50`
                 )}
               />
-
-              {isLoadingMetadata && (
-                <svg
-                  className="animate-spin text-gray-500 dark:text-slate-300 absolute right-3 inset-y-0 my-auto"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="12" y1="2" x2="12" y2="6"></line>
-                  <line x1="12" y1="18" x2="12" y2="22"></line>
-                  <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                  <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                  <line x1="2" y1="12" x2="6" y2="12"></line>
-                  <line x1="18" y1="12" x2="22" y2="12"></line>
-                  <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                  <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-                </svg>
-              )}
             </div>
 
             <button
               onClick={createLink}
-              disabled={isLoadingMetadata || !title.length || !url.length}
+              disabled={!title.length || !url.length}
               className="btn-default dark:bg-slate-700 dark:border-slate-700 dark:hover:bg-slate-600
                 dark:hover:border-slate-600 ml-auto"
             >
