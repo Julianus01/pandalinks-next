@@ -253,8 +253,8 @@ function LinkRow(props: Props) {
 
           <div
             className={classNames({
-              'flex flex-1 py-3 gap-2': true,
-              'flex-wrap': props.link.tags.length > 1,
+              'flex flex-1 py-3 gap-2 flex-wrap': true,
+              'sm:flex-nowrap': props.link.tags.length <= 1,
             })}
           >
             {props.isEditMode && (

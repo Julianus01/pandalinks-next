@@ -17,10 +17,20 @@ function Navbar() {
   return (
     <div className="flex justify-center">
       <div className="w-full max-w-3xl h-20 pt-6 flex items-center px-5">
-        <Image className="dark:invert" priority src="/logo-side-text-md.svg" width={162.8} height={30} alt="logo" />
+        <Image
+          className="dark:invert"
+          priority
+          src="/logo-side-text-md.svg"
+          width={162.8}
+          height={30}
+          alt="logo"
+        />
 
         <div className="flex items-center space-x-2 ml-auto">
-          <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="btn-default px-2.5">
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="btn-default px-2.5"
+          >
             {theme === 'light' ? (
               <svg
                 width="20"
@@ -58,7 +68,9 @@ function Navbar() {
             )}
           </button>
 
-          <ImportBookmarksButton />
+          <div className='hidden sm:flex'>
+            <ImportBookmarksButton />
+          </div>
 
           <button onClick={logout} className="btn-default">
             logout
@@ -74,7 +86,10 @@ function Navbar() {
                 alt="avatar"
               />
 
-              <span className="absolute bottom-0 right-0 inline-block w-3 h-3 bg-green-600 border-2 border-white dark:border-slate-900 rounded-full"></span>
+              <span
+                className="absolute bottom-0 right-0 inline-block w-3 h-3 bg-green-600 border-2 border-white
+                  dark:border-slate-900 rounded-full"
+              ></span>
             </div>
           )}
         </div>
