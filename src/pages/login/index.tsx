@@ -63,7 +63,7 @@ function LoginPage() {
           ))}
         </div>
 
-        <h1 className="text-4xl text-gray-800 dark:text-white font-extrabold mx-auto md:text-5xl ">
+        <h1 className="text-3xl sm:text-4xl text-gray-800 dark:text-white font-extrabold mx-auto md:text-5xl ">
           Make your bookmarks life easier with{' '}
           <span className="bg-gradient-to-r from-gray-800 dark:from-slate-200 dark:via-slate-400 dark:to-slate-600 via-red-400 to-rose-400 bg-clip-text text-transparent">
             Pandalinks
@@ -74,7 +74,7 @@ function LoginPage() {
           Create, update and manage your links in style with a minimalist user interface and smooth experience
         </p>
 
-        <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0">
+        <div className="items-center justify-center gap-x-3 space-y-3 flex sm:space-y-0">
           <button
             onClick={login}
             className="flex items-center justify-center gap-x-2 py-2 px-4 text-white font-medium bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-lg md:inline-flex"
